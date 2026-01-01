@@ -1,0 +1,9 @@
+# on gitignore tous les dossiers nommés "vendor" (même dans les sous-dossiers => pas de chemin précisé avec "/" par ex.)
+vendor/
+node_modules/
+/src/
+
+/composer.lock
+/package-lock.json
+/package.json
+/webpack.config.js

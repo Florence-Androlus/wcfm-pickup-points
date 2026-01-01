@@ -1,0 +1,121 @@
+<?php
+namespace fandWCFMPickupPoints\Classes\Models;
+
+class BranchModel {
+
+    /**
+     * Récupère toutes les données nécessaires pour l'affichage de la page de la succursale.
+     * @param int $vendor_id L'ID de l'utilisateur/vendeur WCFM.
+     * @param array $branch_data Les données de la succursale (latitude, longitude, adresse, etc.)
+     * @return array
+     */
+    public function getSingleBranchData($vendor_id, $branch_data) {
+        global $wpdb;
+
+        // 1. Infos du Vendeur (WCFM/WP User Meta)
+        $profile_settings = get_user_meta($vendor_id, 'wcfmmp_profile_settings', true);
+        $email = get_user_meta($vendor_id, 'billing_email', true);
+        $phone = get_user_meta($vendor_id, 'billing_phone', true);
+        $store_user = function_exists('wcfmmp_get_store') ? wcfmmp_get_store($vendor_id) : null;
+        $store_info = $store_user ? $store_user->get_shop_info() : [];
+
+        // 2. Infos de la Succursale
+        $branch_id = $branch_data['branch_id'] ?? 0;
+        $city = $branch_data['city'] ?? '';
+        $postal = $branch_data['postal_code'] ?? '';
+        $lat = $branch_data['lat'] ?? 0; // Utiliser latitude et longitude comme stocké
+        $lng = $branch_data['lng'] ?? 0;
+
+        // 3. Formatage pour la Vue
+        $display_address = esc_html( $branch_data['address'] ?? 'Adresse non spécifiée' ) . ' ' . strtoupper($postal) . ' ' . $city . ', France';
+        $avatar_id = isset($profile_settings['gravatar']) ? $profile_settings['gravatar'] : 0;
+        $avatar_url = wp_get_attachment_url($avatar_id);
+        $store_url = function_exists('get_wcfm_store_url') ? get_wcfm_store_url($vendor_id) : '#';
+
+        // AJOUT : Récupération de la bannière
+        $banner_id = isset($profile_settings['banner']) ? $profile_settings['banner'] : 0;
+        $banner_url = $banner_id ? wp_get_attachment_url($banner_id) : plugins_url('wc-multivendor-marketplace/assets/images/default_banner.jpg');
+        
+        // 4. Catégories de Produits Spécifiques au Vendeur
+        $product_ids_by_vendor = $this->getVendorProductIds($vendor_id);
+        $category_terms_to_show = $this->getVendorTopLevelCategories($product_ids_by_vendor);
+
+        // Récupération de tous les horaires pour ces branches
+        $hours = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT branch_id, day_of_week, open_time, close_time, is_closed
+                    FROM {$wpdb->prefix}fand_wcfm_pickup_hours
+                    WHERE branch_id ",
+                $branch_id
+            ),
+            ARRAY_A
+        );
+
+        // Organise les horaires par branch_id et day_of_week
+        $hours_by_branch = [];
+        foreach ($hours as $h) {
+            $day = $h['day_of_week'];
+            $hours_by_branch[$h['branch_id']][$day][] = [
+                'open'  => $h['open_time'],
+                'close' => $h['close_time'],
+                'is_closed' => $h['is_closed']
+            ];
+        }
+
+        // 1. Définir le tableau des horaires pour la branche unique (si trouvé)
+        $single_branch_hours = $hours_by_branch[$branch_id] ?? [];
+        
+        // 2. S'assurer que c'est bien un tableau (sécurité)
+        if (!is_array($single_branch_hours)) {
+            $single_branch_hours = [];
+        }
+
+        return [
+            'vendor_id' => $vendor_id,
+            'branch_id' => $branch_id,
+            'branch_name' => esc_html( $branch_data['branch_name'] ?? 'Point de Retrait' ),
+            'display_address' => $display_address,
+            'lat' => floatval($lat),
+            'lng' => floatval($lng),
+            'vendor_email' => $email,
+            'vendor_phone' => $phone,
+            'avatar_url' => $avatar_url,
+            'banner_url'       => $banner_url,
+            'store_url' => $store_url,
+            'opening_hours' => $single_branch_hours,
+            'store_info' => $store_info, // Peut être utilisé pour le nom du magasin
+            'category_terms' => $category_terms_to_show,
+        ];
+    }
+
+    /**
+     * Récupère les IDs de tous les produits publiés par un vendeur.
+     */
+    private function getVendorProductIds($vendor_id) {
+        $query = new \WP_Query( array(
+            'fields'         => 'ids',
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'author'         => $vendor_id,
+            'posts_per_page' => -1,
+        ) );
+        return $query->posts;
+    }
+
+    /**
+     * Récupère les catégories de produits de niveau supérieur utilisées par un ensemble de produits.
+     */
+    private function getVendorTopLevelCategories($product_ids) {
+        if ( empty( $product_ids ) ) {
+            return [];
+        }
+
+        return wp_get_object_terms( $product_ids, 'product_cat', array(
+            'fields'     => 'all',
+            'orderby'    => 'name',
+            'order'      => 'ASC',
+            'hide_empty' => true,
+            'parent'     => 0, // Top-Level seulement
+        ) );
+    }
+}
