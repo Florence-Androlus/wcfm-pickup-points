@@ -1,7 +1,8 @@
-<?php
-if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
-}
+<?
+$default_category = get_option('liste_categories_boutique', 'Alimentation');
+$default_category = trim(explode(',', $default_category)[0]);
+$default_country  = 'FR';
+$default_state    = '';
 ?>
 
 <div id="pickup-map" style="width:100%;height:550px;"></div>
@@ -22,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             if (!empty($categories_array)) {
                 foreach ($categories_array as $category_name) {
                     $selected_attr = selected($_GET['category'] ?? '', $category_name, false);
-                    echo '<option value="' . esc_attr($category_name) . '" ' . esc_attr($selected_attr) . '>' . esc_html($category_name) . '</option>';
+                    echo '<option value="' . esc_attr($category_name) . '" ' . $selected_attr . '>' . esc_html($category_name) . '</option>';
                 }
             }
         ?>
@@ -55,22 +56,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 </form>
 
-<script type="text/javascript">
-    const fandPickupPluginUrl = '<?php echo esc_js(FAND_PICKUP_PLUGIN_URL); ?>';
-    const mapMarkers = <?php echo wp_json_encode($data['markers']); ?>;
-    const FAND_PICKUP_MAP = {
-        defaultCategory: '<?php echo esc_js($data['categories'][0] ?? ''); ?>',
-        defaultCountry: '<?php echo esc_js($data['default_country'] ?? 'FR'); ?>',
-        defaultState: '<?php echo esc_js($data['default_state'] ?? ''); ?>',
-        pluginUrl: '<?php echo esc_js(FAND_PICKUP_PLUGIN_URL); ?>',
-        i18n: {
-            chooseCategory: '<?php echo esc_js(__('Choose category', 'wcfm-pickup-points')); ?>',
-            chooseLocation: '<?php echo esc_js(__('Choose Location', 'wcfm-pickup-points')); ?>',
-            chooseState: '<?php echo esc_js(__('Choose state', 'wcfm-pickup-points')); ?>'
-        }
-    };
+<script>
+    // Variables PHP rendues pour le JavaScript
+    const mapMarkers     = <?php echo json_encode($markers); ?>;
+    const defaultCategory= '<?php echo esc_js($default_category); ?>';
+    const defaultCountry = '<?php echo esc_js($default_country); ?>';
+    const defaultState   = '<?php echo esc_js($default_state); ?>';
+    const fandPickupPluginUrl = '<?php echo esc_url(FAND_PICKUP_PLUGIN_URL); ?>';
 </script>
-
-<?php
-// Ensuite enqueue ton JS via WordPress
-wp_enqueue_script('fand-pickup-map');

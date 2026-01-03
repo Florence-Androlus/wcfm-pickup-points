@@ -1,14 +1,9 @@
 <?php
 namespace fandWCFMPickupPoints\Classes\Admin;
 
-use fandWCFMPickupPoints\Classes\Models\PickupModel;
+use fandWCFMPickupPoints\Classes\Controllers\StoreCategoryController;
 
 class Scripts {
-    
-    private $default_category = '';
-    private $default_country  = 'FR';
-    private $default_state    = '';
-
     public function __construct() {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('wp_enqueue_scripts', function() {
@@ -23,7 +18,6 @@ class Scripts {
 	 */
 	public function enqueue_scripts() {
         global $WCFM, $WCFMmp;
-
         // --- Conditions de chargement ---
         /*$is_frontend_map_page = is_page( 'emplacements-pickup' ) || is_page_template( 'template-store-list.php' );
         
@@ -63,7 +57,7 @@ class Scripts {
                 'loadPickupNonce' => wp_create_nonce('load_pickup_hours_nonce'),
                 'savePickupNonce' => wp_create_nonce('save_pickup_hours_nonce'),
             ]);
-
+            
             wp_enqueue_script('view-script-branch-list', FAND_PICKUP_PLUGIN_URL . 'assets/js/view-script-branch-list.js', ['jquery'], '1.0', true);
             wp_localize_script('view-script-branch-list', 'ajaxurl', admin_url('admin-ajax.php'));
             //Enqueue le Select2 JS si ce n'est pas fait
@@ -84,6 +78,15 @@ class Scripts {
                 'ajax_url'   => admin_url('admin-ajax.php')
             ));
 
-            wp_enqueue_script('fand-pickup-map', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery', 'leaflet'], '1.0', true);
+            wp_enqueue_script('fand-pickup-map', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
+            $data = [
+                'markers'        => $markers,
+                'categories'     => $categories_array,
+                'default_country'=> $this->default_country,
+                'default_state'  => $this->default_state,
+            ];
+            wp_localize_script('fand-pickup-map', 'FAND_PICKUP_DATA', $data);
+
+
     }
 }
