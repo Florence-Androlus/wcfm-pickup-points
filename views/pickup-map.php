@@ -55,21 +55,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 </form>
 
-<script>
-    
-    // Variables PHP rendues pour le JavaScript
-    const mapMarkers = <?php echo json_encode($markers); ?>;
-    const defaultCategory = '<?php echo esc_js($default_category); ?>';
-    const defaultCountry = '<?php echo esc_js($default_country); ?>';
-    const defaultState = '<?php echo esc_js($default_state); ?>';
-    const fandPickupPluginUrl = '<?php echo esc_url(FAND_PICKUP_PLUGIN_URL); ?>';
-    const i18n = {
-        chooseCategory: '<?php echo esc_js(__('Choose category', 'wcfm-pickup-points')); ?>',
-        chooseLocation: '<?php echo esc_js(__('Choose Location', 'wcfm-pickup-points')); ?>',
-        chooseState: '<?php echo esc_js(__('Choose state', 'wcfm-pickup-points')); ?>'
+<script type="text/javascript">
+    const fandPickupPluginUrl = '<?php echo esc_js(FAND_PICKUP_PLUGIN_URL); ?>';
+    const mapMarkers = <?php echo wp_json_encode($data['markers']); ?>;
+    const FAND_PICKUP_MAP = {
+        defaultCategory: '<?php echo esc_js($data['categories'][0] ?? ''); ?>',
+        defaultCountry: '<?php echo esc_js($data['default_country'] ?? 'FR'); ?>',
+        defaultState: '<?php echo esc_js($data['default_state'] ?? ''); ?>',
+        pluginUrl: '<?php echo esc_js(FAND_PICKUP_PLUGIN_URL); ?>',
+        i18n: {
+            chooseCategory: '<?php echo esc_js(__('Choose category', 'wcfm-pickup-points')); ?>',
+            chooseLocation: '<?php echo esc_js(__('Choose Location', 'wcfm-pickup-points')); ?>',
+            chooseState: '<?php echo esc_js(__('Choose state', 'wcfm-pickup-points')); ?>'
+        }
     };
-    
-    // Le reste du code JavaScript sera dans un fichier séparé
 </script>
 
-<script src="<?php echo esc_url(FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js'); ?>"></script>
+<?php
+// Ensuite enqueue ton JS via WordPress
+wp_enqueue_script('fand-pickup-map');

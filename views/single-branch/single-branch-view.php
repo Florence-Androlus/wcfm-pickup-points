@@ -241,7 +241,7 @@ $counter = 0;
     // Ajout des coordonnées pour le centrage de la carte
     const currentLat = <?php echo json_encode($lat); ?>;
     const currentLng = <?php echo json_encode($lng); ?>;
-    const fandPickupPluginUrl = '<?php echo FAND_PICKUP_PLUGIN_URL; ?>';
+    const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_PLUGIN_URL ); ?>';
     const isSingleView = true; // Flag pour le script général, si besoin
 
     // 1. Solution de sécurité pour jQuery (alias $)
@@ -282,5 +282,5 @@ $counter = 0;
     
 
 </script>
-<script src="<?php echo FAND_PICKUP_PLUGIN_URL; ?>assets/js/pickup-map-script.js"></script>
+<script src="<?php echo esc_url( FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js' ); ?>"></script>
 <?php wp_footer(); ?>

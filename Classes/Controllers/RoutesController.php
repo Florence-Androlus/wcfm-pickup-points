@@ -1,8 +1,6 @@
 <?php
 namespace fandWCFMPickupPoints\Classes\Controllers;
 
-use fandWCFMPickupPoints\Classes\Controllers\ShortcodesController;
-
 class RoutesController {
 
     public function __construct() {
@@ -17,9 +15,6 @@ class RoutesController {
         // Enregistre la fonction qui affiche le contenu
         add_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
 
-        add_action('wp_ajax_fand_filter_pickups', [$this,'fand_filter_pickups']);
-        add_action('wp_ajax_nopriv_fand_filter_pickups', [$this, 'fand_filter_pickups']);
-
         // Modifier le titre de l'onglet
         add_filter('document_title_parts', function($title_parts) {
             // On essaie de récupérer la variable propre
@@ -27,7 +22,8 @@ class RoutesController {
 
             // Sécurité : Si get_query_var est vide, on regarde directement l'URL
             if (empty($slug)) {
-                $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+                $parsed_url = wp_parse_url( $_SERVER['REQUEST_URI'] );
+                $path = isset( $parsed_url['path'] ) ? trim( $parsed_url['path'], '/' ) : '';
                 $segments = explode('/', $path);
                 // Si l'URL est /pickup/emplacement/nom-branch/, le slug est le dernier segment
                 if (count($segments) >= 3 && $segments[0] === 'pickup' && $segments[1] === 'emplacement') {
@@ -249,25 +245,6 @@ class RoutesController {
         }
         
         return false;
-    }
-
-    public function fand_filter_pickups() {
-        // Récupération sécurisée des filtres
-        $pickup_day    = isset($_GET['pickup_day']) ? sanitize_text_field($_GET['pickup_day']) : null;
-        $pickup_status = isset($_GET['pickup_status']) ? sanitize_text_field($_GET['pickup_status']) : '';
-        $pickup_orderby = isset($_GET['pickup_orderby']) ? sanitize_text_field($_GET['pickup_orderby']) : 'newness_asc';
-
-        // Récupérer les données depuis ton controller
-        $data_vendor = ShortcodesController::getPickupData($pickup_day, $pickup_status, $pickup_orderby);
-        $markers = $data_vendor['markers'];
-        $vendors_data = $data_vendor['vendors_data'];
-
-        ob_start();
-        include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-list.php';
-        $html = ob_get_clean();
-
-        echo wp_kses_post( $html );
-        wp_die();
     }
 
     /**

@@ -142,7 +142,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                     // --- LOGIQUE HORAIRES & OUVERTURE ---
                     $now = current_time('H:i:s'); // Heure locale WordPress
-                    $php_day_index = date('w'); 
+                    $php_day_index = (int) current_time( 'w' );
                     $current_real_day = ($php_day_index == 0) ? 6 : $php_day_index - 1;
 
                     // A. Logique pour le FILTRE (Ce qui détermine si la boutique apparaît dans la liste)
@@ -166,8 +166,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                     foreach ($real_time_hours as $h) {
                         if (!isset($h['is_closed']) || $h['is_closed'] != '1') {
                             // strtotime transforme "08:00" en timestamp pour une comparaison fiable
-                            $start = date('H:i:s', strtotime($h['open_time']));
-                            $end   = date('H:i:s', strtotime($h['close_time']));
+                            $start = $h['open_time'];
+                            $end   = $h['close_time'];
                             
                             if ($now >= $start && $now <= $end) {
                                 $is_currently_open = true;

@@ -32,24 +32,24 @@ if ( ! defined( 'ABSPATH' ) ) {
                 // 1. Option "Toutes les catégories" (valeur = URL de base sans filtre)
                 $all_cat_selected = empty( $current_cat_slug ) ? 'selected="selected"' : '';
                 ?>
-                <option value="<?php echo $base_url_for_filter; ?>" <?php echo $all_cat_selected; ?>>
+                <option value="<?php echo esc_url( $base_url_for_filter ); ?>" <?php echo esc_attr( $all_cat_selected ); ?>>
                     Toutes les catégories
                 </option>
 
                 <?php
-                // 2. Boucle pour afficher chaque catégorie
+                // Boucle pour chaque catégorie
                 if ( ! is_wp_error( $category_terms ) && ! empty( $category_terms ) ) :
                     foreach ( $category_terms as $category ) :
                         $cat_slug = $category->slug;
                         $cat_name = $category->name;
-                        
-                        // Construit l'URL de filtrage pour cette catégorie
+
+                        // URL de filtrage
                         $category_filter_url = add_query_arg( 'product_cat', $cat_slug, $base_url_for_filter );
-                        
-                        // Détermine si cette option doit être sélectionnée
+
+                        // Déterminer si option sélectionnée
                         $selected_attr = ( $current_cat_slug === $cat_slug ) ? 'selected="selected"' : '';
                         ?>
-                        <option value="<?php echo esc_url( $category_filter_url ); ?>" <?php echo $selected_attr; ?>>
+                        <option value="<?php echo esc_url( $category_filter_url ); ?>" <?php echo esc_attr( $selected_attr ); ?>>
                             <?php echo esc_html( $cat_name ); ?>
                         </option>
                     <?php

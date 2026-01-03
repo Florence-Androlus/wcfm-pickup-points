@@ -19,7 +19,7 @@ class ShortcodesController {
         //$data  = $model->getGlobalPickupData($filters);
         $data  = $model->getPickupData($filters);
         // 3. Logique d'affichage (calcul du jour actuel pour les filtres de vue)
-        $php_day = date('w'); 
+        $php_day = current_time('w'); 
         $data['current_day_idx'] = ($php_day == 0) ? 6 : $php_day - 1;
         $data['selected_day']    = $filters['day'];
         $data['selected_status'] = $filters['status'];

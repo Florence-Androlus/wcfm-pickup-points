@@ -1,0 +1,9 @@
+{"domain":"messages"
+,"locale_data":{
+    "messages":{
+        "":{
+            "domain":"messages",
+            "plural_forms":"nplurals=2; plural=n > 1;","lang":"fr_FR"},
+            "wcfm-pickup-points":[null,"wcfm-pickup-points"],
+            "Échec de la vérification de sécurité.":[null,"Échec de la vérification de sécurité."]
+}}}

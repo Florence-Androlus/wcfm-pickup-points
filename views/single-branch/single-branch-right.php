@@ -7,16 +7,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="tabsWithStyle" class="tab_area">
     <div id="tab_links_area" class="tab_links_area" tabindex="-1" spellcheck="false">
         <ul class="tab_links">
-            <li class="<?php echo ( $active_tab == 'products' ) ? 'active' : ''; ?>">
+            <li class="<?php echo esc_attr( ( $active_tab == 'products' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $base_url_for_tabs ); ?>#tab_links_area">Produits</a>
             </li>
-            <li class="<?php echo ( $active_tab == 'about' ) ? 'active' : ''; ?>">
+            <li class="<?php echo esc_attr( ( $active_tab == 'about' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $base_url_for_tabs . 'about/' ); ?>#tab_links_area">à propos</a>
             </li>
-            <li class="<?php echo ( $active_tab == 'policies' ) ? 'active' : ''; ?>">
+            <li class="<?php echo esc_attr( ( $active_tab == 'policies' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $base_url_for_tabs . 'policies/' ); ?>#tab_links_area">Politiques</a>
             </li>
-            <li class="<?php echo ( $active_tab == 'reviews' ) ? 'active' : ''; ?>">
+            <li class="<?php echo esc_attr( ( $active_tab == 'reviews' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $base_url_for_tabs . 'reviews/' ); ?>#tab_links_area">Avis (<span class="wcfm_reviews_count">0</span>)</a>
             </li>
         </ul>
@@ -100,7 +100,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <?php endif; ?>
                     
                 </div></div><?php do_action( 'wcfmmp_store_after_products', $vendor_id ); ?>
-        </div><?php elseif ( $active_tab == 'about' ) : ?>
+            <?php elseif ( $active_tab === 'about' ): ?>
         <div class="_area" id="wcfmmp_store_about">
             <div class="wcfmmp-store-description">
                 <div class="wcfm-store-about">
@@ -123,8 +123,9 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
         
         <?php elseif ( $active_tab == 'reviews' ) : ?>
-        <div class="_area" id="wcfmmp_store_<?php echo $active_tab; ?>">
-            <h2>Contenu <?php echo esc_html( ucfirst( $active_tab ) ); ?></h2>
+            <div class="_area" id="wcfmmp_store_<?php echo esc_attr( $active_tab ); ?>">
+                <h2>Contenu <?php echo esc_html( ucfirst( $active_tab ) ); ?></h2>
+            </div>
             <?php $WCFMmp->template->get_template( 'store/wcfmmp-view-store-reviews.php', array( 'store_user' => $store_user, 'store_info' => $store_info ) );?>
         </div>
     <?php endif; ?>

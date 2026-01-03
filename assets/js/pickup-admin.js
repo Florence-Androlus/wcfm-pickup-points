@@ -1,58 +1,89 @@
+console.log('pickup-admin.js chargé', typeof PickupAdminData, PickupAdminData);
+
 (function($){
     $(document).ready(function() {
 
     // AJAX formulaire
     $(document).on('click', '.wcfm_store_branch_edit', function(e){
-        e.preventDefault();
+            e.preventDefault();
 
-        var $btn = $(this);
-        var branchData = $btn.data('branch');
+            var $btn = $(this);
+            var branchData = $btn.data('branch');
 
-        if(!branchData || !branchData.ID) return;
-        var branchId = branchData.ID;
+            if(!branchData || !branchData.ID) return;
+            var branchId = branchData.ID;
 
-        if($('#custom_branch_hours').length === 0){
-            $.ajax({
-                url: ajaxurl,
-                method: 'POST',
-                data: {
-                    action: 'load_pickup_hours_template',
-                    branch_id: branchId
-                },
-                success: function(response){
-                    if(response.success && response.data.html){
-                        $('#vendor_edit_branch').after(response.data.html);
+            if($('#custom_branch_hours').length === 0){
+                $.ajax({
+                    url: PickupAdminData.ajax_url,
+                    method: 'POST',
+                    data: {
+                        action: 'load_pickup_hours_template',
+                        branch_id: branchId,
+                        _wpnonce: PickupAdminData.loadPickupNonce
+                    },
+                    success: function(response){
+                        if(response.success && response.data.html){
+                            $('#vendor_edit_branch').after(response.data.html);
 
-                        $('#wcfm_vendor_manage_pickup_hours_setting_form').on('submit', function(e){
-                            e.preventDefault();
-                            var form = $(this);
-                            $.ajax({
-                                url: ajaxurl,
-                                type: 'POST',
-                                data: form.serialize(),
-                                dataType: 'json',
-                                success: function(resp){
-                                    if(resp.success){
-                                        $('#pickup_hours_message').html('<div class="success">'+resp.data.message+'</div>');
-                                    } else {
-                                        $('#pickup_hours_message').html('<div class="error">'+resp.data.message+'</div>');
+                            $('#wcfm_vendor_manage_pickup_hours_setting_form').on('submit', function(e){
+                                e.preventDefault();
+                                var $form = $(this);
+
+                                var data = {
+                                    action: 'save_pickup_hours',
+                                    _wpnonce: PickupAdminData.savePickupNonce,
+                                    branch_id: $form.find('[name="branch_id"]').val(),
+                                    wcfm_pickup_hours: JSON.stringify({ day_times: getPickupHoursData() })
+                                };
+
+                                $.ajax({
+                                    url: PickupAdminData.ajax_url,
+                                    type: 'POST',
+                                    data: data,
+                                    dataType: 'json',
+                                    success: function(resp){
+                                        if(resp.success){
+                                            $('#pickup_hours_message').html('<div class="success">'+resp.data.message+'</div>');
+                                        } else {
+                                            $('#pickup_hours_message').html('<div class="error">'+resp.data.message+'</div>');
+                                        }
+                                    },
+                                    error: function(xhr){
+                                        $('#pickup_hours_message').html('<div class="error">Erreur AJAX: '+xhr.responseText+'</div>');
                                     }
-                                },
-                                error: function(){
-                                    $('#pickup_hours_message').html('<div class="error">Erreur lors de l\'enregistrement</div>');
-                                }
+                                });
                             });
-                        });
+                        }
                     }
-                }
-            });
+                });
         }
     });
+
+    function getPickupHoursData() {
+        var day_times = {};
+
+        $('.multi_input_holder').each(function() {
+            var day_index = $(this).data('day'); // data-day="0..6"
+            day_times[day_index] = [];
+
+            $(this).find('.multi_input_block').each(function(i) {
+                var start = $(this).find('input[data-name="start"]').val();
+                var end   = $(this).find('input[data-name="end"]').val();
+                var id    = $(this).find('input[data-name="id"]').val() || 0;
+
+                if (start || end) {
+                    day_times[day_index].push({ start: start, end: end, id: id });
+                }
+            });
+        });
+
+        return day_times;
+    }
 
     // Quand on clique sur "← Back to branch list" 
     $(document).on('click', '.branch-header-wrap .back', function(e) { 
         e.preventDefault(); 
-        console.log('Retour à la liste des branches – suppression du bloc d’horaires'); 
         $('#custom_branch_hours').remove(); 
     }); 
 

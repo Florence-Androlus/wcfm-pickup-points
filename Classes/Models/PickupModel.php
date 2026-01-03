@@ -6,55 +6,46 @@ class PickupModel {
     private $table_hours;
     private $table_holidays;
 
-
     public function __construct() {
         global $wpdb;
         $this->table_hours = $wpdb->prefix . 'fand_wcfm_pickup_hours';
         $this->table_holidays = $wpdb->prefix . 'fand_wcfm_pickup_holidays';
-        $this->table_locations = $wpdb->prefix . 'wcfm_store_locations';
     }
 
+    /**
+     * Sauvegarde les horaires d'une branche
+     *
+     * @param int   $branch_id
+     * @param array $day_times Structure : [0 => [[start,end,id], ...], 1 => [...], ...]
+     */
     public function saveHours($branch_id, $day_times) {
         global $wpdb;
 
-        // 1. ÉTAPE CRITIQUE : SUPPRIMER TOUS LES ANCIENS HORAIRES POUR CETTE BRANCHE
-        // Ceci garantit qu'il n'y a ni doublons ni créneaux obsolètes.
-        $wpdb->delete(
-            $this->table_hours,
-            ['branch_id' => $branch_id],
-            ['%d']
-        );
+        if (!$branch_id || !is_array($day_times)) return;
 
-        // 2. INSERER LES NOUVEAUX HORAIRES REÇUS
-        if (!empty($day_times) && is_array($day_times)) {
-            foreach ($day_times as $day_index => $slots) {
-                // $day_index va de 0 à 6 (Lundi à Dimanche)
-                if (!empty($slots) && is_array($slots)) {
-                    foreach ($slots as $slot) {
-                        
-                        $open  = isset($slot['start']) ? sanitize_text_field($slot['start']) : '';
-                        $close = isset($slot['end']) ? sanitize_text_field($slot['end']) : '';
+        // 1️⃣ Supprimer uniquement les jours existants pour cette branche
+        foreach ($day_times as $day_index => $slots) {
+            $wpdb->delete(
+                $this->table_hours,
+                [
+                    'branch_id' => $branch_id,
+                    'day_of_week' => intval($day_index)
+                ],
+                ['%d', '%d']
+            );
+        }
 
-                        // Champs vides -> ignore (suppose que l'interface gère la fermeture en n'envoyant pas de créneau)
-                        if (empty($open) && empty($close)) continue;
-                        
-                        // Ajouter les secondes
-                        if (strlen($open) === 5) $open .= ':00';
-                        if (strlen($close) === 5) $close .= ':00';
-
-                        $wpdb->insert(
-                            $this->table_hours,
-                            [
-                                'branch_id'   => $branch_id,
-                                'day_of_week' => intval($day_index),
-                                'open_time'   => $open,
-                                'close_time'  => $close,
-                                'is_closed'   => 0 // Assumons 0 si un créneau est entré
-                            ],
-                            ['%d', '%d', '%s', '%s', '%d']
-                        );
-                    }
-                }
+        // 2️⃣ Insérer les créneaux pour chaque jour
+        foreach ($day_times as $day_index => $slots) {
+            if (!empty($slots) && is_array($slots)) {
+                PickupHours::save([
+                    'branch_id' => $branch_id,
+                    'wcfm_pickup_hours' => [
+                        'day_times' => [
+                            $day_index => $slots
+                        ]
+                    ]
+                ]);
             }
         }
     }
