@@ -30,6 +30,7 @@
     cursor: pointer;
     color: #999;
     font-size: 18px;
+    width: 23%;
 }
 
 #wcfmmp-store .address i{
@@ -289,4 +290,110 @@ ul.products.list li.product .short-description {
 
 #wcfmmp-stores-wrap ul.wcfmmp-store-wrap li .bd_rating{
     padding: 10px 0px !important;
+}
+
+/* --- Mise en forme du formulaire de recherche --- */
+.wcfmmp-store-search-form {
+    display: flex !important;
+    flex-wrap: wrap; /* Permet de passer à la ligne sur mobile */
+    gap: 10px;       /* Espace entre les éléments */
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* --- Style commun pour TOUS les champs (Input + Select) --- */
+.wcfmmp-store-search-form input[type="search"],
+.wcfmmp-store-search-form select,
+.wcfmmp-store-search-form .select2-container {
+    flex: 1 1 200px; /* Grandit, rétrécit, base à 200px */
+    min-width: 0;    /* Évite de casser le flex */
+    height: 42px !important;
+    margin: 0 !important;
+}
+
+/* Force la taille interne de Select2 */
+.wcfmmp-store-search-form .select2-container--default .select2-selection--single {
+    height: 42px !important;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+}
+
+/* Style spécifique de l'input texte pour s'aligner sur les selects */
+/* 1. Réinitialisation spécifique pour l'input search */
+#pickup-search {
+    -webkit-appearance: none; /* Retire le style spécial iOS/Safari */
+    appearance: none;
+    height: 42px !important; /* Même hauteur que les autres */
+    line-height: 42px !important;
+    padding: 0 15px !important;
+    margin: 0 !important;
+    
+    /* Bordures et Couleurs */
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    background-color: #ffffff !important;
+    
+    /* Typographie */
+    font-size: 14px !important;
+    font-family: inherit;
+    color: #444;
+    
+    /* Ombre légère pour matcher ton style précédent */
+    box-shadow: 1px 1px 5px 0 #e9e9e9 !important;
+    box-sizing: border-box !important; /* Très important pour le calcul de largeur */
+}
+
+/* 2. Correction du bouton "X" de nettoyage propre aux inputs search (Chrome/Safari) */
+#pickup-search::-webkit-search-decoration,
+#pickup-search::-webkit-search-cancel-button,
+#pickup-search::-webkit-search-results-button,
+#pickup-search::-webkit-search-results-decoration {
+    display: none;
+}
+
+/* 3. État au focus (quand on clique dedans) */
+#pickup-search:focus {
+    outline: none !important;
+    border-color: #aaa !important;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1) !important;
+}
+
+/* 4. Ajustement pour aligner l'input avec les conteneurs Select2 */
+.wcfmmp-store-search-form {
+    display: flex !important;
+    align-items: stretch !important; /* Force tous les éléments à la même hauteur */
+    gap: 10px;
+}
+
+/* --- Responsive : Mobile (écrans < 767px) --- */
+@media screen and (max-width: 767px) {
+    .wcfmmp-store-search-form {
+        flex-direction: column; /* On empile tout verticalement */
+        align-items: stretch;
+    }
+
+    .wcfmmp-store-search-form input[type="search"],
+    .wcfmmp-store-search-form .select2-container,
+    .wcfmmp-store-search-form select {
+        width: 100% !important; /* Prend toute la largeur */
+        flex: none;
+    }
+
+    .wcfm-woocommerce-ordering {
+        flex-direction: column;
+    }
+    #wcfmmp_pickup_store_orderby,#wcfmmp_pickup_store_day {
+        width:100% !important;
+    }
+}
+.wcfm-woocommerce-ordering{
+    display: flex;
+}
+
+#wcfmmp_pickup_store_orderby,#wcfmmp_pickup_store_day {
+        margin-right: 20px !important;
 }
