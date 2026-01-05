@@ -68,11 +68,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                     $flat_list = [];
                     foreach ($vendors_data as $v_data) {
                         foreach ($v_data['branches'] as $branch) {
-                            $branch['vendor_data_node'] = $v_data['vendor']; // On garde le lien vers le vendeur
+                            $branch['vendor_data_node'] = $v_data['vendor']; 
+                            $branch['vendor_email'] = $v_data['vendor_email'];
+                            $branch['vendor_phone'] = $v_data['vendor_phone'];
                             $flat_list[] = $branch;
                         }
                     }
-
+                    
                     // 4. LE TRI FONCTIONNEL
                     usort($flat_list, function($a, $b) use ($orderby) {
                         $nameA = $a['branch_name'] ?? $a['name'] ?? '';
@@ -100,7 +102,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     $vendor = $branch['vendor_data_node'];
                     $branch_name = strtolower($branch['branch_name'] ?? $branch['name'] ?? '');
                     $vendor_name = strtolower($vendor->display_name ?? '');
-                    
+
                     // Mise à jour du lien "Visiter le Magasin"
                     // NOUVELLE URL : /pickup/emplacement/mon-emplacement-agreable/
                     $location_url = home_url( '/pickup/emplacement/' . esc_attr(sanitize_title( $branch_name )) . '/' );
@@ -191,8 +193,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                     $banner_image = $banner_id ? wp_get_attachment_url($banner_id) : plugins_url('wc-multivendor-marketplace/assets/images/default_banner.jpg');
                     $country_name = isset($countries[$branch['country']]) ? $countries[$branch['country']] : 'France';
                     $address = strtoupper($branch['postal_code'] ?? '') . ' ' . ($branch['city'] ?? '') . ', ' . $country_name;
-                    $email = get_user_meta($vendor->ID, 'billing_email', true);
-                    $phone = get_user_meta($vendor->ID, 'billing_phone', true);
+                    $email = $branch['vendor_email'];
+                    $phone = $branch['vendor_phone'];
                     $branch_name = $branch['branch_name'] ?? $branch['name'] ?? 'Emplacement';
 
                     include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-card.php';

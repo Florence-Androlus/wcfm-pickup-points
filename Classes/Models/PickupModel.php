@@ -145,7 +145,14 @@ class PickupModel {
 
         foreach ($vendors as $vendor) {
             $vendor_id = intval($vendor->ID);
+            //On récupère les réglages WCFM 
+            $store_settings = get_user_meta($vendor_id, 'wcfmmp_profile_settings', true);
 
+            // On définit l'email et le téléphone
+            // On cherche d'abord dans WCFM, sinon on prend le meta WordPress standard
+            $vendor_email = !empty($store_settings['store_email']) ? $store_settings['store_email'] : $vendor->user_email;
+            $vendor_phone = !empty($store_settings['phone']) ? $store_settings['phone'] : get_user_meta($vendor_id, 'billing_phone', true);
+            
             // --- LOGIQUE DES CATÉGORIES PERSONNALISÉES ---
             // On récupère le tableau des catégories choisies par le vendeur
             $vendor_categories = get_user_meta($vendor_id, 'wcfm_store_custom_categories', true);
@@ -223,11 +230,13 @@ class PickupModel {
                     ];
                 }
             }
-
+      
             // Stockage des données vendeurs pour la liste latérale
             if (!empty($pickup_only_branches)) {
                 $vendors_data[] = [
                     'vendor'   => $vendor, 
+                    'vendor_email' =>$vendor_email,
+                    'vendor_phone' =>$vendor_phone,
                     'branches' => $pickup_only_branches,
                     'group_id' => $assigned_category,
                 ];

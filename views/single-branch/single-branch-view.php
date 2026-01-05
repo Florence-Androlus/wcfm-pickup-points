@@ -11,10 +11,7 @@ use fandWCFMPickupPoints\Classes\Models\BranchModel;
 
 // Récupération des données passées
 $vendor_id = get_query_var('current_vendor_id');
-$profile_settings = get_user_meta($vendor_id, 'wcfmmp_profile_settings', true);
 $store_url = function_exists('get_wcfm_store_url') ? get_wcfm_store_url($vendor_id) : '#';
-$email = get_user_meta($vendor_id, 'billing_email', true);
-$phone = get_user_meta($vendor_id, 'billing_phone', true);
 
 $branch_raw_data = get_query_var( 'current_branch_data' );
 
@@ -38,7 +35,6 @@ $store_url         = $data['store_url'];
 $banner            = $data['banner_url']; 
 $store_info        = $data['store_info'];
 $category_terms    = $data['category_terms']; // Utilisé plus bas pour le filtre/catégories
-
 $store_user        = wcfmmp_get_store( $vendor_id );
 $store_info        = $store_user->get_shop_info();
 

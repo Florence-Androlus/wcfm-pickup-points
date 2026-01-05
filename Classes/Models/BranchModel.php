@@ -14,8 +14,12 @@ class BranchModel {
 
         // 1. Infos du Vendeur (WCFM/WP User Meta)
         $profile_settings = get_user_meta($vendor_id, 'wcfmmp_profile_settings', true);
-        $email = get_user_meta($vendor_id, 'billing_email', true);
-        $phone = get_user_meta($vendor_id, 'billing_phone', true);
+
+        $vendor_user = get_userdata($vendor_id); // Récupère l'objet utilisateur WP
+
+        $vendor_email = !empty($profile_settings['store_email']) ? $profile_settings['store_email'] : ($vendor_user ? $vendor_user->user_email : get_user_meta($vendor_id, 'billing_email', true));
+        $vendor_phone = !empty($profile_settings['phone']) ? $profile_settings['phone'] : get_user_meta($vendor_id, 'billing_phone', true);
+        
         $store_user = function_exists('wcfmmp_get_store') ? wcfmmp_get_store($vendor_id) : null;
         $store_info = $store_user ? $store_user->get_shop_info() : [];
 
@@ -77,8 +81,8 @@ class BranchModel {
             'display_address' => $display_address,
             'lat' => floatval($lat),
             'lng' => floatval($lng),
-            'vendor_email' => $email,
-            'vendor_phone' => $phone,
+            'vendor_email' => $vendor_email,
+            'vendor_phone' => $vendor_phone,
             'avatar_url' => $avatar_url,
             'banner_url'       => $banner_url,
             'store_url' => $store_url,
