@@ -168,7 +168,7 @@ $counter = 0;
                                     </div>
                                     <div class="spacer"></div>  
 				                </div>
-                                <div class="address rgt" style="width: 1251.82px;">                                            
+                                <div class="address rgt">                                            
                                     <p class=" wcfmmp_store_header_address">
                                     <i class="wcfmfa fa-map-marker" aria-hidden="true"></i>
                                     <a href="https://google.com/maps/place/Avenue%20Pierre%20et%20Marie%20Curie%2C%2083240%20CAVALAIRE-SUR-MER%2C%20France/@43.17160958829991,6.5316724776202895&amp;z=16" target="_blank"><span><?php echo esc_html( $address ); ?></span></a>
