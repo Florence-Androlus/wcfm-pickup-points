@@ -1,5 +1,9 @@
 <?php
 namespace fandWCFMPickupPoints\Classes\Controllers;
+// Empêche l'accès direct au fichier
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 class RoutesController {
 
@@ -114,11 +118,10 @@ class RoutesController {
                 // AJOUT CRITIQUE POUR DÉFINIR LE CONTEXTE (Identique à votre code)
                 global $wp_query;
                 
-                // ... (Votre code pour simuler WP_Query, is_single=true, $fake_post, setup_postdata($post)) ...
-                
                 if ( ! isset( $wp_query ) || is_null( $wp_query ) ) {
                     $wp_query = new \WP_Query();
                 }
+
                 if ( ! $wp_query instanceof \WP_Query ) {
                     $wp_query = new \WP_Query();
                 }
@@ -173,11 +176,11 @@ class RoutesController {
 
             // Mapping des slugs d'onglets pour un affichage convivial
             $tab_titles = [
-                'products'  => __( 'Produits', 'wcfm-pickup-points' ), // Pour la page de base (pas d'onglet)
-                'about'     => __( 'À propos', 'wcfm-pickup-points' ),
-                'policies'  => __( 'Politiques', 'wcfm-pickup-points' ),
-                'reviews'   => __( 'Avis', 'wcfm-pickup-points' ),
-                'followers' => __( 'Abonnés', 'wcfm-pickup-points' ),
+                'products'  => __( 'Produits', 'pickup-points-ultimate' ), // Pour la page de base (pas d'onglet)
+                'about'     => __( 'À propos', 'pickup-points-ultimate' ),
+                'policies'  => __( 'Politiques', 'pickup-points-ultimate' ),
+                'reviews'   => __( 'Avis', 'pickup-points-ultimate' ),
+                'followers' => __( 'Abonnés', 'pickup-points-ultimate' ),
             ];
 
             // Déterminer le titre de l'onglet (Produits par défaut si $active_tab_slug n'est pas trouvé)

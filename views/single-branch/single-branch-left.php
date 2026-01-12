@@ -1,4 +1,3 @@
- 
 <?php
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -59,10 +58,10 @@ if ( ! defined( 'ABSPATH' ) ) {
             </select>
     </div>
 </aside>		
-    
+
 <aside class="widget">
     <div class="sidebar_heading"><h4 class="widget-title">Emplacement du Pickup</h4></div>
-    <div id="pickup-map" style="height: 383px;">
+   <div id="pickup-map" style="height: 383px;">
     </div>
 </aside>
 
@@ -72,8 +71,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     // Assurez-vous que cette variable est disponible, elle est cruciale
     // Pour cet exemple, je suppose que vous avez l'ID de la branche
     // Si vous n'avez que le slug, le code pour trouver l'ID devra être ajouté.
-    
-
+ 
     $hours_table = $wpdb->prefix . 'fand_wcfm_pickup_hours';
 
     // Récupérer tous les horaires pour cette branche
@@ -87,7 +85,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     foreach ( $raw_hours as $hour ) {
         $day = $hour['day_of_week'];
-        
+       
         if ( ! isset( $branch_hours[$day] ) ) {
             $branch_hours[$day] = array( 'closed' => false, 'periods' => array() );
         }
@@ -126,7 +124,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <?php
                     // Parcourir tous les jours de la semaine (pour garantir l'ordre)
                     foreach ( $days_map as $day_index => $day_name ) :
-                        
+                       
                         // Vérifier si nous avons des données pour ce jour
                         $day_data = isset( $branch_hours[$day_index] ) ? $branch_hours[$day_index] : null;
                         
@@ -162,4 +160,6 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php
     }
 ?>
+
+
 

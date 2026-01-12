@@ -1,9 +1,14 @@
 <?php
+
 namespace fandWCFMPickupPoints\Classes\Admin;
 
-use fandWCFMPickupPoints\Classes\Controllers\StoreCategoryController;
+// Empêche l'accès direct au fichier
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 class Scripts {
+
     public function __construct() {
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('wp_enqueue_scripts', function() {
@@ -16,11 +21,12 @@ class Scripts {
 	 *
 	 * @param string $hook_suffix Identifiant de la page actuelle
 	 */
+
 	public function enqueue_scripts() {
         global $WCFM, $WCFMmp;
         // --- Conditions de chargement ---
         /*$is_frontend_map_page = is_page( 'emplacements-pickup' ) || is_page_template( 'template-store-list.php' );
-        
+
         // Condition pour le Store Manager WCFM
         $is_wcfm_vendor_management_page = false;
         if ( function_exists( 'is_wcfm_endpoint_page' ) ) {
@@ -32,9 +38,13 @@ class Scripts {
 
             // CSS spécifique pickup
             wp_enqueue_style('pickup-admin', FAND_PICKUP_PLUGIN_URL . 'assets/css/style.css');
+            wp_enqueue_script('fand-pickup-map-script', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), '1.0.0',true );
+            
             // Enqueue le Select2 CSS depuis le CDN
-            wp_enqueue_style('select2-css','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',[],'4.1.0');
-            wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4' );
+            //wp_enqueue_style('select2-css','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',[],'4.1.0');
+            wp_enqueue_style('select2-css', FAND_PICKUP_PLUGIN_URL . 'assets/css/select2.min.css', [], '4.1.0');
+            //wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4' );
+            wp_enqueue_style('font-awesome', FAND_PICKUP_PLUGIN_URL . 'assets/css/all.min.css', [], '5.15.4');
 
             // WCFM CSS/JS
             $wcmm_plugin_file = WP_PLUGIN_DIR . '/wc-multivendor-marketplace/wc-multivendor-marketplace.php';
@@ -52,22 +62,25 @@ class Scripts {
 
             // JS spécifique pickup
             wp_enqueue_script('pickup-admin', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
-            
             wp_localize_script('pickup-admin', 'PickupAdminData', [
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'loadPickupNonce' => wp_create_nonce('load_pickup_hours_nonce'),
                 'savePickupNonce' => wp_create_nonce('save_pickup_hours_nonce'),
             ]);
-            
+
             wp_enqueue_script('view-script-branch-list', FAND_PICKUP_PLUGIN_URL . 'assets/js/view-script-branch-list.js', ['jquery'], '1.0', true);
             wp_localize_script('view-script-branch-list', 'ajaxurl', admin_url('admin-ajax.php'));
-            //Enqueue le Select2 JS si ce n'est pas fait
-            wp_enqueue_script('select2-js','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',['jquery'],'4.1.0',true);
 
+            //Enqueue le Select2 JS si ce n'est pas fait
+            //wp_enqueue_script('select2-js','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',['jquery'],'4.1.0',true);
+            wp_enqueue_script('select2-js', FAND_PICKUP_PLUGIN_URL . 'assets/js/select2.min.js', ['jquery'], '4.1.0', true);
+            
             // Leaflet
-            wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet/dist/leaflet.css');
-            wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet/dist/leaflet.js', [], null, true);
-       
+            //wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet/dist/leaflet.css');
+            wp_enqueue_style('leaflet-css', FAND_PICKUP_PLUGIN_URL . 'assets/css/leaflet.css', [], '1.9.4');
+            //wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet/dist/leaflet.js', [], null, true);
+            wp_enqueue_script('leaflet-js', FAND_PICKUP_PLUGIN_URL . 'assets/js/leaflet.js', [], '1.9.4', true);
+
             wp_enqueue_style( 'kadence-shop-styles' );
 
             // On ne cherche plus l'ID ici, car il n'est pas fiable au chargement
@@ -81,13 +94,11 @@ class Scripts {
 
             wp_enqueue_script('fand-pickup-map', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
             $data = [
-                'markers'        => $markers,
+                //'markers'        => $markers,
                 'categories'     => $categories_array,
-                'default_country'=> $this->default_country,
-                'default_state'  => $this->default_state,
+               // 'default_country'=> $this->default_country,
+               // 'default_state'  => $this->default_state,
             ];
             wp_localize_script('fand-pickup-map', 'FAND_PICKUP_DATA', $data);
-
-
     }
 }

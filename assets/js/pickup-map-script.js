@@ -215,7 +215,13 @@ let iconClosed, iconOpen;
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Initialisation Leaflet
-    map = L.map('pickup-map').setView([46.6, 2.4], 6);
+    //map = L.map('pickup-map').setView([46.6, 2.4], 6);
+    const startLat = (typeof currentLat !== 'undefined' && currentLat) ? currentLat : 46.6;
+    const startLng = (typeof currentLng !== 'undefined' && currentLng) ? currentLng : 2.4;
+    const startZoom = (typeof isSingleView !== 'undefined' && isSingleView) ? 15 : 6;
+
+    map = L.map('pickup-map').setView([startLat, startLng], startZoom);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
@@ -237,14 +243,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Création des marqueurs
     mapMarkers.forEach(p => {
         const marker = L.marker([p.lat, p.lng], { icon: iconClosed }).addTo(map);
-        // 1. Lier un popup est OBLIGATOIRE pour updateMarkers
 
-        marker.bindPopup(getMainPopupContent(p)); // On enlève { autoClose: false, closeOnClick: false } pour la gestion manuelle
-
-        // 2. Empêcher l'ouverture au clic en vue unique
-        if (typeof isSingleView !== 'undefined' && isSingleView) {
-            // Si c'est une vue unique, on enlève le listener de clic de Leaflet
-            marker.off('click');
+        // MODIFICATION : On ne lie le popup QUE si on n'est PAS en vue unique
+        if (typeof isSingleView === 'undefined' || !isSingleView) {
+            marker.bindPopup(getMainPopupContent(p));
+        } else {
+            // En vue unique, on peut désactiver l'interaction avec le marqueur
+            marker.off('click'); 
+            // Optionnel : changer le curseur pour montrer qu'il n'est pas cliquable
+            marker.getElement().style.cursor = 'default';
         }
 
         p.marker = marker;
@@ -273,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 1. On filtre les cartes (HTML)
             $('.wcfmmp-single-store').each(function() {
                 const $card = $(this);
-                // On récupère le nom de la branche et du vendeur à l'intérieur de TA structure
+                // On récupère le nom de la branche et du vendeur à l'intérieur de la structure
                 const branchName = $card.find('.branch-title').first().text().toLowerCase();
                 const vendorName = $card.find('.branch-title a').text().toLowerCase();
                 const address = $card.find('.store-address').text().toLowerCase();
@@ -301,25 +308,66 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#pickup-country').on('change', function() {
             $(this).closest('form').submit();
         });
+
+        /**
+         * Gestion du changement de layout (Grid/List)
+         * Spécifique aux thèmes utilisant Kadence ou des sélecteurs similaires
+         */
+        // Sélecteur 1 : Le conteneur '#products-wrapper'
+        const $productWrapper = $('#products-wrapper'); 
+
+        // Sélecteur 2 : Le conteneur principal du magasin (si #products-wrapper est trop petit)
+        // Essayons un conteneur plus général si #products-wrapper ne fonctionne pas.
+        const $storeContent = $productWrapper.closest('.product_area'); // Remonte au parent .product_area
+
+        $('.kadence-toggle-shop-layout').on('click', function(e) {
+            e.preventDefault();
+            const toggleType = $(this).data('archive-toggle'); 
+
+            // 1. Gérer les classes actives des boutons
+            $('.kadence-toggle-shop-layout').removeClass('toggle-active');
+            $(this).addClass('toggle-active');
+
+            // 2. Appliquer les classes de vue
+            // On retire les anciennes classes 'list'/'grid' et on ajoute la nouvelle.
+            $productWrapper.removeClass('list grid').addClass(toggleType); 
+            $storeContent.removeClass('list grid').addClass(toggleType); 
+            $productWrapper.find('ul.products').removeClass('list grid').addClass(toggleType); // Cible la liste des produits WooCommerce
+        });
+
+        // Initialisation au chargement
+        const $activeButton = $('.kadence-toggle-shop-layout.toggle-active');
+        if ($activeButton.length) {
+            const defaultToggle = $activeButton.data('archive-toggle');
+            $productWrapper.addClass(defaultToggle);
+            $storeContent.addClass(defaultToggle);
+            $productWrapper.find('ul.products').addClass(defaultToggle);
+        }
+        
     });
 
     // 5. Gestion de la géolocalisation et du premier affichage
     const initialUpdate = (error) => {
         applyFilters();
         updateMarkers();
+        // En vue unique, on force l'ouverture du popup au démarrage
+        if (typeof isSingleView !== 'undefined' && isSingleView && mapMarkers.length > 0) {
+            mapMarkers[0].marker.openPopup();
+        }
     }
 
-    if (navigator.geolocation) {
+    if (navigator.geolocation && (typeof isSingleView === 'undefined' || !isSingleView)) {
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
 
-            map.setView([lat, lng], 15);
-            document.getElementById("pickup-lat").value = lat;
-            document.getElementById("pickup-lng").value = lng;
+            map.setView([lat, lng], 13);
+            if(document.getElementById("pickup-lat")) document.getElementById("pickup-lat").value = lat;
+            if(document.getElementById("pickup-lng")) document.getElementById("pickup-lng").value = lng;
             initialUpdate();
-        }, initialUpdate); // En cas d'erreur ou refus
+        }, initialUpdate); 
     } else {
+        // Si on est en Single View, on reste sur les coordonnées du PHP
         initialUpdate();
     }
 
@@ -327,4 +375,3 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateMarkers, 60000); // toutes les minutes
 
 });
-

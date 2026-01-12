@@ -1,5 +1,11 @@
 <?php
+
 namespace fandWCFMPickupPoints\Classes\Admin;
+
+// Empêche l'accès direct au fichier
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 class PageManager {
 
@@ -11,9 +17,8 @@ class PageManager {
         $pickup_page_id = get_option('fand_pickup_page_id');
 
         if ($pickup_page_id && (int) $pickup_page_id === $post->ID) {
-            $post_states['fand_pickup_page'] = __('Page Emplacements Pickup', 'wcfm-pickup-points');
+            $post_states['fand_pickup_page'] = __('Page Emplacements Pickup', 'pickup-points-ultimate');
         }
-
         return $post_states;
     }
 }

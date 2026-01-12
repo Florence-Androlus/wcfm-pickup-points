@@ -168,7 +168,7 @@ $counter = 0;
                                     </div>
                                     <div class="spacer"></div>  
 				                </div>
-                                <div class="address rgt">                                            
+                                <div class="address rgt" >                                            
                                     <p class=" wcfmmp_store_header_address">
                                     <i class="wcfmfa fa-map-marker" aria-hidden="true"></i>
                                     <a href="https://google.com/maps/place/Avenue%20Pierre%20et%20Marie%20Curie%2C%2083240%20CAVALAIRE-SUR-MER%2C%20France/@43.17160958829991,6.5316724776202895&amp;z=16" target="_blank"><span><?php echo esc_html( $address ); ?></span></a>
@@ -238,45 +238,10 @@ $counter = 0;
     const currentLat = <?php echo json_encode($lat); ?>;
     const currentLng = <?php echo json_encode($lng); ?>;
     const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_PLUGIN_URL ); ?>';
-    const isSingleView = true; // Flag pour le script général, si besoin
-
-    // 1. Solution de sécurité pour jQuery (alias $)
-    (function($) {
-        $(document).ready(function() {
-            // Sélecteur 1 : Le conteneur '#products-wrapper'
-            const $productWrapper = $('#products-wrapper'); 
-
-            // Sélecteur 2 : Le conteneur principal du magasin (si #products-wrapper est trop petit)
-            // Essayons un conteneur plus général si #products-wrapper ne fonctionne pas.
-            const $storeContent = $productWrapper.closest('.product_area'); // Remonte au parent .product_area
-
-            $('.kadence-toggle-shop-layout').on('click', function(e) {
-                e.preventDefault();
-                const toggleType = $(this).data('archive-toggle'); 
-
-                // 1. Gérer les classes actives des boutons
-                $('.kadence-toggle-shop-layout').removeClass('toggle-active');
-                $(this).addClass('toggle-active');
-
-                // 2. Appliquer les classes de vue
-                // On retire les anciennes classes 'list'/'grid' et on ajoute la nouvelle.
-                $productWrapper.removeClass('list grid').addClass(toggleType); 
-                $storeContent.removeClass('list grid').addClass(toggleType); 
-                $productWrapper.find('ul.products').removeClass('list grid').addClass(toggleType); // Cible la liste des produits WooCommerce
-            });
-
-            // Initialisation au chargement
-            const $activeButton = $('.kadence-toggle-shop-layout.toggle-active');
-            if ($activeButton.length) {
-                const defaultToggle = $activeButton.data('archive-toggle');
-                $productWrapper.addClass(defaultToggle);
-                $storeContent.addClass(defaultToggle);
-                $productWrapper.find('ul.products').addClass(defaultToggle);
-            }
-        });
-    })(jQuery);
-    
+    const isSingleView = true; // Flag pour le script général
 
 </script>
-<script src="<?php echo esc_url( FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js' ); ?>"></script>
+<?php
+    wp_enqueue_script('fand-pickup-map-script'); 
+?>
 <?php wp_footer(); ?>

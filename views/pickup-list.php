@@ -188,15 +188,24 @@ if ( ! defined( 'ABSPATH' ) ) {
                     // Variables standards pour le template
 
                     $profile_settings = get_user_meta($vendor->ID, 'wcfmmp_profile_settings', true);
-                    $avatar = wp_get_attachment_url($profile_settings['gravatar'] ?? 0);
+                    //Sécuriser l'avatar (on force 0 si c'est null ou vide)
+                    $avatar_id = !empty($profile_settings['gravatar']) ? $profile_settings['gravatar'] : 0;
+                    $avatar = wp_get_attachment_url($avatar_id);
+                    if (!$avatar) { $avatar = 'URL_PAR_DEFAUT'; }
                     $banner_id = $profile_settings['banner'] ?? 0;
                     $banner_image = $banner_id ? wp_get_attachment_url($banner_id) : plugins_url('wc-multivendor-marketplace/assets/images/default_banner.jpg');
                     $country_name = isset($countries[$branch['country']]) ? $countries[$branch['country']] : 'France';
-                    $address = strtoupper($branch['postal_code'] ?? '') . ' ' . ($branch['city'] ?? '') . ', ' . $country_name;
+                    //Sécuriser les métadonnées de branche (on force une chaîne vide si null)
+                    $address = ($branch['postal_code'] ?? '') . ' ' . ($branch['city'] ?? '');
+                    $address = ltrim(trim($address));
                     $email = $branch['vendor_email'];
                     $phone = $branch['vendor_phone'];
                     $branch_name = $branch['branch_name'] ?? $branch['name'] ?? 'Emplacement';
-
+                    // Sécuriser l'ID du vendeur
+                    $v_id = isset($vendor->ID) ? intval($vendor->ID) : 0;
+                    // Sécuriser l'URL de la boutique (on s'assure que $v_id n'est pas 0)
+                    $store_url = ($v_id > 0) ? wcfmmp_get_store_url($v_id) : '#';
+                    
                     include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-card.php';
 
                 endforeach; ?>

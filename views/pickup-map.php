@@ -1,4 +1,9 @@
-<?
+<?php
+// Empêche l'accès direct au fichier
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 $default_category = get_option('liste_categories_boutique', 'Alimentation');
 $default_category = trim(explode(',', $default_category)[0]);
 $default_country  = 'FR';
@@ -22,8 +27,11 @@ $default_state    = '';
             // 3. Boucler sur tes catégories pour créer les options
             if (!empty($categories_array)) {
                 foreach ($categories_array as $category_name) {
-                    $selected_attr = selected($_GET['category'] ?? '', $category_name, false);
-                    echo '<option value="' . esc_attr($category_name) . '" ' . $selected_attr . '>' . esc_html($category_name) . '</option>';
+                    ?>
+                    <option value="<?php echo esc_attr($category_name); ?>" <?php selected($_GET['category'] ?? '', $category_name); ?>>
+                        <?php echo esc_html($category_name); ?>
+                    </option>
+                    <?php
                 }
             }
         ?>

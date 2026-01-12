@@ -1,5 +1,11 @@
 <?php
+
 namespace fandWCFMPickupPoints\Classes\Controllers;
+
+// Empêche l'accès direct au fichier
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 use fandWCFMPickupPoints\Classes\Models\PickupModel;
 
@@ -7,7 +13,9 @@ class pickuphoursController {
 
     public function __construct() {
         add_action('wp_ajax_save_pickup_hours', [$this, 'savePickupHours']);
+        add_action('wp_ajax_nopriv_save_pickup_hours', [$this, 'savePickupHours']);
         add_action('wp_ajax_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
+        add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
     }
 
     public function savePickupHours() {
@@ -19,15 +27,15 @@ class pickuphoursController {
 
         // --- Branch ID
         $branch_id = isset($_POST['branch_id']) ? intval($_POST['branch_id']) : 0;
+
         if (!$branch_id) {
             wp_send_json_error(['message' => 'Branch ID manquant']);
         }
 
         // --- Horaires
         $hours = isset($_POST['wcfm_pickup_hours']) ? wp_unslash($_POST['wcfm_pickup_hours']) : [];
-        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? wp_unslash($_POST['wcfm_pickup_hours']) : '{}';
-        $hours = json_decode($hours_raw, true);
-
+        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? wp_unslash($_POST['wcfm_pickup_hours']) : '';
+        $hours = json_decode($hours_raw, true) ?: [];
         $day_times = $hours['day_times'] ?? [];
 
         // --- Sauvegarde
@@ -36,7 +44,6 @@ class pickuphoursController {
 
         wp_send_json_success(['message' => 'Horaires sauvegardés !']);
     }
-
 
     public function loadPickupHoursTemplate() {
         // --- Nonce
@@ -57,7 +64,12 @@ class pickuphoursController {
         $holidays = $model->getHolidays($branch_id);
 
         ob_start();
-        include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-hours/pickup-hours-template.php';
+
+       // include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-hours/pickup-hours-template.php';
+        $template_path = trailingslashit(FAND_PICKUP_PLUGIN_DIR) . 'views/pickup-hours/pickup-hours-template.php';
+        if ( file_exists( $template_path ) ) {
+            include $template_path;
+        } 
         $html = ob_get_clean();
 
         wp_send_json_success(['html' => $html, 'branch_id' => $branch_id]);
