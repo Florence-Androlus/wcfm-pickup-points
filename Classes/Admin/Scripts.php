@@ -37,8 +37,8 @@ class Scripts {
         //if ( $is_frontend_map_page || $is_wcfm_vendor_management_page ) {
 
             // CSS spécifique pickup
-            wp_enqueue_style('pickup-admin', FAND_PICKUP_PLUGIN_URL . 'assets/css/style.css');
-            wp_enqueue_script('fand-pickup-map-script', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), '1.0.0',true );
+            wp_enqueue_style('pickup-admin', FAND_PICKUP_PLUGIN_URL . 'assets/css/style.css', [],FAND_PICKUP_VERSION);
+            wp_enqueue_script('fand-pickup-map-script', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FAND_PICKUP_VERSION,true );
             
             // Enqueue le Select2 CSS depuis le CDN
             //wp_enqueue_style('select2-css','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',[],'4.1.0');
@@ -53,12 +53,12 @@ class Scripts {
             $wcfm_assets_url = plugin_dir_url($wcfm_plugin_file) . 'assets/';
 
             // CSS WCFM
-            wp_enqueue_style('wcfmmp-style-stores-list', $wcmm_assets_url . 'css/min/store-lists/wcfmmp-style-stores-list.css');
-            wp_enqueue_style('wcfmmp-style-stores-list-classic', $wcmm_assets_url . 'css/min/store-lists/wcfmmp-style-stores-list-classic.css');
-            wp_enqueue_style('wcfmmp-style-store', $wcmm_assets_url . 'css/min/store/wcfmmp-style-store.css');
-            wp_enqueue_style('wcfmmp-style-store-ver', $wcmm_assets_url . 'css/min/store/wcfmmp-style-store.css?ver=3.6.16');
-            wp_enqueue_style('wcfmmp-style-store-responsive',$wcmm_assets_url . 'css/min/store/wcfmmp-style-store-responsive.css');
-            wp_enqueue_style('wcfmicon', $wcfm_assets_url . 'fonts/font-awesome/css/wcfmicon.min.css?ver=6.7.22');
+            wp_enqueue_style('wcfmmp-style-stores-list', $wcmm_assets_url . 'css/min/store-lists/wcfmmp-style-stores-list.css', [],WCFMmp_VERSION);
+            wp_enqueue_style('wcfmmp-style-stores-list-classic', $wcmm_assets_url . 'css/min/store-lists/wcfmmp-style-stores-list-classic.css', [],WCFMmp_VERSION);
+            wp_enqueue_style('wcfmmp-style-store', $wcmm_assets_url . 'css/min/store/wcfmmp-style-store.css', [],WCFMmp_VERSION);
+            wp_enqueue_style('wcfmmp-style-store-ver', $wcmm_assets_url . 'css/min/store/wcfmmp-style-store.css', [],WCFMmp_VERSION);
+            wp_enqueue_style('wcfmmp-style-store-responsive',$wcmm_assets_url . 'css/min/store/wcfmmp-style-store-responsive.css', [],WCFMmp_VERSION);
+            wp_enqueue_style('wcfmicon', $wcfm_assets_url . 'fonts/font-awesome/css/wcfmicon.min.css', [],WCFMmp_VERSION);
 
             // JS spécifique pickup
             wp_enqueue_script('pickup-admin', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
@@ -94,10 +94,7 @@ class Scripts {
 
             wp_enqueue_script('fand-pickup-map', FAND_PICKUP_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
             $data = [
-                //'markers'        => $markers,
                 'categories'     => $categories_array,
-               // 'default_country'=> $this->default_country,
-               // 'default_state'  => $this->default_state,
             ];
             wp_localize_script('fand-pickup-map', 'FAND_PICKUP_DATA', $data);
     }

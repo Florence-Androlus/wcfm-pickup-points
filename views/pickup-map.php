@@ -13,7 +13,13 @@ $default_state    = '';
 <div id="pickup-map" style="width:100%;height:550px;"></div>
 
 <form role="search" method="get" class="wcfmmp-store-search-form" action="">
-    <input class="search-field wcfmmp-store-search" type="search" id="pickup-search" placeholder="Recherche..." name="pickup_search" value="<?php echo esc_attr($_GET['pickup_search'] ?? ''); ?>" />
+    <?php
+    // 1. Préparation sécurisée de la valeur de recherche
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $search_value = isset($_GET['pickup_search']) ? sanitize_text_field(wp_unslash($_GET['pickup_search'])) : '';
+    ?>
+
+    <input class="search-field wcfmmp-store-search" type="search" id="pickup-search" placeholder="Recherche..." name="pickup_search" value="<?php echo esc_attr($search_value); ?>"/>
 
     <select name="category" id="pickup-category" class="select2 select2-container select2-container--default">
         <option value="">Toutes catégories</option>
@@ -27,8 +33,12 @@ $default_state    = '';
             // 3. Boucler sur tes catégories pour créer les options
             if (!empty($categories_array)) {
                 foreach ($categories_array as $category_name) {
+                    // 1. Préparation sécurisée de la catégorie sélectionnée
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $current_category = isset($_GET['category']) ? sanitize_text_field(wp_unslash($_GET['category'])) : '';
                     ?>
-                    <option value="<?php echo esc_attr($category_name); ?>" <?php selected($_GET['category'] ?? '', $category_name); ?>>
+
+                    <option value="<?php echo esc_attr($category_name); ?>" <?php selected($current_category, $category_name); ?>>
                         <?php echo esc_html($category_name); ?>
                     </option>
                     <?php
@@ -39,8 +49,10 @@ $default_state    = '';
 
     <!-- Champ texte pour filtrer le select pays -->
     <?php
-    // On récupère le pays de l'URL, sinon on prend la France par défaut
-    $selected_country = isset($_GET['country']) ? sanitize_text_field($_GET['country']) : 'FR'; 
+        // On récupère le pays de l'URL, sinon on prend la France par défaut
+        // On ignore le manque de Nonce car c'est un filtre de carte public (GET)
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $selected_country = isset($_GET['country']) ? sanitize_text_field(wp_unslash($_GET['country'])) : 'FR'; 
     ?>
 
     <select name="country" id="pickup-country"> <option value="">Tous les pays</option>

@@ -1,6 +1,6 @@
 <?php
 namespace fandWCFMPickupPoints\Classes\Controllers;
-// Empêche l'accès direct au fichier
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -10,43 +10,33 @@ class RoutesController {
     public function __construct() {
         add_action('init', [$this, 'register_rewrite_rules']);
         add_filter('query_vars', [$this, 'register_query_vars']);
-
-        // Logique pour la page SINGLE BRANCH pickup
         add_filter( 'template_include', [$this, 'fand_wcfm_load_branch_template'], 999 );
-
-        // Enregistre la fonction principale pour les hooks WooCommerce
         add_action( 'wp', [ $this, 'afficher_excerpt_en_vue_liste' ] );
-        // Enregistre la fonction qui affiche le contenu
         add_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
 
-        // Modifier le titre de l'onglet
         add_filter('document_title_parts', function($title_parts) {
-            // On essaie de récupérer la variable propre
             $slug = get_query_var('emplacement');
 
-            // Sécurité : Si get_query_var est vide, on regarde directement l'URL
-            if (empty($slug)) {
-                $parsed_url = wp_parse_url( $_SERVER['REQUEST_URI'] );
+            if (empty($slug) && isset($_SERVER['REQUEST_URI'])) {
+                // CORRECTION : Unslash + Sanitize de REQUEST_URI
+                $request_uri = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
+                $parsed_url = wp_parse_url( $request_uri );
                 $path = isset( $parsed_url['path'] ) ? trim( $parsed_url['path'], '/' ) : '';
                 $segments = explode('/', $path);
-                // Si l'URL est /pickup/emplacement/nom-branch/, le slug est le dernier segment
+                
                 if (count($segments) >= 3 && $segments[0] === 'pickup' && $segments[1] === 'emplacement') {
                     $slug = end($segments);
                 }
             }
 
             if (!empty($slug)) {
-                // On nettoie le slug pour l'affichage (nom-branch -> nom branch)
-                $name = ucwords(str_replace('-', ' ', $slug));
-                
-                // On change le titre de l'onglet
+                $name = ucwords(str_replace('-', ' ', sanitize_title($slug)));
                 $title_parts['title'] = $name;
-                // Optionnel : on peut enlever le slogan du site pour cette page
                 unset($title_parts['tagline']); 
             }
 
             return $title_parts;
-        }, 100); // Priorité haute pour passer après les plugins SEO
+        }, 100);
     }
 
     public function register_rewrite_rules() {
@@ -71,26 +61,19 @@ class RoutesController {
     function fand_wcfm_load_branch_template( $template ) {
         $branch_slug = get_query_var( 'branch_slug' );
         $tab_slug    = get_query_var( 'tab_slug' ); 
-
-        // Définir les slugs d'onglets que nous gérons (utilisé pour la logique de routage)
-        $valid_tabs = array('about', 'policies', 'reviews', 'followers');
+        $valid_tabs  = array('about', 'policies', 'reviews', 'followers');
         
-        // --- Étape 1 : Extraire le slug de l'emplacement si l'on est sur un onglet ---
         if ( empty( $branch_slug ) && ! empty( $tab_slug ) && in_array($tab_slug, $valid_tabs) ) {
-            
-            // Si $branch_slug est vide, mais $tab_slug est rempli (ex: URL est .../emplacement-slug/about/)
-            
-            $request_uri = trim( $_SERVER['REQUEST_URI'], '/' );
-            $parts = explode( '/', $request_uri );
-            
-            // L'onglet est le dernier segment, l'avant-dernier devrait être le slug de l'emplacement.
-            $tab_index = array_search( $tab_slug, $parts );
-            
-            if ( $tab_index !== false && $tab_index > 0 ) {
-                // On récupère le segment avant le slug de l'onglet (C'est le branch_slug)
-                $branch_slug = $parts[$tab_index - 1]; 
-                // On met à jour la query_var, même si elle n'a pas été trouvée automatiquement
-                set_query_var( 'branch_slug', $branch_slug ); 
+            // CORRECTION : Vérification et nettoyage de REQUEST_URI
+            if ( isset( $_SERVER['REQUEST_URI'] ) ) {
+                $request_uri = trim( esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ), '/' );
+                $parts = explode( '/', $request_uri );
+                $tab_index = array_search( $tab_slug, $parts );
+                
+                if ( $tab_index !== false && $tab_index > 0 ) {
+                    $branch_slug = $parts[$tab_index - 1]; 
+                    set_query_var( 'branch_slug', $branch_slug ); 
+                }
             }
         }
         // --- Fin Étape 1 ---
@@ -218,35 +201,48 @@ class RoutesController {
      */
     public static function fand_wcfm_get_branch_by_slug( $branch_slug ) {
         global $wpdb;
-        $table_locations = $wpdb->prefix . 'wcfm_store_locations'; 
 
-        $all_locations = $wpdb->get_results( 
-            "SELECT * FROM $table_locations WHERE name != ''", // Récupérez TOUTES les colonnes (*)
-            ARRAY_A 
-        );
-        
-        foreach ( $all_locations as $location ) {
-            $db_name = $location['name']; 
-            $current_slug = sanitize_title( $db_name ); 
-            
-            if ( $current_slug === $branch_slug ) {
-                // Retournez l'objet/tableau complet de la ligne.
-                return [
-                    'branch_id'     => $location['ID'],
-                    'vendor_id'     => $location['store_id'],
-                    'branch_name'   => $location['name'], 
-                    'lat'           => $location['latitude'],
-                    'lng'           => $location['longitude'],
-                    'map_address'   => $location['map_address'],
-                    'address'       => $location['address'],
-                    'city'          => $location['city'],
-                    'postal_code'   => $location['postal_code'],
-                    'state'         => $location['state'],
-                    'country'       => $location['country'],
-                ];
-            }
+        // 1. Définir une clé de cache unique (basée sur le slug ou la requête)
+        $cache_key = 'fand_wcfm_all_locations';
+        $cache_group = 'fand_pickup';
+
+        // 2. Tenter de récupérer les données depuis le cache
+        $all_locations = wp_cache_get( $cache_key, $cache_group );
+
+        if ( false === $all_locations ) {
+            // 3. Si le cache est vide, on fait la requête SQL
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+            $all_locations = $wpdb->get_results( 
+                "SELECT ID, store_id, name, latitude, longitude, map_address, address, city, postal_code, state, country 
+                 FROM {$wpdb->prefix}wcfm_store_locations 
+                 WHERE name != ''", 
+                ARRAY_A 
+            );
+
+            // 4. On enregistre le résultat en cache pour 1 heure (3600 secondes)
+            wp_cache_set( $cache_key, $all_locations, $cache_group, 3600 );
         }
         
+        if ( $all_locations ) {
+            foreach ( $all_locations as $location ) {
+                $db_name = $location['name']; 
+                if ( sanitize_title( $db_name ) === $branch_slug ) {
+                    return [
+                        'branch_id'   => $location['ID'],
+                        'vendor_id'   => $location['store_id'],
+                        'branch_name' => $location['name'], 
+                        'lat'         => $location['latitude'],
+                        'lng'         => $location['longitude'],
+                        'map_address' => $location['map_address'],
+                        'address'     => $location['address'],
+                        'city'        => $location['city'],
+                        'postal_code' => $location['postal_code'],
+                        'state'       => $location['state'],
+                        'country'     => $location['country'],
+                    ];
+                }
+            }
+        }
         return false;
     }
 
@@ -254,19 +250,17 @@ class RoutesController {
      * Gère l'activation de l'extrait en mode liste.
      */
     public function afficher_excerpt_en_vue_liste() {
-        // Ne s'exécute que sur les pages d'archives WooCommerce (boutique, catégorie, etc.)
         if ( is_shop() || is_product_category() || is_product_tag() ) {
             
-            // --- Logique pour déterminer si la vue liste est active ---
-            $view_mode = isset($_COOKIE['productViewMode']) ? $_COOKIE['productViewMode'] : null;
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $view_mode = isset( $_COOKIE['productViewMode'] ) ? sanitize_text_field( wp_unslash( $_COOKIE['productViewMode'] ) ) : '';
             
-            if ( $view_mode == 'list' || (isset($_GET['view']) && $_GET['view'] == 'list') ) {
-                
-                // Si la vue liste est active, nous nous assurons que notre fonction sera appelée
-                // et retirons l'extrait par défaut si le thème ou WooCommerce l'avait mis ailleurs.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $get_view  = isset( $_GET['view'] ) ? sanitize_text_field( wp_unslash( $_GET['view'] ) ) : '';
+
+            if ( 'list' === $view_mode || 'list' === $get_view ) {
                 remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_product_excerpt', 30 );
             } else {
-                // Si ce n'est PAS la vue liste, nous retirons notre action pour qu'elle n'affiche rien
                 remove_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
             }
         }
@@ -276,14 +270,10 @@ class RoutesController {
      * Affiche le contenu de la description courte à l'intérieur du div .product-excerpt.
      */
     public function ma_description_en_vue_liste() {
-        // La vérification is_shop, etc., est faite dans la méthode précédente (afficher_excerpt_en_vue_liste)
-        
         global $product;
-        
-        // On vérifie si l'extrait existe pour éviter d'afficher un div vide
-        if ( $product && $product->get_short_description() ) {
+        if ( $product && method_exists($product, 'get_short_description') && $product->get_short_description() ) {
             echo '<div class="product-excerpt">';
-            the_excerpt(); // Affiche la description courte
+            the_excerpt(); 
             echo '</div>';
         }
     }

@@ -25,6 +25,7 @@ class PickupModel {
 
         // 1️⃣ Supprimer uniquement les jours existants pour cette branche
         foreach ($day_times as $day_index => $slots) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $wpdb->delete(
                 $this->table_hours,
                 [
@@ -52,7 +53,7 @@ class PickupModel {
 
     public function saveHolidays($branch_id, $data) {
         global $wpdb;
-
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->update(
             $this->table_holidays,
             [
@@ -71,11 +72,11 @@ class PickupModel {
 
     public function getHours($branch_id) {
         global $wpdb;
-
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $results = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT ID, day_of_week, open_time, close_time 
-                FROM {$this->table_hours} 
+                FROM $wpdb->prefix . 'fand_wcfm_pickup_hours' 
                 WHERE branch_id = %d
                 ORDER BY day_of_week, open_time ASC",
                 $branch_id
@@ -103,8 +104,9 @@ class PickupModel {
 
     public function getHolidays($branch_id) {
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         return $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM {$this->table_holidays} WHERE branch_id=%d", $branch_id),
+            $wpdb->prepare("SELECT * FROM $wpdb->prefix . 'fand_wcfm_pickup_holidays' WHERE branch_id=%d", $branch_id),
             ARRAY_A
         );
     }
@@ -120,7 +122,8 @@ class PickupModel {
         $orderby = $filters['orderby'] ?? '';
 
         // Récupération de la catégorie sélectionnée dans l'URL (le filtre)
-        $selected_category = isset($_GET['category']) ? sanitize_text_field($_GET['category']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $selected_category = isset($_GET['category']) ? sanitize_text_field(wp_unslash($_GET['category'])) : '';
 
         // Récupération de la liste globale des catégories pour le retour
         $liste_brute = get_option('liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
@@ -169,6 +172,7 @@ class PickupModel {
             $assigned_category = !empty($selected_category) ? $selected_category : (!empty($vendor_categories) ? $vendor_categories[0] : '');
 
             // --- RÉCUPÉRATION DES BRANCHES (LOCATIONS) ---
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $branches = $wpdb->get_results(
                 $wpdb->prepare("SELECT * FROM {$wpdb->prefix}wcfm_store_locations WHERE store_id = %d", $vendor_id),
                 ARRAY_A
@@ -177,13 +181,29 @@ class PickupModel {
             if (empty($branches)) continue;
 
             $branch_ids = wp_list_pluck($branches, 'ID');
-            $placeholders = implode(',', array_fill(0, count($branch_ids), '%d'));
+            // On génère les placeholders (%d, %d, %d...)
+            $placeholders = implode( ',', array_fill( 0, count( $branch_ids ), '%d' ) );
 
-            // Récupération des metas "offers_pickup" pour ces branches
-            $meta_query = $wpdb->get_results(
-                $wpdb->prepare("SELECT branch_id, meta_value FROM {$wpdb->prefix}wcfm_store_locations_meta WHERE branch_id IN ($placeholders) AND meta_key='offers_pickup'", $branch_ids), 
-                ARRAY_A
-            );
+            // 1. Préparation de la requête brute avec les placeholders déjà injectés
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $sql_meta = "SELECT branch_id, meta_value 
+                        FROM {$wpdb->prefix}wcfm_store_locations_meta 
+                        WHERE branch_id IN ($placeholders) 
+                        AND meta_key = 'offers_pickup'";
+
+            // 2. On utilise prepare() sur la chaîne construite
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // Créer une clé unique basée sur les IDs des branches pour le cache
+            $meta_cache_key = 'branches_meta_' . md5( implode( ',', $branch_ids ) );
+            $meta_query = wp_cache_get( $meta_cache_key, 'fand_pickup' );
+
+            if ( false === $meta_query ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+                $meta_query = $wpdb->get_results( $wpdb->prepare( $sql_meta, ...$branch_ids ), ARRAY_A );
+                
+                // On met en cache pour 1 heure
+                wp_cache_set( $meta_cache_key, $meta_query, 'fand_pickup', 3600 );
+            }
             
             $offers_pickup_map = [];
             foreach ($meta_query as $m) { 
@@ -191,10 +211,27 @@ class PickupModel {
             }
 
             // Récupération des horaires d'ouverture personnalisés
-            $hours = $wpdb->get_results(
-                $wpdb->prepare("SELECT branch_id, day_of_week, open_time, close_time, is_closed FROM {$wpdb->prefix}fand_wcfm_pickup_hours WHERE branch_id IN ($placeholders)", $branch_ids), 
-                ARRAY_A
-            );
+            // 1. Préparation de la requête SQL dans une variable distincte
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $sql_hours = "SELECT branch_id, day_of_week, open_time, close_time, is_closed 
+                          FROM {$wpdb->prefix}fand_wcfm_pickup_hours 
+                          WHERE branch_id IN ($placeholders)";
+
+            // 2. On place le commentaire d'ignorance juste avant l'exécution
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // Création d'une clé de cache unique basée sur la liste des IDs demandés
+            $hours_cache_key = 'batch_hours_' . md5( implode( ',', $branch_ids ) );
+
+            // Tentative de récupération depuis le cache
+            $hours = wp_cache_get( $hours_cache_key, 'fand_pickup' );
+
+            if ( false === $hours ) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+                $hours = $wpdb->get_results( $wpdb->prepare( $sql_hours, ...$branch_ids ), ARRAY_A );
+                
+                // Mise en cache pour 1 heure (3600 secondes)
+                wp_cache_set( $hours_cache_key, $hours, 'fand_pickup', 3600 );
+            }
             
             $hours_by_branch = [];
             foreach ($hours as $h) { 

@@ -45,15 +45,29 @@ class BranchModel {
         $category_terms_to_show = $this->getVendorTopLevelCategories($product_ids_by_vendor);
 
         // Récupération de tous les horaires pour ces branches
-        $hours = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT branch_id, day_of_week, open_time, close_time, is_closed
-                    FROM {$wpdb->prefix}fand_wcfm_pickup_hours
-                    WHERE branch_id ",
-                $branch_id
-            ),
-            ARRAY_A
-        );
+        // 1. Définir une clé de cache spécifique à cette branche
+        $cache_key   = 'branch_hours_' . intval( $branch_id );
+        $cache_group = 'fand_pickup';
+
+        // 2. Tenter de récupérer les horaires depuis le cache
+        $hours = wp_cache_get( $cache_key, $cache_group );
+
+        if ( false === $hours ) {
+            // 3. Si non présent en cache, on exécute la requête
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            $hours = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT branch_id, day_of_week, open_time, close_time, is_closed
+                        FROM {$wpdb->prefix}fand_wcfm_pickup_hours
+                        WHERE branch_id = %d",
+                    intval( $branch_id )
+                ),
+                ARRAY_A
+            );
+
+            // 4. On stocke le résultat en cache (ex: pour 1 heure)
+            wp_cache_set( $cache_key, $hours, $cache_group, 3600 );
+        }
 
         // Organise les horaires par branch_id et day_of_week
         $hours_by_branch = [];

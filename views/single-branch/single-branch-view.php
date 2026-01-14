@@ -77,7 +77,8 @@ if ( ! empty( $active_tab ) && in_array( $active_tab, $valid_tabs ) ) {
 // Récupérer la page actuelle pour la pagination
 $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 // Récupérer le slug de la catégorie sélectionnée (pour le filtre)
-$current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( $_GET['product_cat'] ) : '';
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( wp_unslash( $_GET['product_cat'] ) ) : '';
 
 // 1. Définition des arguments de la requête des produits
 $args = array(
@@ -90,6 +91,7 @@ $args = array(
 
 // 2. Logique de FILTRE par CATÉGORIE
 if ( ! empty( $current_cat_slug ) ) {
+    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
     $args['tax_query'] = array(
         array(
             'taxonomy' => 'product_cat',
@@ -100,14 +102,20 @@ if ( ! empty( $current_cat_slug ) ) {
 }
 
 // 3. Logique de TRI (OrderBy)
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 if ( isset( $_GET['orderby'] ) ) {
-    $orderby = sanitize_text_field( $_GET['orderby'] );
+    // On ignore le Nonce car il s'agit d'un tri d'affichage public via URL (GET)
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    $orderby = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+
     if ( $orderby == 'price' ) {
         $args['orderby'] = 'meta_value_num';
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
         $args['meta_key'] = '_price';
         $args['order'] = 'ASC';
     } elseif ( $orderby == 'price-desc' ) {
         $args['orderby'] = 'meta_value_num';
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
         $args['meta_key'] = '_price';
         $args['order'] = 'DESC';
     } elseif ( $orderby == 'date' ) {

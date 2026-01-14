@@ -14,35 +14,60 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <input type="hidden" id="pickup-lat">
                     <input type="hidden" id="pickup-lng">
 
+                    <?php
+                    // 1. On prépare la variable une seule fois de manière sécurisée
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $current_orderby = isset($_GET['pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['pickup_orderby'])) : 'newness_asc';
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $current_day    = isset($_GET['pickup_day']) ? sanitize_text_field(wp_unslash($_GET['pickup_day'])) : '';
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $current_status = isset($_GET['pickup_status']) ? sanitize_text_field(wp_unslash($_GET['pickup_status'])) : '';
+                    // phpcs:enable WordPress.Security.NonceVerification.Recommended
+                    ?>
                     <select id="wcfmmp_pickup_store_orderby" name="pickup_orderby" class="orderby" onchange="this.form.submit()">
-                        <option value="newness_asc" <?php echo (($_GET['pickup_orderby'] ?? '') === 'newness_asc') ? 'selected="selected"' : ''; ?>>Trier plus vieux au plus récent</option>
-                        <option value="newness_desc" <?php echo(($_GET['pickup_orderby'] ?? '') === 'newness_desc') ? 'selected="selected"' : ''; ?>>Trier du plus récent au plus vieux</option>
-                        <option value="alphabetical_asc" <?php echo(($_GET['pickup_orderby'] ?? '') === 'alphabetical_asc') ? 'selected="selected"' : ''; ?>>Alphabétique : A → Z</option>
-                        <option value="alphabetical_desc" <?php echo(($_GET['pickup_orderby'] ?? '') === 'alphabetical_desc') ? 'selected="selected"' : ''; ?>>Alphabétique : Z → A</option>
+                        <option value="newness_asc" <?php selected($current_orderby, 'newness_asc'); ?>>
+                            Trier plus vieux au plus récent
+                        </option>
+                        <option value="newness_desc" <?php selected($current_orderby, 'newness_desc'); ?>>
+                            Trier du plus récent au plus vieux
+                        </option>
+                        <option value="alphabetical_asc" <?php selected($current_orderby, 'alphabetical_asc'); ?>>
+                            Alphabétique : A → Z
+                        </option>
+                        <option value="alphabetical_desc" <?php selected($current_orderby, 'alphabetical_desc'); ?>>
+                            Alphabétique : Z → A
+                        </option>
                     </select>
 
                     <select id="wcfmmp_pickup_store_day" name="pickup_day" class="orderby" onchange="this.form.submit()">
                         <option value="">Tous les jours</option>
-                        <option value="0" <?php echo (($_GET['pickup_day'] ?? '') === '0') ? 'selected="selected"' : ''; ?>>Lundi</option>
-                        <option value="1" <?php echo (($_GET['pickup_day'] ?? '') === '1') ? 'selected="selected"' : ''; ?>>Mardi</option>
-                        <option value="2" <?php echo (($_GET['pickup_day'] ?? '') === '2') ? 'selected="selected"' : ''; ?>>Mercredi</option>
-                        <option value="3" <?php echo (($_GET['pickup_day'] ?? '') === '3') ? 'selected="selected"' : ''; ?>>Jeudi</option>
-                        <option value="4" <?php echo (($_GET['pickup_day'] ?? '') === '4') ? 'selected="selected"' : ''; ?>>Vendredi</option>
-                        <option value="5" <?php echo (($_GET['pickup_day'] ?? '') === '5') ? 'selected="selected"' : ''; ?>>Samedi</option>
-                        <option value="6" <?php echo (($_GET['pickup_day'] ?? '') === '6') ? 'selected="selected"' : ''; ?>>Dimanche</option>
+                        <option value="0" <?php selected($current_day, '0'); ?>>Lundi</option>
+                        <option value="1" <?php selected($current_day, '1'); ?>>Mardi</option>
+                        <option value="2" <?php selected($current_day, '2'); ?>>Mercredi</option>
+                        <option value="3" <?php selected($current_day, '3'); ?>>Jeudi</option>
+                        <option value="4" <?php selected($current_day, '4'); ?>>Vendredi</option>
+                        <option value="5" <?php selected($current_day, '5'); ?>>Samedi</option>
+                        <option value="6" <?php selected($current_day, '6'); ?>>Dimanche</option>
                     </select>
 
                     <select id="wcfmmp_pickup_store_status" name="pickup_status" class="orderby" onchange="this.form.submit()">
-                        <option value="" <?php echo (($_GET['pickup_status'] ?? '') === '') ? 'selected="selected"' : ''; ?>>Tout</option>
-                        <option value="open" <?php echo (($_GET['pickup_status'] ?? '') === 'open') ? 'selected="selected"' : ''; ?>>Ouvert</option>
-                        <option value="closed" <?php echo (($_GET['pickup_status'] ?? '') === 'closed') ? 'selected="selected"' : ''; ?>>Fermé</option>
+                        <option value="" <?php selected($current_status, ''); ?>>Tout</option>
+                        <option value="open" <?php selected($current_status, 'open'); ?>>Ouvert</option>
+                        <option value="closed" <?php selected($current_status, 'closed'); ?>>Fermé</option>
                     </select>
 
-                    <?php
+<?php
+                        // On ignore le manque de Nonce car c'est un formulaire GET de filtrage public
+                        // phpcs:disable WordPress.Security.NonceVerification.Recommended
                         if(!empty($_GET)){
-                            foreach($_GET as $key=>$value){
-                                if(in_array($key,['pickup_orderby','pickup_day','pickup_status', 'country', 'category', 'pickup_search'])) continue;
-                                echo '<input type="hidden" name="'.esc_attr($key).'" value="'.esc_attr($value).'">';
+                            foreach($_GET as $key => $value){
+                                // On nettoie systématiquement la clé et la valeur
+                                $safe_key = sanitize_text_field(wp_unslash($key));
+                                $safe_value = sanitize_text_field(wp_unslash($value));
+
+                                if(in_array($safe_key, ['pickup_orderby', 'pickup_day', 'pickup_status', 'country', 'category', 'pickup_search'])) continue;
+                                
+                                echo '<input type="hidden" name="' . esc_attr($safe_key) . '" value="' . esc_attr($safe_value) . '">';
                             }
                         }
                     ?>
@@ -51,18 +76,32 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <?php
                     global $wpdb;
                     // 1. Préparer les horaires
-                    $hours_table = $wpdb->prefix . 'fand_wcfm_pickup_hours';
-                    $all_hours = $wpdb->get_results("SELECT * FROM $hours_table", ARRAY_A);
-                    $branch_hours = [];
+                    // Définition des paramètres de cache
+                    $cache_key   = 'fand_all_pickup_hours';
+                    $cache_group = 'fand_pickup';
 
+                    // 2. Tentative de récupération depuis le cache
+                    $all_hours = wp_cache_get( $cache_key, $cache_group );
+
+                    if ( false === $all_hours ) {
+                        // 3. Si pas en cache, on exécute la requête SQL
+                        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+                        $all_hours = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}fand_wcfm_pickup_hours", ARRAY_A );
+                        
+                        // 4. On stocke en cache pour 12 heures (43200 secondes) car les horaires changent peu
+                        wp_cache_set( $cache_key, $all_hours, $cache_group, 43200 );
+                    }
+                    
+                    $branch_hours = [];
                     foreach ($all_hours as $h) {
                         $branch_hours[$h['branch_id']][$h['day_of_week']][] = $h;
                     }
 
-                    // 2. Récupérer les filtres
-                    $selected_day = isset($_GET['pickup_day']) && $_GET['pickup_day'] !== '' ? intval($_GET['pickup_day']) : null;
-                    $selected_status = $_GET['pickup_status'] ?? '';
-                    $orderby = $_GET['pickup_orderby'] ?? 'newness_desc';
+                    // 2. Récupérer les filtres de manière sécurisée
+                    $selected_day    = isset($_GET['pickup_day']) && $_GET['pickup_day'] !== '' ? intval($_GET['pickup_day']) : null;
+                    $selected_status = isset($_GET['pickup_status']) ? sanitize_text_field(wp_unslash($_GET['pickup_status'])) : '';
+                    $orderby         = isset($_GET['pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['pickup_orderby'])) : 'newness_desc';
+                    // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
                     // 3. MISE À PLAT pour le TRI
                     $flat_list = [];
@@ -86,8 +125,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                         return 0;
                     });
 
-                    $selected_country = isset($_GET['country']) ? sanitize_text_field($_GET['country']) : 'FR';
-                    $search_query = isset($_GET['pickup_search']) ? strtolower(sanitize_text_field($_GET['pickup_search'])) : '';
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $selected_country = isset($_GET['country']) ? sanitize_text_field(wp_unslash($_GET['country'])) : 'FR';
+
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $search_query = isset($_GET['pickup_search']) ? strtolower(sanitize_text_field(wp_unslash($_GET['pickup_search']))) : '';
                 ?>
 
                 <div class="spacer"></div>

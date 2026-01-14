@@ -32,7 +32,7 @@
                 // 3. On enregistre le résultat dans le cache pour 24 heures (DAY_IN_SECONDS)
                 set_transient('fand_pp_licence_check', $is_active, DAY_IN_SECONDS);
                 
-                error_log('WCFM Pickup : Vérification réelle effectuée et mise en cache pour 24h.');
+                //error_log('WCFM Pickup : Vérification réelle effectuée et mise en cache pour 24h.');
             }
 
             // On retourne le résultat (on compare à 'yes' car un transient ne stocke pas bien true/false)

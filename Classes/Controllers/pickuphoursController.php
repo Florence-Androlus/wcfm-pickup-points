@@ -18,9 +18,9 @@ class pickuphoursController {
         add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
     }
 
-    public function savePickupHours() {
-        // --- Nonce
-        $nonce = isset($_POST['_wpnonce']) ? wp_unslash($_POST['_wpnonce']) : '';
+public function savePickupHours() {
+        // --- Nonce (Sanitized)
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (! wp_verify_nonce($nonce, 'save_pickup_hours_nonce')) {
             wp_send_json_error(['message' => 'Nonce invalide']);
         }
@@ -32,9 +32,8 @@ class pickuphoursController {
             wp_send_json_error(['message' => 'Branch ID manquant']);
         }
 
-        // --- Horaires
-        $hours = isset($_POST['wcfm_pickup_hours']) ? wp_unslash($_POST['wcfm_pickup_hours']) : [];
-        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? wp_unslash($_POST['wcfm_pickup_hours']) : '';
+        // --- Horaires (Sanitized avant json_decode)
+        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? sanitize_text_field(wp_unslash($_POST['wcfm_pickup_hours'])) : '';
         $hours = json_decode($hours_raw, true) ?: [];
         $day_times = $hours['day_times'] ?? [];
 
@@ -46,8 +45,8 @@ class pickuphoursController {
     }
 
     public function loadPickupHoursTemplate() {
-        // --- Nonce
-        $nonce = isset($_POST['_wpnonce']) ? wp_unslash($_POST['_wpnonce']) : '';
+        // --- Nonce (Sanitized)
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (! wp_verify_nonce($nonce, 'load_pickup_hours_nonce')) {
             wp_send_json_error(['message' => 'Nonce invalide']);
         }

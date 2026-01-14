@@ -67,18 +67,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <?php
     global $wpdb;
-
-    // Assurez-vous que cette variable est disponible, elle est cruciale
-    // Pour cet exemple, je suppose que vous avez l'ID de la branche
-    // Si vous n'avez que le slug, le code pour trouver l'ID devra être ajouté.
  
-    $hours_table = $wpdb->prefix . 'fand_wcfm_pickup_hours';
-
     // Récupérer tous les horaires pour cette branche
-    $raw_hours = $wpdb->get_results( $wpdb->prepare(
-        "SELECT day_of_week, open_time, close_time, is_closed FROM $hours_table WHERE branch_id = %d",
-        $branch_id
-    ), ARRAY_A );
+    // 1. Définition des paramètres de cache pour cette branche spécifique
+    $cache_key   = 'branch_hours_' . intval( $branch_id );
+    $cache_group = 'fand_pickup';
+
+    // 2. Tentative de récupération depuis le cache
+    $raw_hours = wp_cache_get( $cache_key, $cache_group );
+
+    if ( false === $raw_hours ) {
+        // 3. Si non présent, on exécute la requête SQL préparée
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $raw_hours = $wpdb->get_results( 
+            $wpdb->prepare(
+                "SELECT day_of_week, open_time, close_time, is_closed FROM {$wpdb->prefix}fand_wcfm_pickup_hours WHERE branch_id = %d",
+                intval( $branch_id )
+            ), 
+            ARRAY_A 
+        );
+
+        // 4. On stocke en cache pour 12 heures
+        wp_cache_set( $cache_key, $raw_hours, $cache_group, 43200 );
+    }
 
     // Organiser les données pour l'affichage (car il peut y avoir plusieurs plages horaires par jour)
     $branch_hours = array();

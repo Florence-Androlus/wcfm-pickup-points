@@ -58,8 +58,10 @@ class FANDPickupSettings {
             // Vérification de sécurité
             check_admin_referer('fand_save_categories_action'); 
             
-            $categories = sanitize_text_field($_POST['liste_categories_boutique']);
-            update_option('liste_categories_boutique', $categories);
+        if ( isset( $_POST['liste_categories_boutique'] ) ) {
+            $categories = sanitize_text_field( wp_unslash( $_POST['liste_categories_boutique'] ) );
+            update_option( 'liste_categories_boutique', $categories );
+        }
             
             echo '<div class="updated notice is-dismissible"><p>✅ Catégories mises à jour avec succès !</p></div>';
         }
