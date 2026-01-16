@@ -20,7 +20,6 @@ class StoreCategoryController {
      * Logique de sauvegarde 
      */
     public function saveVendorCategories($vendor_id, $wcfm_settings_form) {
-        // Suppression des error_log pour la production
         if (isset($wcfm_settings_form['wcfm_store_main_category'])) {
             $categories = array_map('sanitize_text_field', (array) $wcfm_settings_form['wcfm_store_main_category']);
             update_user_meta($vendor_id, 'wcfm_store_custom_categories', $categories);
@@ -41,16 +40,16 @@ class StoreCategoryController {
      * Récupération AJAX des catégories
      */
     public function ajaxGetCategories() {
-        // 1. Vérification du Nonce (Sécurité indispensable)
-        // Note: Assurez-vous d'envoyer 'security' dans votre appel JS avec wp_create_nonce('get_categories_nonce')
+        // 1. Vérification du Nonce
         check_ajax_referer('get_categories_nonce', 'security');
 
-        // 2. Vérification des permissions minimales
+        // 2. Vérification des permissions
         if ( ! is_user_logged_in() ) {
             wp_send_json_error('Utilisateur non connecté');
         }
 
         // 3. Nettoyage de l'entrée
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
         $vendor_id = isset($_POST['vendor_id']) ? intval($_POST['vendor_id']) : get_current_user_id();
 
         if (!$vendor_id) {

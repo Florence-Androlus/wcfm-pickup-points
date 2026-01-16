@@ -70,9 +70,9 @@
 
     // Vérification si la version Pro est active
     if (is_plugin_active(FAND_ULTIMAT_PRO_PLUGIN)) {
-        define('FAND_ULTIMATE_PRO_ACTIVE', true);
+        define('FAND_PICKUP_PLUGIN_ACTIVE', true);
     } else {
-        define('FAND_ULTIMATE_PRO_ACTIVE', false);
+        define('FAND_PICKUP_PLUGIN_ACTIVE', false);
     }
 
     // Inclure le fichier principal du plugin

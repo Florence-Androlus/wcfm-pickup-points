@@ -36,8 +36,8 @@ if ( ! defined( 'ABSPATH' ) ) {
                     // L'objet $products est déjà une WP_Query exécutée et injectée dans $wp_query dans le parent.
                     // On peut simplement faire la boucle :
                     if ( $products->have_posts() ) :
-                                                // $count et $paged sont disponibles ou peuvent être récupérés de $products
-                        $count = $products->found_posts;
+                                                // $fand_count et $paged sont disponibles ou peuvent être récupérés de $products
+                        $fand_count = $products->found_posts;
                         $paged = $products->query_vars['paged']; // Utiliser paged de la query
                         ?>
                         
@@ -46,10 +46,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php if ( woocommerce_product_loop() ) { ?>
                             
                             <?php do_action( 'wcfmmp_woocommerce_before_shop_loop_before', $vendor_id, $store_info ); ?>
-                            <?php do_action( 'woocommerce_before_shop_loop' ); ?>
+                            <?php 
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+                            do_action( 'woocommerce_before_shop_loop' ); 
+                            ?>
                             <?php do_action( 'wcfmmp_woocommerce_before_shop_loop_after', $vendor_id, $store_info ); ?>
                             
-                            <?php do_action( 'flatsome_category_title_alt'); // Flatsome Catalog support ?>
+                            <?php 
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+                            do_action( 'flatsome_category_title_alt'); 
+                            ?>
                             <?php do_action( 'wcfmmp_before_store_product_loop', $vendor_id, $store_info ); ?>
                             
                             <?php woocommerce_product_loop_start(); ?>
@@ -60,13 +66,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     
                                     <?php while ( have_posts() ) { the_post(); ?>
                                         
-                                        <?php do_action( 'wcfmmp_store_product_loop_in_before', $vendor_id, $store_info, $counter ); ?>
+                                        <?php do_action( 'wcfmmp_store_product_loop_in_before', $vendor_id, $store_info, $fand_counter ); ?>
                                         
                                         <?php wc_get_template_part( 'content', 'product' ); ?>
                                         
-                                        <?php do_action( 'wcfmmp_store_product_loop_in_after', $vendor_id, $store_info, $counter ); ?>
+                                        <?php do_action( 'wcfmmp_store_product_loop_in_after', $vendor_id, $store_info, $fand_counter ); ?>
                                         
-                                        <?php $counter++; ?>
+                                        <?php $fand_counter++; ?>
                                     
                                     <?php }  ?>
                                     
@@ -83,20 +89,29 @@ if ( ! defined( 'ABSPATH' ) ) {
                             <?php do_action( 'wcfmmp_after_store_product_loop', $vendor_id, $store_info ); ?>
                             
                             <?php do_action( 'wcfmmp_woocommerce_after_shop_loop_before', $vendor_id, $store_info ); ?>
-                            <?php do_action( 'woocommerce_after_shop_loop' ); ?>
+                            <?php 
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+                            do_action( 'woocommerce_after_shop_loop' ); 
+                            ?>
                             <?php do_action( 'wcfmmp_woocommerce_after_shop_loop_after', $vendor_id, $store_info ); ?>
                             
                             <?php //wcfmmp_content_nav( 'nav-below' ); ?>
                         
                         <?php } else { ?>
-                            <?php do_action( 'woocommerce_no_products_found' ); ?>
+                            <?php 
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+                            do_action( 'woocommerce_no_products_found' ); 
+                            ?>
                         <?php } ?>
                         
                         <?php do_action( 'wcfmmp_after_store_product', $vendor_id, $store_info ); ?>
                         
                     
                     <?php else : ?>
-                        <?php do_action( 'woocommerce_no_products_found' ); ?>
+                        <?php 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+                        do_action( 'woocommerce_no_products_found' ); 
+                        ?>
                     <?php endif; ?>
                     
                 </div></div><?php do_action( 'wcfmmp_store_after_products', $vendor_id ); ?>

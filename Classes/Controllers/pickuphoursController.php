@@ -18,7 +18,7 @@ class pickuphoursController {
         add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
     }
 
-public function savePickupHours() {
+    public function savePickupHours() {
         // --- Nonce (Sanitized)
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (! wp_verify_nonce($nonce, 'save_pickup_hours_nonce')) {
@@ -45,6 +45,7 @@ public function savePickupHours() {
     }
 
     public function loadPickupHoursTemplate() {
+        
         // --- Nonce (Sanitized)
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
         if (! wp_verify_nonce($nonce, 'load_pickup_hours_nonce')) {

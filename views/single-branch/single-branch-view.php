@@ -10,93 +10,93 @@ get_header();
 use fandWCFMPickupPoints\Classes\Models\BranchModel;
 
 // Récupération des données passées
-$vendor_id = get_query_var('current_vendor_id');
-$store_url = function_exists('get_wcfm_store_url') ? get_wcfm_store_url($vendor_id) : '#';
+$fand_vendor_id = get_query_var('current_vendor_id');
+$fand_store_url = function_exists('get_wcfm_store_url') ? get_wcfm_store_url($fand_vendor_id) : '#';
 
-$branch_raw_data = get_query_var( 'current_branch_data' );
+$fand_branch_raw_data = get_query_var( 'current_branch_data' );
 
 // 2. Utilisation du Modèle pour récupérer TOUTES les données formatées
 // Assurez-vous que l'instanciation est correcte selon où se trouve la classe (probablement besoin d'un autoloader ou d'un require, mais l'usage du namespace ici est supposé fonctionnel)
-$branch_model = new BranchModel();
-$data = $branch_model->getSingleBranchData($vendor_id, $branch_raw_data);
+$fand_branch_model = new BranchModel();
+$fand_data = $fand_branch_model->getSingleBranchData($fand_vendor_id, $fand_branch_raw_data);
 // Le script JS s'attend à un tableau de marqueurs, nous encapsulons donc le résultat.
-$markers = $data ? [$data] : [];
+$fand_markers = $fand_data ? [$fand_data] : [];
 // 3. Extraction des variables pour la vue (similaire à ce que vous faisiez)
 // Les noms de variables sont maintenant ceux définis dans le tableau de retour du modèle.
-$branch_id         = $data['branch_id'];
-$branch_name       = $data['branch_name'];
-$address           = $data['display_address'];
-$lat               = $data['lat'];
-$lng               = $data['lng'];
-$email             = $data['vendor_email'];
-$phone             = $data['vendor_phone'];
-$avatar            = $data['avatar_url'];
-$store_url         = $data['store_url'];
-$banner            = $data['banner_url']; 
-$store_info        = $data['store_info'];
-$category_terms    = $data['category_terms']; // Utilisé plus bas pour le filtre/catégories
-$store_user        = wcfmmp_get_store( $vendor_id );
-$store_info        = $store_user->get_shop_info();
+$fand_branch_id         = $fand_data['branch_id'];
+$fand_branch_name       = $fand_data['branch_name'];
+$fand_address           = $fand_data['display_address'];
+$fand_lat               = $fand_data['lat'];
+$fand_lng               = $fand_data['lng'];
+$fand_email             = $fand_data['vendor_email'];
+$fand_phone             = $fand_data['vendor_phone'];
+$fand_avatar            = $fand_data['avatar_url'];
+$fand_store_url    = $fand_data['store_url'];
+$fand_banner            = $fand_data['banner_url']; 
+$fand_store_info        = $fand_data['store_info'];
+$fand_category_terms    = $fand_data['category_terms']; // Utilisé plus bas pour le filtre/catégories
+$fand_store_user        = wcfmmp_get_store( $fand_vendor_id );
+$fand_store_info        = $fand_store_user->get_shop_info();
 
 // Récupérer l'ID du post "Branch" actuellement affiché dans la requête principale
-$current_post_id = get_queried_object_id();
+$fand_current_post_id = get_queried_object_id();
 
 // Assurez-vous que cette variable est disponible avant ce bloc (elle doit venir de la fonction de routage)
-$branch_slug = get_query_var( 'branch_slug' ); 
+$fand_branch_slug = get_query_var( 'branch_slug' ); 
 
 // 1. Définir le chemin de base stable
 // Assurez-vous que 'pickup/emplacement' est la base de vos permaliens.
-if ( ! empty( $branch_slug ) ) {
-    $base_path = 'pickup/emplacement/' . $branch_slug;
+if ( ! empty( $fand_branch_slug ) ) {
+    $fand_base_path = 'pickup/emplacement/' . $fand_branch_slug;
     
     // 2. Reconstruire l'URL de base complète de l'emplacement (ex: .../la-rhum-caffee/)
     // Cette URL DOIT se terminer par un slash, mais SANS SLUG D'ONGLET.
-    $base_url_for_tabs = trailingslashit( site_url( $base_path ) );
+    $fand_base_url_for_tabs = trailingslashit( site_url( $fand_base_path ) );
     
 } else {
     // Cas de repli si le branch_slug n'est pas disponible (improbable si le routage fonctionne)
-    $base_url_for_tabs = site_url(); 
+    $fand_base_url_for_tabs = site_url(); 
 }
 // Reconstruit l'URL de base stable de l'emplacement :
-$base_url_for_filter = trailingslashit( site_url( $base_path ) );
+$fand_base_url_for_filter = trailingslashit( site_url( $fand_base_path ) );
 
 // Récupérer le slug d'onglet actif. On utilise maintenant 'tab_slug' qui est défini par le routage
-$active_tab = get_query_var( 'tab_slug' ); 
+$fand_active_tab = get_query_var( 'tab_slug' ); 
 
 // --- Détermination de l'onglet actif (Logique simplifiée et plus robuste) ---
-$valid_tabs = array('about', 'policies', 'reviews', 'followers');
+$fand_valid_tabs = array('about', 'policies', 'reviews', 'followers');
 
-if ( ! empty( $active_tab ) && in_array( $active_tab, $valid_tabs ) ) {
+if ( ! empty( $fand_active_tab ) && in_array( $fand_active_tab, $fand_valid_tabs ) ) {
     // Si la variable de requête 'tab_slug' existe et est valide, on l'utilise
     // (Ceci suppose que le routage PHP fonctionne maintenant)
 } else {
     // Sinon, on utilise l'onglet par défaut (produits)
-    $active_tab = 'products'; 
+    $fand_active_tab = 'products'; 
 }
 
 // Récupérer la page actuelle pour la pagination
-$paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+$fand_paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 // Récupérer le slug de la catégorie sélectionnée (pour le filtre)
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( wp_unslash( $_GET['product_cat'] ) ) : '';
+$fand_current_cat_slug = isset( $_GET['product_cat'] ) ? sanitize_text_field( wp_unslash( $_GET['product_cat'] ) ) : '';
 
 // 1. Définition des arguments de la requête des produits
-$args = array(
+$fand_args = array(
     'post_type'      => 'product',
     'post_status'    => 'publish',
     'posts_per_page' => 12, 
-    'author'         => $vendor_id, 
-    'paged'          => $paged,
+    'author'         => $fand_vendor_id, 
+    'paged'          => $fand_paged,
 );
 
 // 2. Logique de FILTRE par CATÉGORIE
-if ( ! empty( $current_cat_slug ) ) {
+if ( ! empty( $fand_current_cat_slug ) ) {
     // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-    $args['tax_query'] = array(
+    $fand_args['tax_query'] = array(
         array(
             'taxonomy' => 'product_cat',
             'field'    => 'slug',
-            'terms'    => $current_cat_slug,
+            'terms'    => $fand_current_cat_slug,
         ),
     );
 }
@@ -106,39 +106,39 @@ if ( ! empty( $current_cat_slug ) ) {
 if ( isset( $_GET['orderby'] ) ) {
     // On ignore le Nonce car il s'agit d'un tri d'affichage public via URL (GET)
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-    $orderby = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
+    $fand_orderby = sanitize_text_field( wp_unslash( $_GET['orderby'] ) );
 
-    if ( $orderby == 'price' ) {
-        $args['orderby'] = 'meta_value_num';
+    if ( $fand_orderby == 'price' ) {
+        $fand_args['orderby'] = 'meta_value_num';
         // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-        $args['meta_key'] = '_price';
-        $args['order'] = 'ASC';
-    } elseif ( $orderby == 'price-desc' ) {
-        $args['orderby'] = 'meta_value_num';
+        $fand_args['meta_key'] = '_price';
+        $fand_args['order'] = 'ASC';
+    } elseif ( $fand_orderby == 'price-desc' ) {
+        $fand_args['orderby'] = 'meta_value_num';
         // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-        $args['meta_key'] = '_price';
-        $args['order'] = 'DESC';
-    } elseif ( $orderby == 'date' ) {
-        $args['orderby'] = 'date';
-        $args['order'] = 'DESC';
+        $fand_args['meta_key'] = '_price';
+        $fand_args['order'] = 'DESC';
+    } elseif ( $fand_orderby == 'date' ) {
+        $fand_args['orderby'] = 'date';
+        $fand_args['order'] = 'DESC';
     }
 }
 
 // 4. Exécuter la requête
-$products = new WP_Query( $args );
+$fand_products = new WP_Query( $fand_args );
 
 // 5. Mettre à jour la requête globale pour les fonctions WooCommerce/pagination si des produits existent
-if ( $products->have_posts() ) {
+if ( $fand_products->have_posts() ) {
     global $wp_query;
-    $original_wp_query = $wp_query; // Sauvegarder l'original
-    $wp_query = $products;          // Remplacer
+    $fand_original_wp_query = $wp_query; // Sauvegarder l'original
+    $wp_query = $fand_products;          // Remplacer
     wc_set_loop_prop( 'is_main_query', false ); 
-    wc_set_loop_prop( 'total', $products->found_posts );
-    wc_set_loop_prop( 'current_page', $paged ); 
+    wc_set_loop_prop( 'total', $fand_products->found_posts );
+    wc_set_loop_prop( 'current_page', $fand_paged ); 
 }
 
 // Définir la variable de compteur, même si elle n'est pas strictement nécessaire ici
-$counter = 0;
+$fand_counter = 0;
 
 ?>
 
@@ -149,8 +149,8 @@ $counter = 0;
 
                 <div class="wcfm_banner_area">
                     <section class="banner_area banner_area_desktop">
-                          <div class="banner_img" style="background-image: url('<?php echo esc_url($banner); ?>');"></div>
-                        <div class="banner_text"><h1><?php echo esc_html( $branch_name ); ?></h1></div>
+                          <div class="banner_img" style="background-image: url('<?php echo esc_url($fand_banner); ?>');"></div>
+                        <div class="banner_text"><h1><?php echo esc_html( $fand_branch_name ); ?></h1></div>
                     </section>
                 </div>
                 
@@ -160,7 +160,7 @@ $counter = 0;
                             <div class="lft header_left">
                                 <div class="logo_area lft">
                                     <a href="#">
-                                        <img src="<?php echo esc_url( $avatar ); ?>" alt="Logo">
+                                        <img src="<?php echo esc_url( $fand_avatar ); ?>" alt="Logo">
                                     </a>
                                 </div>
                                 <div class="logo_area_after">
@@ -179,22 +179,22 @@ $counter = 0;
                                 <div class="address rgt" >                                            
                                     <p class=" wcfmmp_store_header_address">
                                     <i class="wcfmfa fa-map-marker" aria-hidden="true"></i>
-                                    <a href="https://google.com/maps/place/Avenue%20Pierre%20et%20Marie%20Curie%2C%2083240%20CAVALAIRE-SUR-MER%2C%20France/@43.17160958829991,6.5316724776202895&amp;z=16" target="_blank"><span><?php echo esc_html( $address ); ?></span></a>
+                                    <a href="https://google.com/maps/place/Avenue%20Pierre%20et%20Marie%20Curie%2C%2083240%20CAVALAIRE-SUR-MER%2C%20France/@43.17160958829991,6.5316724776202895&amp;z=16" target="_blank"><span><?php echo esc_html( $fand_address ); ?></span></a>
                                     </p>
                                     <div class="">
                                         <div class="store_info_parallal wcfmmp_store_header_phone" style="margin-right: 10px;">
                                             <i class="wcfmfa fa-phone" aria-hidden="true"></i>
                                             <span>
-                                            <a href="tel:<?php echo esc_attr( $phone ); ?>">
-                                                <?php echo esc_html( $phone ); ?>
+                                            <a href="tel:<?php echo esc_attr( $fand_phone ); ?>">
+                                                <?php echo esc_html( $fand_phone ); ?>
                                             </a>
                                             </span>
                                         </div>
                                         <div class="store_info_parallal wcfmmp_store_header_email">
                                             <i class="wcfmfa fa-envelope" aria-hidden="true"></i>
                                             <span>
-                                            <a href="mailto:<?php echo esc_attr( $email ); ?>">
-                                                <?php echo esc_html( $email ); ?>
+                                            <a href="mailto:<?php echo esc_attr( $fand_email ); ?>">
+                                                <?php echo esc_html( $fand_email ); ?>
                                             </a>
                                             </span>
                                         </div>  
@@ -240,11 +240,11 @@ $counter = 0;
 <script>
     // Variables PHP rendues pour le JavaScript
     // mapMarkers ne contient maintenant qu'un seul élément (la branche actuelle)
-    const mapMarkers = <?php echo wp_json_encode( $markers ); ?>;
+    const mapMarkers = <?php echo wp_json_encode( $fand_markers ); ?>;
 
     // Ajout des coordonnées pour le centrage de la carte
-    const currentLat = <?php echo json_encode($lat); ?>;
-    const currentLng = <?php echo json_encode($lng); ?>;
+    const currentLat = <?php echo json_encode($fand_lat); ?>;
+    const currentLng = <?php echo json_encode($fand_lng); ?>;
     const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_PLUGIN_URL ); ?>';
     const isSingleView = true; // Flag pour le script général
 

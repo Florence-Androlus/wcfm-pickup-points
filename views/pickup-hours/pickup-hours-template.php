@@ -30,52 +30,52 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="wcfm_clearfix"></div>
 
     <?php 
-    $jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-    foreach(range(0,6) as $day): 
-        $day_slots = $hours[$day] ?? [];
+    $fand_jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    foreach(range(0,6) as $fand_day): 
+        $fand_day_slots = $hours[$fand_day] ?? [];
     ?>
         <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_0">
-          <strong><?php echo esc_html( $jours[$day] ) ?> : Time Slots</strong>
+          <strong><?php echo esc_html( $fand_jours[$fand_day] ) ?> : Time Slots</strong>
           <?php 
             // On définit le nom complet avec le namespace
-            $func_pro = '\fandWCFMPickupPoints\wcfm_pickup_is_premium_active';
-            if ( function_exists($func_pro) && $func_pro() ) : 
+            $fand_func_pro = '\fandWCFMPickupPoints\wcfm_pickup_is_premium_active';
+            if ( function_exists($fand_func_pro) && $fand_func_pro() ) : 
           ?>
-            <a href="#" class="duplicate-hours-btn" data-day="<?php echo esc_attr( $day ) ?>" title="Dupliquer les horaires">
+            <a href="#" class="duplicate-hours-btn" data-day="<?php echo esc_attr( $fand_day ) ?>" title="Dupliquer les horaires">
 
           <span class="wcfmfa fa-copy"></span>
           </a>
           <?php endif; ?>
         </p>
 
-        <label class="screen-reader-text" for="wcfm_store_hours_mon_times"><?php echo esc_html( $jours[$day] ) ?> : Time Slots</label>
+        <label class="screen-reader-text" for="wcfm_store_hours_mon_times"><?php echo esc_html( $fand_jours[$fand_day] ) ?> : Time Slots</label>
         
-        <div class="multi_input_holder" data-day="<?php echo esc_attr( $day ) ?>">
-            <?php if(!empty($day_slots)): ?>
-                <?php foreach($day_slots as $slot_index => $slot): ?>
+        <div class="multi_input_holder" data-day="<?php echo esc_attr( $fand_day ) ?>">
+            <?php if(!empty($fand_day_slots)): ?>
+                <?php foreach($fand_day_slots as $fand_slot_index => $fand_slot): ?>
                     <div class="multi_input_block ui-sortable-handle">
                         <div class="wcfm_clearfix"></div>
                         
                         <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong>Opening</strong></p>
                         <label class="screen-reader-text">Opening</label>
                         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
-                              data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][<?php echo esc_attr($slot_index) ?>][start]" 
-                              value="<?php echo esc_attr($slot['start'] ?? '') ?>">                       
+                              data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][<?php echo esc_attr($fand_slot_index) ?>][start]" 
+                              value="<?php echo esc_attr($fand_slot['start'] ?? '') ?>">                       
                         <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label">
                           <strong>Closing</strong>
                         </p>
                         <label class="screen-reader-text">Closing</label>
                         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
-                              data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][<?php echo esc_attr($slot_index) ?>][end]" 
-                              value="<?php echo esc_attr($slot['end'] ?? '') ?>">
+                              data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][<?php echo esc_attr($fand_slot_index) ?>][end]" 
+                              value="<?php echo esc_attr($fand_slot['end'] ?? '') ?>">
                         
                         <span class="multi_input_block_manupulate remove_multi_input_block wcfmfa fa-times-circle"></span>
                         <span class="add_multi_input_block multi_input_block_manupulate wcfmfa fa-plus-circle"></span>
 
                         <!-- ID du créneau -->
                         <input type="hidden" class="slot-id" 
-                              data-name="id" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][<?php echo esc_attr($slot_index) ?>][id]" 
-                              value="<?php echo !empty($slot['id']) ? intval($slot['id']) : 0 ?>">
+                              data-name="id" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][<?php echo esc_attr($fand_slot_index) ?>][id]" 
+                              value="<?php echo !empty($fand_slot['id']) ? intval($fand_slot['id']) : 0 ?>">
 
                     </div>
                 <?php endforeach; ?>
@@ -88,18 +88,18 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong>Opening</strong></p>
                     <label class="screen-reader-text">Opening</label>
                     <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
-                          data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][0][start]" value="">
+                          data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][0][start]" value="">
                     
                     <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label"><strong>Closing</strong></p>
                     <label class="screen-reader-text">Closing</label>
                     <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
-                          data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][0][end]" value="">
+                          data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][0][end]" value="">
                     
                     <span class="multi_input_block_manupulate remove_multi_input_block wcfmfa fa-times-circle"></span>
                     <span class="add_multi_input_block multi_input_block_manupulate wcfmfa fa-plus-circle"></span>
 
                     <input type="hidden" class="slot-id" 
-                          data-name="id" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($day) ?>][0][id]" value="0">
+                          data-name="id" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fand_day) ?>][0][id]" value="0">
                 </div>
             <?php endif; ?>
         </div>
@@ -113,7 +113,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="wcfm-clearfix"></div>
       <div class="wcfm_clearfix"></div>
       <?php
-            if ( function_exists($func_pro) && $func_pro() ) : 
+            if ( function_exists($fand_func_pro) && $fand_func_pro() ) : 
       ?>
 			<div class="wcfm_pickup_settings_heading"><h2>Mode vacances</h2></div>
 			<div class="wcfm_clearfix"></div>

@@ -72,13 +72,15 @@ class PickupModel {
 
     public function getHours($branch_id) {
         global $wpdb;
+        $table_name = $wpdb->prefix . 'fand_wcfm_pickup_hours';
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $results = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT ID, day_of_week, open_time, close_time 
-                FROM $wpdb->prefix . 'fand_wcfm_pickup_hours' 
+                FROM %i 
                 WHERE branch_id = %d
                 ORDER BY day_of_week, open_time ASC",
+                $table_name,
                 $branch_id
             ),
             ARRAY_A
@@ -104,16 +106,17 @@ class PickupModel {
 
     public function getHolidays($branch_id) {
         global $wpdb;
+        $table_name = $wpdb->prefix . 'fand_wcfm_pickup_holidays';
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         return $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM $wpdb->prefix . 'fand_wcfm_pickup_holidays' WHERE branch_id=%d", $branch_id),
+            $wpdb->prepare("SELECT * FROM %i WHERE branch_id=%d",$table_name, $branch_id),
             ARRAY_A
         );
     }
 
     public static function getPickupData($filters) { 
         global $wpdb;
-        
+        error_log('getPickupData');
         // --- 1. Initialisation des variables ---
         $markers = [];
         $vendors_data = [];
@@ -142,6 +145,7 @@ class PickupModel {
             $country_codes = array_flip($countries); 
             $default_country = $country_codes[$default_location] ?? 'FR'; 
         }
+        error_log($default_country);
 
         // --- 2. Récupération des vendeurs ---
         $vendors = get_users(['role__in' => ['wcfm_vendor']]);

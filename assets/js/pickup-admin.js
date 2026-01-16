@@ -131,7 +131,8 @@
             type: 'POST',
             data: {
                 action: 'get_vendor_categories',
-                vendor_id: vendorId
+                vendor_id: vendorId,
+                security: MonPluginData.get_categories_nonce
             },
             success: function(response) {
                 

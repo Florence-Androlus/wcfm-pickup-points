@@ -15,7 +15,7 @@ class PickupHours {
         global $wpdb;
         
         // On construit le nom de la table directement
-        $table_name = "{$wpdb->prefix}fand_wcfm_pickup_hours";
+        $table_name = $wpdb->prefix . 'fand_wcfm_pickup_hours';
 
         $branch_id = isset($data['branch_id']) ? intval($data['branch_id']) : 0;
         

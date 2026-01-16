@@ -29,27 +29,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 <?php 
                 // 1. Option "Toutes les catégories" (valeur = URL de base sans filtre)
-                $all_cat_selected = empty( $current_cat_slug ) ? 'selected="selected"' : '';
+                $fand_all_cat_selected = empty( $current_cat_slug ) ? 'selected="selected"' : '';
                 ?>
-                <option value="<?php echo esc_url( $base_url_for_filter ); ?>" <?php echo esc_attr( $all_cat_selected ); ?>>
+                <option value="<?php echo esc_url( $base_url_for_filter ); ?>" <?php echo esc_attr( $fand_all_cat_selected ); ?>>
                     Toutes les catégories
                 </option>
 
                 <?php
                 // Boucle pour chaque catégorie
-                if ( ! is_wp_error( $category_terms ) && ! empty( $category_terms ) ) :
-                    foreach ( $category_terms as $category ) :
-                        $cat_slug = $category->slug;
-                        $cat_name = $category->name;
+                if ( ! is_wp_error( $fand_category_terms ) && ! empty( $fand_category_terms ) ) :
+                    foreach ( $fand_category_terms as $fand_category ) :
+                        $fand_cat_slug = $fand_category->slug;
+                        $fand_cat_name = $fand_category->name;
 
                         // URL de filtrage
-                        $category_filter_url = add_query_arg( 'product_cat', $cat_slug, $base_url_for_filter );
+                        $fand_category_filter_url = add_query_arg( 'product_cat', $fand_cat_slug, $base_url_for_filter );
 
                         // Déterminer si option sélectionnée
-                        $selected_attr = ( $current_cat_slug === $cat_slug ) ? 'selected="selected"' : '';
+                        $fand_selected_attr = ( $current_cat_slug === $fand_cat_slug ) ? 'selected="selected"' : '';
                         ?>
-                        <option value="<?php echo esc_url( $category_filter_url ); ?>" <?php echo esc_attr( $selected_attr ); ?>>
-                            <?php echo esc_html( $cat_name ); ?>
+                        <option value="<?php echo esc_url( $fand_category_filter_url ); ?>" <?php echo esc_attr( $fand_selected_attr ); ?>>
+                            <?php echo esc_html( $fand_cat_name ); ?>
                         </option>
                     <?php
                     endforeach;
@@ -70,16 +70,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  
     // Récupérer tous les horaires pour cette branche
     // 1. Définition des paramètres de cache pour cette branche spécifique
-    $cache_key   = 'branch_hours_' . intval( $branch_id );
-    $cache_group = 'fand_pickup';
+    $fand_cache_key   = 'branch_hours_' . intval( $branch_id );
+    $fand_cache_group = 'fand_pickup';
 
     // 2. Tentative de récupération depuis le cache
-    $raw_hours = wp_cache_get( $cache_key, $cache_group );
+    $fand_raw_hours = wp_cache_get( $fand_cache_key, $fand_cache_group );
 
-    if ( false === $raw_hours ) {
+    if ( false === $fand_raw_hours ) {
         // 3. Si non présent, on exécute la requête SQL préparée
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-        $raw_hours = $wpdb->get_results( 
+        $fand_raw_hours = $wpdb->get_results( 
             $wpdb->prepare(
                 "SELECT day_of_week, open_time, close_time, is_closed FROM {$wpdb->prefix}fand_wcfm_pickup_hours WHERE branch_id = %d",
                 intval( $branch_id )
@@ -88,35 +88,35 @@ if ( ! defined( 'ABSPATH' ) ) {
         );
 
         // 4. On stocke en cache pour 12 heures
-        wp_cache_set( $cache_key, $raw_hours, $cache_group, 43200 );
+        wp_cache_set( $fand_cache_key, $fand_raw_hours, $fand_cache_group, 43200 );
     }
 
     // Organiser les données pour l'affichage (car il peut y avoir plusieurs plages horaires par jour)
-    $branch_hours = array();
+    $fand_branch_hours = array();
 
-    foreach ( $raw_hours as $hour ) {
-        $day = $hour['day_of_week'];
+    foreach ( $fand_raw_hours as $fand_hour ) {
+        $fand_day = $fand_hour['day_of_week'];
        
-        if ( ! isset( $branch_hours[$day] ) ) {
-            $branch_hours[$day] = array( 'closed' => false, 'periods' => array() );
+        if ( ! isset( $fand_branch_hours[$fand_day] ) ) {
+            $fand_branch_hours[$fand_day] = array( 'closed' => false, 'periods' => array() );
         }
         
         // Si is_closed est à 1, marquer le jour comme fermé (même si des périodes existent, on priorise le fermé)
-        if ( $hour['is_closed'] == 1 ) {
-            $branch_hours[$day]['closed'] = true;
+        if ( $fand_hour['is_closed'] == 1 ) {
+            $fand_branch_hours[$fand_day]['closed'] = true;
         } else {
             // Ajouter la plage horaire
-            $branch_hours[$day]['periods'][] = array(
-                'open'  => $hour['open_time'],
-                'close' => $hour['close_time']
+            $fand_branch_hours[$fand_day]['periods'][] = array(
+                'open'  => $fand_hour['open_time'],
+                'close' => $fand_hour['close_time']
             );
         }
     }
 
-    // Utilisation des données préparées $branch_hours
-    if ( ! empty( $branch_hours ) ) {
+    // Utilisation des données préparées $fand_branch_hours
+    if ( ! empty( $fand_branch_hours ) ) {
         // Les jours sont indexés de 0 (Lundi) à 6 (Dimanche) selon votre description
-        $days_map = array(
+        $fand_days_map = array(
             0 => 'Lundi',
             1 => 'Mardi',
             2 => 'Mercredi',
@@ -134,35 +134,35 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <ul style="list-style: none; margin: 0; padding: 0;">
                     <?php
                     // Parcourir tous les jours de la semaine (pour garantir l'ordre)
-                    foreach ( $days_map as $day_index => $day_name ) :
+                    foreach ( $fand_days_map as $fand_day_index => $fand_day_name ) :
                        
                         // Vérifier si nous avons des données pour ce jour
-                        $day_data = isset( $branch_hours[$day_index] ) ? $branch_hours[$day_index] : null;
+                        $fand_day_data = isset( $fand_branch_hours[$fand_day_index] ) ? $fand_branch_hours[$fand_day_index] : null;
                         
-                        $hours_display = '';
-                        $css_style = '';
+                        $fand_hours_display = '';
+                        $fand_css_style = '';
                         
-                        if ( $day_data && $day_data['closed'] ) {
+                        if ( $fand_day_data && $fand_day_data['closed'] ) {
                             // Jour marqué comme fermé
-                            $hours_display = 'Fermé';
-                            $css_style = 'color: red; font-weight: bold;';
-                        } elseif ( $day_data && ! empty( $day_data['periods'] ) ) {
+                            $fand_hours_display = 'Fermé';
+                            $fand_css_style = 'color: red; font-weight: bold;';
+                        } elseif ( $fand_day_data && ! empty( $fand_day_data['periods'] ) ) {
                             // Afficher les plages horaires (gestion des multiples plages)
-                            $periods_texts = array();
-                            foreach ($day_data['periods'] as $period) {
+                            $fand_periods_text = array();
+                            foreach ($fand_day_data['periods'] as $fand_period) {
                                 // Formatage simple HH:MM - HH:MM
-                                $periods_texts[] = substr($period['open'], 0, 5) . ' - ' . substr($period['close'], 0, 5);
+                                $fand_periods_text[] = substr($fand_period['open'], 0, 5) . ' - ' . substr($fand_period['close'], 0, 5);
                             }
-                            $hours_display = implode('<br>', $periods_texts); // Afficher les plages sur plusieurs lignes
+                            $fand_hours_display = implode('<br>', $fand_periods_text); // Afficher les plages sur plusieurs lignes
                         } else {
                             // Pas de données spécifiques (peut être considéré comme fermé si non renseigné)
-                            $hours_display = 'Non spécifié / Fermé';
-                            $css_style = 'color: #888;';
+                            $fand_hours_display = 'Non spécifié / Fermé';
+                            $fand_css_style = 'color: #888;';
                         }
                         ?>
                         <li style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
-                            <span style="font-weight: 600;"><?php echo esc_html($day_name); ?> :</span>
-                            <span style="<?php echo esc_attr($css_style); ?> text-align: right;"><?php echo esc_html($hours_display); ?></span>
+                            <span style="font-weight: 600;"><?php echo esc_html($fand_day_name); ?> :</span>
+                            <span style="<?php echo esc_attr($fand_css_style); ?> text-align: right;"><?php echo esc_html($fand_hours_display); ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>
