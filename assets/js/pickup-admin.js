@@ -1,6 +1,13 @@
 (function($){
     $(document).ready(function() {
+        // On détecte quelle variable est disponible
+        const config = window.config || window.FAND_PICKUP_DATA;
 
+        if (!config) {
+            console.error("Aucune configuration trouvée pour le plugin Pickup.");
+            return;
+        }
+        
         // AJAX formulaire
         $(document).on('click', '.wcfm_store_branch_edit', function(e){
                 e.preventDefault();
@@ -13,12 +20,12 @@
 
                 if($('#custom_branch_hours').length === 0){
                     $.ajax({
-                        url: PickupAdminData.ajax_url,
+                        url: config.ajax_url,
                         method: 'POST',
                         data: {
                             action: 'load_pickup_hours_template',
                             branch_id: branchId,
-                            _wpnonce: PickupAdminData.loadPickupNonce
+                            _wpnonce: config.loadPickupNonce
                         },
                         success: function(response){
                             if(response.success && response.data.html){
@@ -30,13 +37,13 @@
 
                                     var data = {
                                         action: 'save_pickup_hours',
-                                        _wpnonce: PickupAdminData.savePickupNonce,
+                                        _wpnonce: config.savePickupNonce,
                                         branch_id: $form.find('[name="branch_id"]').val(),
                                         wcfm_pickup_hours: JSON.stringify({ day_times: getPickupHoursData() })
                                     };
 
                                     $.ajax({
-                                        url: PickupAdminData.ajax_url,
+                                        url: config.ajax_url,
                                         type: 'POST',
                                         data: data,
                                         dataType: 'json',
@@ -126,34 +133,39 @@
         }
 
         // Appel AJAX pour récupérer les catégories déjà sauvées
+
         $.ajax({
-            url: MonPluginData.ajax_url || ajaxurl, 
+            url: config.ajax_url, // On utilise config partout
             type: 'POST',
             data: {
                 action: 'get_vendor_categories',
                 vendor_id: vendorId,
-                security: MonPluginData.get_categories_nonce
+                security: config.getCategoriesNonce // Assurez-vous que ce nom correspond au PHP
             },
             success: function(response) {
-                
-                // On récupère les valeurs (si erreur ou vide, on prend un tableau vide)
                 const savedValues = (response.success && response.data) ? response.data : [];
-                const categories = MonPluginData.categories || [];
+                // On récupère les catégories ou un tableau vide pour éviter le crash
+                const categories = config.categories || [];
 
-                // On injecte le champ seulement si on a la liste des catégories globales
                 if (categories.length > 0) {
                     injectCategoryField(categories, savedValues);
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Erreur AJAX lors de la récupération des catégories :", error);
-                // En cas d'erreur, on injecte quand même le champ vide
-                injectCategoryField(MonPluginData.categories, []);
+                // SECURITÉ : On passe un tableau vide [] si les catégories sont absentes
+                const categories = (config && config.categories) ? config.categories : [];
+                injectCategoryField(categories, []);
             }
         });
 
         function injectCategoryField(allCategories, savedValues) {
-            // Sécurité : on s'assure que savedValues est un tableau
+            // 1. Double sécurité pour éviter le TypeError 'map'
+            if (!allCategories || !Array.isArray(allCategories)) {
+                console.warn("injectCategoryField: allCategories n'est pas un tableau valide.");
+                return; 
+            }
+
             const selectedList = Array.isArray(savedValues) ? savedValues : [];
 
             let optionsHtml = allCategories.map(cat => {

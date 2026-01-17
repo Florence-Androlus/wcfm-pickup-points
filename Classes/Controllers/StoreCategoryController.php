@@ -14,6 +14,7 @@ class StoreCategoryController {
     
         // Ajout des routes AJAX
         add_action('wp_ajax_get_vendor_categories', [$this, 'ajaxGetCategories']);
+        add_action('wp_ajax_nopriv_get_vendor_categories', [$this, 'ajaxGetCategories']);
     }
 
     /**

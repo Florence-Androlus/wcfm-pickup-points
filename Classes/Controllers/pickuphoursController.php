@@ -52,6 +52,10 @@ class pickuphoursController {
             wp_send_json_error(['message' => 'Nonce invalide']);
         }
 
+        if (!current_user_can('manage_woocommerce') && !wcfm_is_vendor()) {
+            wp_send_json_error(['message' => 'Accès refusé']);
+        }
+
         // --- Branch ID
         $branch_id = isset($_POST['branch_id']) ? intval($_POST['branch_id']) : 0;
         if (!$branch_id) {
@@ -60,8 +64,10 @@ class pickuphoursController {
 
         // --- Récupération données
         $model = new PickupModel();
-        $hours = $model->getHours($branch_id);
-        $holidays = $model->getHolidays($branch_id);
+        $fand_hours = $model->getHours($branch_id);
+        $fand_holidays = $model->getHolidays($branch_id);
+        error_log('fand_hours :'.print_r($fand_hours,true));
+        error_log('fand_holidays :'.print_r($fand_holidays,true));
 
         ob_start();
 

@@ -54,8 +54,6 @@ $fand_default_state    = '';
         // On ignore le manque de Nonce car c'est un filtre de carte public (GET)
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $fand_selected_country = isset($_GET['country']) ? sanitize_text_field(wp_unslash($_GET['country'])) : $fand_default_country; 
-        error_log( $fand_selected_country);
-        error_log( print_r($fand_countries,true));
     ?>
 
     <select name="country" id="pickup-country"> <option value="">Tous les pays</option>

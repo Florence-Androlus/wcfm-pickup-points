@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <label class="screen-reader-text" for="woocommerce-product-search-field-0">Recherche pour&nbsp;:</label>
         <input type="search" id="woocommerce-product-search-field-0" class="search-field" placeholder="Recherche de produits…" value="" name="s">
         
-        <input type="hidden" name="vendor_id_for_redirect" value="<?php echo esc_attr( $vendor_id ); ?>" />
+        <input type="hidden" name="vendor_id_for_redirect" value="<?php echo esc_attr( $fand_vendor_id ); ?>" />
         <input type="hidden" name="force_redirect_product" value="1" />
         
         <button type="submit" value="Recherche">Recherche</button>
@@ -29,9 +29,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 <?php 
                 // 1. Option "Toutes les catégories" (valeur = URL de base sans filtre)
-                $fand_all_cat_selected = empty( $current_cat_slug ) ? 'selected="selected"' : '';
+                $fand_all_cat_selected = empty( $fand_current_cat_slug ) ? 'selected="selected"' : '';
                 ?>
-                <option value="<?php echo esc_url( $base_url_for_filter ); ?>" <?php echo esc_attr( $fand_all_cat_selected ); ?>>
+                <option value="<?php echo esc_url( $fand_base_url_for_filter ); ?>" <?php echo esc_attr( $fand_all_cat_selected ); ?>>
                     Toutes les catégories
                 </option>
 
@@ -43,10 +43,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                         $fand_cat_name = $fand_category->name;
 
                         // URL de filtrage
-                        $fand_category_filter_url = add_query_arg( 'product_cat', $fand_cat_slug, $base_url_for_filter );
+                        $fand_category_filter_url = add_query_arg( 'product_cat', $fand_cat_slug, $fand_base_url_for_filter );
 
                         // Déterminer si option sélectionnée
-                        $fand_selected_attr = ( $current_cat_slug === $fand_cat_slug ) ? 'selected="selected"' : '';
+                        $fand_selected_attr = ( $fand_current_cat_slug === $fand_cat_slug ) ? 'selected="selected"' : '';
                         ?>
                         <option value="<?php echo esc_url( $fand_category_filter_url ); ?>" <?php echo esc_attr( $fand_selected_attr ); ?>>
                             <?php echo esc_html( $fand_cat_name ); ?>
@@ -70,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  
     // Récupérer tous les horaires pour cette branche
     // 1. Définition des paramètres de cache pour cette branche spécifique
-    $fand_cache_key   = 'branch_hours_' . intval( $branch_id );
+    $fand_cache_key   = 'branch_hours_' . intval( $fand_branch_id );
     $fand_cache_group = 'fand_pickup';
 
     // 2. Tentative de récupération depuis le cache
@@ -81,8 +81,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $fand_raw_hours = $wpdb->get_results( 
             $wpdb->prepare(
-                "SELECT day_of_week, open_time, close_time, is_closed FROM {$wpdb->prefix}fand_wcfm_pickup_hours WHERE branch_id = %d",
-                intval( $branch_id )
+                "SELECT day_of_week, open_time, close_time, is_closed FROM $wpdb->prefix.fand_wcfm_pickup_hours WHERE branch_id = %d",
+                intval( $fand_branch_id )
             ), 
             ARRAY_A 
         );
@@ -162,7 +162,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         ?>
                         <li style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee;">
                             <span style="font-weight: 600;"><?php echo esc_html($fand_day_name); ?> :</span>
-                            <span style="<?php echo esc_attr($fand_css_style); ?> text-align: right;"><?php echo esc_html($fand_hours_display); ?></span>
+                            <span style="<?php echo esc_attr($fand_css_style); ?> text-align: right;"><?php echo wp_kses($fand_hours_display, array('br' => array())); ?></span>
                         </li>
                     <?php endforeach; ?>
                 </ul>

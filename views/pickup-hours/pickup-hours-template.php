@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php 
     $fand_jours = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
     foreach(range(0,6) as $fand_day): 
-        $fand_day_slots = $hours[$fand_day] ?? [];
+        $fand_day_slots = $fand_hours[$fand_day] ?? [];
     ?>
         <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_0">
           <strong><?php echo esc_html( $fand_jours[$fand_day] ) ?> : Time Slots</strong>

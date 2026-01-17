@@ -71,21 +71,22 @@ class PickupModel {
     }
 
     public function getHours($branch_id) {
+        error_log('getHours');
         global $wpdb;
-        $table_name = $wpdb->prefix . 'fand_wcfm_pickup_hours';
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $table_name = $this->table_hours; // Utilise la variable de classe
+        
         $results = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT ID, day_of_week, open_time, close_time 
-                FROM %i 
+                FROM $table_name 
                 WHERE branch_id = %d
                 ORDER BY day_of_week, open_time ASC",
-                $table_name,
                 $branch_id
             ),
             ARRAY_A
         );
 
+        error_log('results :'.print_r($results,true));
         // Regrouper par jour
         $hours_by_day = [];
         foreach ($results as $row) {
@@ -100,7 +101,7 @@ class PickupModel {
                 'end'   => $row['close_time']
             ];
         }
-
+        error_log('hours_by_day :'.print_r($hours_by_day,true));
         return $hours_by_day;
     }
 
@@ -116,7 +117,7 @@ class PickupModel {
 
     public static function getPickupData($filters) { 
         global $wpdb;
-        error_log('getPickupData');
+        
         // --- 1. Initialisation des variables ---
         $markers = [];
         $vendors_data = [];
@@ -145,21 +146,13 @@ class PickupModel {
             $country_codes = array_flip($countries); 
             $default_country = $country_codes[$default_location] ?? 'FR'; 
         }
-        error_log($default_country);
 
         // --- 2. Récupération des vendeurs ---
         $vendors = get_users(['role__in' => ['wcfm_vendor']]);
 
         foreach ($vendors as $vendor) {
             $vendor_id = intval($vendor->ID);
-            //On récupère les réglages WCFM 
-            $store_settings = get_user_meta($vendor_id, 'wcfmmp_profile_settings', true);
 
-            // On définit l'email et le téléphone
-            // On cherche d'abord dans WCFM, sinon on prend le meta WordPress standard
-            $vendor_email = !empty($store_settings['store_email']) ? $store_settings['store_email'] : $vendor->user_email;
-            $vendor_phone = !empty($store_settings['phone']) ? $store_settings['phone'] : get_user_meta($vendor_id, 'billing_phone', true);
-            
             // --- LOGIQUE DES CATÉGORIES PERSONNALISÉES ---
             // On récupère le tableau des catégories choisies par le vendeur
             $vendor_categories = get_user_meta($vendor_id, 'wcfm_store_custom_categories', true);
@@ -176,7 +169,7 @@ class PickupModel {
             $assigned_category = !empty($selected_category) ? $selected_category : (!empty($vendor_categories) ? $vendor_categories[0] : '');
 
             // --- RÉCUPÉRATION DES BRANCHES (LOCATIONS) ---
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
             $branches = $wpdb->get_results(
                 $wpdb->prepare("SELECT * FROM {$wpdb->prefix}wcfm_store_locations WHERE store_id = %d", $vendor_id),
                 ARRAY_A
@@ -185,6 +178,8 @@ class PickupModel {
             if (empty($branches)) continue;
 
             $branch_ids = wp_list_pluck($branches, 'ID');
+            $table_meta   = $wpdb->prefix . 'wcfm_store_locations_meta';
+            
             // On génère les placeholders (%d, %d, %d...)
             $placeholders = implode( ',', array_fill( 0, count( $branch_ids ), '%d' ) );
 
@@ -200,7 +195,7 @@ class PickupModel {
             // Créer une clé unique basée sur les IDs des branches pour le cache
             $meta_cache_key = 'branches_meta_' . md5( implode( ',', $branch_ids ) );
             $meta_query = wp_cache_get( $meta_cache_key, 'fand_pickup' );
-
+            
             if ( false === $meta_query ) {
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
                 $meta_query = $wpdb->get_results( $wpdb->prepare( $sql_meta, ...$branch_ids ), ARRAY_A );
@@ -208,30 +203,30 @@ class PickupModel {
                 // On met en cache pour 1 heure
                 wp_cache_set( $meta_cache_key, $meta_query, 'fand_pickup', 3600 );
             }
-            
+                    
             $offers_pickup_map = [];
             foreach ($meta_query as $m) { 
                 $offers_pickup_map[$m['branch_id']] = $m['meta_value']; 
             }
 
             // Récupération des horaires d'ouverture personnalisés
+            // Récupération des horaires d'ouverture personnalisés
             // 1. Préparation de la requête SQL dans une variable distincte
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
             $sql_hours = "SELECT branch_id, day_of_week, open_time, close_time, is_closed 
-                          FROM {$wpdb->prefix}fand_wcfm_pickup_hours 
+                          FROM  {$wpdb->prefix}fand_wcfm_pickup_hours
                           WHERE branch_id IN ($placeholders)";
 
             // 2. On place le commentaire d'ignorance juste avant l'exécution
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
             // Création d'une clé de cache unique basée sur la liste des IDs demandés
             $hours_cache_key = 'batch_hours_' . md5( implode( ',', $branch_ids ) );
-
+            
             // Tentative de récupération depuis le cache
             $hours = wp_cache_get( $hours_cache_key, 'fand_pickup' );
-
             if ( false === $hours ) {
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
-                $hours = $wpdb->get_results( $wpdb->prepare( $sql_hours, ...$branch_ids ), ARRAY_A );
+                $hours = $wpdb->get_results( $wpdb->prepare( $sql_hours,$branch_ids ), ARRAY_A );
                 
                 // Mise en cache pour 1 heure (3600 secondes)
                 wp_cache_set( $hours_cache_key, $hours, 'fand_pickup', 3600 );
@@ -271,13 +266,11 @@ class PickupModel {
                     ];
                 }
             }
-      
+
             // Stockage des données vendeurs pour la liste latérale
             if (!empty($pickup_only_branches)) {
                 $vendors_data[] = [
                     'vendor'   => $vendor, 
-                    'vendor_email' =>$vendor_email,
-                    'vendor_phone' =>$vendor_phone,
                     'branches' => $pickup_only_branches,
                     'group_id' => $assigned_category,
                 ];

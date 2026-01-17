@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </div>
 
                     <div class="store-contact-details">
-                        <p class="store-address"><?php echo esc_html($address); ?></p>
+                        <p class="store-address"><?php echo esc_html($fand_address); ?></p>
                         <?php if ($fand_email) : ?><p class="store-phone"><i class="wcfmfa fa-envelope"></i> <?php echo esc_html($fand_email); ?></p><?php endif; ?>
                         <?php if ($fand_phone) : ?><p class="store-phone"><i class="wcfmfa fa-phone"></i> <?php echo esc_html($fand_phone); ?></p><?php endif; ?>
                     </div>

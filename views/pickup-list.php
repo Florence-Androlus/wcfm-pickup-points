@@ -89,7 +89,7 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     if ( false === $fand_all_hours ) {
                         // 3. Si pas en cache, on exécute la requête SQL
                         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-                        $fand_all_hours = $wpdb->get_results( "SELECT * FROM $wpdb->prefix.fand_wcfm_pickup_hours", ARRAY_A );
+                        $fand_all_hours = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}fand_wcfm_pickup_hours", ARRAY_A );
                         
                         // 4. On stocke en cache pour 12 heures (43200 secondes) car les horaires changent peu
                         wp_cache_set( $fand_cache_key, $fand_all_hours, $fand_cache_group, 43200 );
@@ -108,12 +108,19 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
 
                     // 3. MISE À PLAT pour le TRI
                     $fand_flat_list = [];
-                    foreach ($fand_vendors_data as $fand_v_data) {
-                        foreach ($fand_v_data['branches'] as  $fand_branch) {
-                             $fand_branch['vendor_data_node'] = $fand_v_data['vendor']; 
-                             $fand_branch['vendor_email'] = $fand_v_data['vendor_email'];
-                             $fand_branch['vendor_phone'] = $fand_v_data['vendor_phone'];
-                            $fand_flat_list[] =  $fand_branch;
+                    if ( ! empty( $fand_vendors_data ) ) {
+                        foreach ( $fand_vendors_data as $fand_v_data ) {
+                            if ( ! isset( $fand_v_data['branches'] ) ) continue;
+
+                            foreach ( $fand_v_data['branches'] as $fand_branch ) {
+                                // On s'assure que les données vendeur remontent bien dans chaque branche
+                                $fand_branch['vendor_data_node'] = $fand_v_data['vendor'] ?? null;
+                                $fand_branch['vendor_email']     = $fand_v_data['vendor_email'] ?? '';
+                                $fand_branch['vendor_phone']     = $fand_v_data['vendor_phone'] ?? '';
+                                $fand_branch['category']         = $fand_v_data['group_id'] ?? ''; // On récupère la catégorie
+                                
+                                $fand_flat_list[] = $fand_branch;
+                            }
                         }
                     }
                     
@@ -145,7 +152,7 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
 
                 foreach ($fand_flat_list as  $fand_branch):
                     $fand_vendor =  $fand_branch['vendor_data_node'];
-                     $fand_branch_name = strtolower( $fand_branch['branch_name'] ??  $fand_branch['name'] ?? '');
+                    $fand_branch_name = strtolower( $fand_branch['branch_name'] ??  $fand_branch['name'] ?? '');
                     $fand_vendor_name = strtolower($fand_vendor->display_name ?? '');
 
                     // Mise à jour du lien "Visiter le Magasin"
@@ -243,9 +250,9 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     //Sécuriser les métadonnées de branche (on force une chaîne vide si null)
                     $fand_address = ( $fand_branch['postal_code'] ?? '') . ' ' . ( $fand_branch['city'] ?? '');
                     $fand_address = ltrim(trim($fand_address));
-                    $fand_email =  $fand_branch['vendor_email'];
-                    $fand_phone =  $fand_branch['vendor_phone'];
-                     $fand_branch_name =  $fand_branch['branch_name'] ??  $fand_branch['name'] ?? 'Emplacement';
+                    $fand_email = isset($fand_branch['vendor_email']) ? $fand_branch['vendor_email'] : '';
+                    $fand_phone = isset($fand_branch['vendor_phone']) ? $fand_branch['vendor_phone'] : '';
+                    $fand_branch_name =  $fand_branch['branch_name'] ??  $fand_branch['name'] ?? 'Emplacement';
                     // Sécuriser l'ID du vendeur
                     $fand_v_id = isset($fand_vendor->ID) ? intval($fand_vendor->ID) : 0;
                     // Sécuriser l'URL de la boutique (on s'assure que $v_id n'est pas 0)
