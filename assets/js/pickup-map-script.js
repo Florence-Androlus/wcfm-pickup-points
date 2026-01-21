@@ -1,8 +1,10 @@
 // Les variables mapMarkers, defaultCategory, i18n, etc. sont disponibles
 // car le script est chargé après la balise <script> qui les définit.
 
-let markers = []; // Marqueurs Leaflet
-const popupThreshold = 10; // minutes avant ouverture/fermeture
+if (typeof markers === 'undefined') {
+    var markers = []; // Marqueurs Leaflet
+} 
+var popupThreshold = 10; // minutes avant ouverture/fermeture
 
 // ===================================
 // Fonctions utilitaires
@@ -20,120 +22,57 @@ function getCurrentDayIndex() {
 }
 
 function getMainPopupContent(p) {
-    const day = getCurrentDayIndex();
+    const dayIndex = getCurrentDayIndex();
+    const daysNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const currentDayName = daysNames[dayIndex];
+    
     const allHours = p.opening_hours || {};
-    let hours = allHours[day];
+    let hours = allHours[dayIndex];
 
-    // Traitement du texte pour l'affichage
-    const openStr = (hours && (Array.isArray(hours) || typeof hours === 'object')) 
-        ? Object.values(hours).map(r => {
-            // Correction ici : on utilise open_time et close_time
+    let hoursDisplay = 'Fermé aujourd\'hui';
+
+    if (hours && (Array.isArray(hours) || typeof hours === 'object')) {
+        // 1. Conversion en tableau et Tri pour éviter l'inversion (ex: 07:00 avant 22:00)
+        let hoursArray = Object.values(hours).sort((a, b) => {
+            return timeToMinutes(String(a.open_time)) - timeToMinutes(String(b.open_time));
+        });
+
+        // 2. Formatage des plages horaires
+        hoursDisplay = hoursArray.map(r => {
             const s = (r && r.open_time) ? String(r.open_time).substring(0, 5) : '??:??';
             const e = (r && r.close_time) ? String(r.close_time).substring(0, 5) : '??:??';
-            return s + ' - ' + e;
-        }).join(', ')
-        : 'Horaires non définis';
+            return `<strong>${s} - ${e}</strong>`;
+        }).join(', ');
+    }
 
+    // 3. Construction du HTML du Popup
     return `
-        <strong>${p.branch_name}</strong><br>
-        ${p.address}<br>
-        <em>Boutique : ${p.vendor_name}</em><br>
-        <small>Horaires : ${openStr}</small><br>
-        <a href="${p.store_url}" target="_blank">Voir la boutique</a>
+        <div class="fand-popup-content">
+            <strong style="font-size:1.1em;">${p.branch_name}</strong><br>
+            <span style="color: #666;">${p.address}</span><br>
+            <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
+            <div style="margin-bottom: 5px;">
+                <span class="day-label">${currentDayName} :</span> 
+                <span class="hours-label">${hoursDisplay}</span>
+            </div>
+            <a href="${p.store_url}" target="_blank" style="display: inline-block; margin-top: 5px; color: #0073aa; text-decoration: none; font-weight: bold;">
+                Voir la boutique →
+            </a>
+        </div>
     `;
 }
 
 // ===================================
 // Logique de Mise à Jour du Marqueur
 // ===================================
+// On définit une fonction vide ou "placeholder" pour éviter les erreurs
+// Elle sera écrasée si le fichier PRO est chargé
+var updateMarkers = updateMarkers || function() { 
+    // En version gratuite, on peut juste mettre une version ultra-simplifiée
+    // ou laisser vide pour ne rien faire dynamiquement.
+    console.log("UpdateMarkers: Version gratuite (statique)");
+};
 
-function updateMarkers() {
-    const now = new Date();
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-    const dayIndex = getCurrentDayIndex();
-
-    if (typeof markers === 'undefined' || !markers) return;
-
-    markers.forEach(p => {
-        const allHours = p.opening_hours || {}; 
-        let todayHours = allHours[dayIndex] || [];
-
-        // Sécurité conversion objet -> tableau
-        if (todayHours !== null && typeof todayHours === 'object' && !Array.isArray(todayHours)) {
-            todayHours = Object.values(todayHours);
-        }
-
-        let isOpen = false;
-        let nextOpenTime = null;
-        let soonClose = null;
-
-        if (Array.isArray(todayHours)) {
-            todayHours.forEach(r => {
-                // SÉCURITÉ : On utilise open_time et close_time
-                if (!r.open_time || !r.close_time) return;
-
-                const openMin = timeToMinutes(String(r.open_time));
-                const closeMin = timeToMinutes(String(r.close_time));
-
-                // 1. Ouvert Actuellement
-                if (nowMinutes >= openMin && nowMinutes < closeMin) {
-                    isOpen = true;
-                }
-
-                // 2. Ouvre Bientôt
-                const openTimeDiff = openMin - nowMinutes;
-                if (!isOpen && openTimeDiff > 0 && openTimeDiff <= popupThreshold) {
-                    nextOpenTime = String(r.open_time).substring(0, 5);
-                }
-
-                // 3. Ferme Bientôt
-                const closeTimeDiff = closeMin - nowMinutes;
-                if (isOpen && closeTimeDiff > 0 && closeTimeDiff <= popupThreshold) {
-                    // SÉCURITÉ : substring sur close_time
-                    soonClose = String(r.close_time).substring(0, 5);
-                }
-            });
-        }
-
-        // --- Mise à jour de la liste (Cercle Logo) ---
-        const branchID = p.branch_id || p.ID;
-        const $avatarCircle = jQuery('#avatar-branch-' + branchID);
-
-        if ($avatarCircle.length > 0) {
-            if (isOpen) {
-                $avatarCircle.addClass('is-open').removeClass('is-closed');
-            } else {
-                $avatarCircle.addClass('is-closed').removeClass('is-open');
-            }
-        }
-
-        // --- Mise à jour de l'icône ---
-        p.marker.setIcon(isOpen ? iconOpen : iconClosed);
-
-        // --- Gestion des Popups Automatiques ---
-        if (nextOpenTime && !isOpen) {
-            if (p.popupType !== 'soonOpen') {
-                p.marker.setPopupContent(`<strong>${p.branch_name}</strong><br>Ouvre bientôt à ${nextOpenTime}`);
-                p.marker.openPopup();
-                p.popupType = 'soonOpen';
-            }
-        } else if (soonClose) {
-            if (p.popupType !== 'soonClose') {
-                p.marker.setPopupContent(`<strong>${p.branch_name}</strong><br>Ferme bientôt à ${soonClose}`);
-                p.marker.openPopup();
-                p.popupType = 'soonClose';
-            }
-        } else if (p.popupType !== null) {
-            // Remise à zéro du popup
-            p.marker.setPopupContent(getMainPopupContent(p));
-            // On ne ferme pas forcément le popup, on le réinitialise juste pour le clic manuel
-            if (p.popupType === 'soonOpen' || p.popupType === 'soonClose') {
-                p.marker.closePopup();
-            }
-            p.popupType = null;
-        }
-    });
-}
 // ===================================
 // Logique de Filtrage
 // ===================================
@@ -209,8 +148,8 @@ function applyFilters() {
 // Initialisation
 // ===================================
 
-let map; // Déclarer la carte globalement si nécessaire
-let iconClosed, iconOpen;
+var map; // Déclarer la carte globalement si nécessaire
+var iconClosed, iconOpen;
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -226,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    iconClosed = L.icon({
+   /* iconClosed = L.icon({
         iconUrl: fandPickupPluginUrl + "assets/images/fand_map_icon_rouge.png",
         iconSize: [40, 57],
         iconAnchor: [20, 57],
@@ -238,7 +177,28 @@ document.addEventListener('DOMContentLoaded', () => {
         iconSize: [40, 57],
         iconAnchor: [20, 57],
         popupAnchor: [0, -57]
+    });*/
+    // Définition de l'icône par défaut (WCFM Original)
+    // On construit l'URL pour pointer vers le dossier de WCFM
+    //const wcfmIconUrl = fandPickupPluginUrl.replace('fand-pickup-points-ultimate/', 'wc-multivendor-marketplace/') + "assets/images/wcfmmp_map_icon-original.png";
+    const wcfmIconUrl = window.location.origin + "/wp-content/plugins/wc-frontend-manager/includes/libs/leaflet/images/marker-icon.png";
+    // On initialise les icônes avec l'image par défaut
+    // Elles sont déclarées SANS 'const' ou 'let' car elles ont été déclarées globalement au début du fichier
+    iconClosed = L.icon({
+        iconUrl: wcfmIconUrl,
+        iconSize: [25, 41],
+        iconAnchor: [20, 57],
+        popupAnchor: [0, -57]
     });
+
+    iconOpen = iconClosed; // En gratuit, pas de distinction de couleur
+
+    // --- LOGIQUE PRO : Surcharge des icônes ---
+    // Si une fonction de surcharge existe (définie dans le script Pro), on l'appelle
+    // On vérifie si la fonction setupProIcons a été injectée par le fichier PRO
+    if (typeof window.setupProIcons === 'function') {
+        window.setupProIcons();
+    }
 
     // 2. Création des marqueurs
     mapMarkers.forEach(p => {
@@ -372,6 +332,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 6. Mise à jour périodique du statut (ouvert/fermé)
-    setInterval(updateMarkers, 60000); // toutes les minutes
+    // On ne lance le timer que si on est en mode PRO (updateMarkers a été remplacé)
+    if (typeof PickupProData === 'function') {
+        updateMarkers();
+        setInterval(updateMarkers, 60000);
+    }
 
 });

@@ -4,6 +4,6 @@
         "":{
             "domain":"messages",
             "plural_forms":"nplurals=2; plural=n > 1;","lang":"fr_FR"},
-            "pickup-points-ultimate":[null,"pickup-points-ultimate"],
+            "fand-pickup-points-ultimate":[null,"fand-pickup-points-ultimate"],
             "Échec de la vérification de sécurité.":[null,"Échec de la vérification de sécurité."]
 }}}

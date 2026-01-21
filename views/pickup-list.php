@@ -258,7 +258,7 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     // Sécuriser l'URL de la boutique (on s'assure que $v_id n'est pas 0)
                     $fand_store_url = ($fand_v_id > 0) ? wcfmmp_get_store_url($fand_v_id) : '#';
                     
-                    include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-card.php';
+                    include FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-card.php';
 
                 endforeach; ?>
 

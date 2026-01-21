@@ -39,8 +39,8 @@ class ShortcodesController {
         }
         
         ob_start();
-        $map_view  = FAND_PICKUP_PLUGIN_DIR . 'views/pickup-map.php';
-        $list_view = FAND_PICKUP_PLUGIN_DIR . 'views/pickup-list.php';
+        $map_view  = FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-map.php';
+        $list_view = FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-list.php';
 
         if ( file_exists( $map_view ) ) {
             include $map_view;

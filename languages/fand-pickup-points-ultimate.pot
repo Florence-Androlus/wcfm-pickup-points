@@ -1,9 +1,9 @@
-# Translation of Plugins - pickup-points-ultimate - Stable (latest release) in French (France)
-# This file is distributed under the same license as the Plugins - pickup-points-ultimate - Stable (latest release) package.
+# Translation of Plugins - fand-pickup-points-ultimate - Stable (latest release) in French (France)
+# This file is distributed under the same license as the Plugins - fand-pickup-points-ultimate - Stable (latest release) package.
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Plugins - pickup-points-ultimate - Stable (latest "
+"Project-Id-Version: Plugins - fand-pickup-points-ultimate - Stable (latest "
 "release)\n"
 "POT-Creation-Date: 2026-01-02 08:19+0100\n"
 "PO-Revision-Date: 2026-01-02 18:49+0100\n"
@@ -20,8 +20,8 @@ msgstr ""
 
 #. Author URI of the plugin
 #. Plugin Name of the plugin
-#: pickup-points-ultimate.php
-msgid "pickup-points-ultimate"
+#: fand-pickup-points-ultimate.php
+msgid "fand-pickup-points-ultimate"
 msgstr ""
 
 #: plugin.php:86

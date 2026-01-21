@@ -17,7 +17,7 @@ class PageManager {
         $pickup_page_id = get_option('fand_pickup_page_id');
 
         if ($pickup_page_id && (int) $pickup_page_id === $post->ID) {
-            $post_states['fand_pickup_page'] = __('Page Emplacements Pickup', 'pickup-points-ultimate');
+            $post_states['fand_pickup_page'] = __('Page Emplacements Pickup', 'fand-pickup-points-ultimate');
         }
         return $post_states;
     }

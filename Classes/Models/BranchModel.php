@@ -74,8 +74,8 @@ class BranchModel {
         foreach ($hours as $h) {
             $day = $h['day_of_week'];
             $hours_by_branch[$h['branch_id']][$day][] = [
-                'open'  => $h['open_time'],
-                'close' => $h['close_time'],
+                'open_time'  => $h['open_time'],
+                'close_time' => $h['close_time'],
                 'is_closed' => $h['is_closed']
             ];
         }

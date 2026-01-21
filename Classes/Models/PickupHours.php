@@ -17,7 +17,7 @@ class PickupHours {
 
                 // ignorer les créneaux vides
                 if ($open === '' && $close === '') continue;
-
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
                 $wpdb->insert(
                     $table_hours,
                     [

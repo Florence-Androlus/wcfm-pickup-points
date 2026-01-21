@@ -71,22 +71,21 @@ class PickupModel {
     }
 
     public function getHours($branch_id) {
-        error_log('getHours');
         global $wpdb;
         $table_name = $this->table_hours; // Utilise la variable de classe
-        
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $results = $wpdb->get_results(
             $wpdb->prepare(
+                // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
                 "SELECT ID, day_of_week, open_time, close_time 
-                FROM $table_name 
+                FROM  %i
                 WHERE branch_id = %d
                 ORDER BY day_of_week, open_time ASC",
-                $branch_id
+                $table_name,$branch_id
             ),
             ARRAY_A
         );
 
-        error_log('results :'.print_r($results,true));
         // Regrouper par jour
         $hours_by_day = [];
         foreach ($results as $row) {
@@ -101,7 +100,7 @@ class PickupModel {
                 'end'   => $row['close_time']
             ];
         }
-        error_log('hours_by_day :'.print_r($hours_by_day,true));
+
         return $hours_by_day;
     }
 

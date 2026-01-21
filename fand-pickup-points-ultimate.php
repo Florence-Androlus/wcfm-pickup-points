@@ -1,12 +1,13 @@
 <?php
 /**
- * Plugin Name: Pickup Points : Ultimate Edition - FAND Addon
+ * Plugin Name: Fand Pickup Points : Ultimate Edition - FAND Addon
  * Description: Gestion avancée des points de retrait pour WCFM Marketplace. Développé par Fan-develop.
  * Version:            1.0.0
  * Requires at least:  6.9
  * Requires PHP:       8.2
  * Author: Fan-develop
- * Text Domain: pickup-points-ultimate
+ * Text Domain: fand-pickup-points-ultimate
+ * Domain Path: /languages
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * */
@@ -56,11 +57,11 @@
 
     add_filter('doing_it_wrong_trigger_error', '__return_false');
 
-    define('FAND_PICKUP_VERSION', '1.0.0');
-    define('FAND_PICKUP_MAIN_FILE', __FILE__);
-    define('FAND_PICKUP_PLUGIN_URL', plugin_dir_url(__FILE__));
-    define('FAND_PICKUP_PLUGIN_DIR', plugin_dir_path(__FILE__));
-    define('FAND_ULTIMAT_PRO_PLUGIN', 'pickup-points-ultimate-pro/pickup-points-ultimate-pro.php');
+    define('FAND_PICKUP_POINTS_ULTIMATE_VERSION', '1.0.0');
+    define('FAND_PICKUP_POINTS_ULTIMATE_MAIN_FILE', __FILE__);
+    define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL', plugin_dir_url(__FILE__));
+    define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR', plugin_dir_path(__FILE__));
+    define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN', 'fand-pickup-points-ultimate-pro/fand-pickup-points-ultimate-pro.php');
     register_activation_hook(__FILE__, function() {
         PluginActivator::createPage();
         PluginActivator::createTables();
@@ -69,12 +70,12 @@
 
 
     // Vérification si la version Pro est active
-    if (is_plugin_active(FAND_ULTIMAT_PRO_PLUGIN)) {
-        define('FAND_PICKUP_PLUGIN_ACTIVE', true);
+    if (is_plugin_active(FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN)) {
+        define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE', true);
     } else {
-        define('FAND_PICKUP_PLUGIN_ACTIVE', false);
+        define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE', false);
     }
 
     // Inclure le fichier principal du plugin
-    require_once FAND_PICKUP_PLUGIN_DIR . 'plugin.php';
+    require_once FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'plugin.php';
     new FANDPickupSettings();

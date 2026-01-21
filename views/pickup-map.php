@@ -83,5 +83,5 @@ $fand_default_state    = '';
     const defaultCategory= '<?php echo esc_js($fand_default_category); ?>';
     const defaultCountry = '<?php echo esc_js($fand_default_country); ?>';
     const defaultState   = '<?php echo esc_js($fand_default_state); ?>';
-    const fandPickupPluginUrl = '<?php echo esc_url(FAND_PICKUP_PLUGIN_URL); ?>';
+    const fandPickupPluginUrl = '<?php echo esc_url(FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL ); ?>';
 </script>

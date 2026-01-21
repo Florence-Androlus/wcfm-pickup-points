@@ -1,5 +1,5 @@
 {
-  "name": "fandevelop/pickup-points-ultimate",
+  "name": "fandevelop/fand-pickup-points-ultimate",
   "description": "Gestion avancée des points de retrait pour WCFM Marketplace. Addon développé par Fan-develop.",
   "type": "wordpress-plugin",
   "autoload": {

@@ -8,10 +8,10 @@ return [
     'x-generator'=>'GlotPress/4.0.1',
     'translation-revision-date'=>'2026-01-02 09:38:51+0000',
     'plural-forms'=>'nplurals=2; plural=n > 1;',
-    'project-id-version'=>'Plugins - pickup-points-ultimate - Stable (latest release)',
-    'language'=>'en_US',
+    'project-id-version'=>'Plugins - fand-pickup-points-ultimate - Stable (latest release)',
+    'language'=>'fr_FR',
     'messages'=>[
-        'pickup-points-ultimate'=>'pickup-points-ultimate',
+        'fand-pickup-points-ultimate'=>'fand-pickup-points-ultimate',
         'Échec de la vérification de sécurité.'=>'Échec de la vérification de sécurité.',
-    ]
+        ]
 ];

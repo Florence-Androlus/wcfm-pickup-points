@@ -31,7 +31,7 @@ $fand_lng               = $fand_data['lng'];
 $fand_email             = $fand_data['vendor_email'];
 $fand_phone             = $fand_data['vendor_phone'];
 $fand_avatar            = $fand_data['avatar_url'];
-$fand_store_url    = $fand_data['store_url'];
+$fand_store_url         = $fand_data['store_url'];
 $fand_banner            = $fand_data['banner_url']; 
 $fand_store_info        = $fand_data['store_info'];
 $fand_category_terms    = $fand_data['category_terms']; // Utilisé plus bas pour le filtre/catégories
@@ -245,7 +245,7 @@ $fand_counter = 0;
     // Ajout des coordonnées pour le centrage de la carte
     const currentLat = <?php echo json_encode($fand_lat); ?>;
     const currentLng = <?php echo json_encode($fand_lng); ?>;
-    const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_PLUGIN_URL ); ?>';
+    const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL ); ?>';
     const isSingleView = true; // Flag pour le script général
 
 </script>

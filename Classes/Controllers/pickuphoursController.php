@@ -66,13 +66,11 @@ class pickuphoursController {
         $model = new PickupModel();
         $fand_hours = $model->getHours($branch_id);
         $fand_holidays = $model->getHolidays($branch_id);
-        error_log('fand_hours :'.print_r($fand_hours,true));
-        error_log('fand_holidays :'.print_r($fand_holidays,true));
 
         ob_start();
 
-       // include FAND_PICKUP_PLUGIN_DIR . 'views/pickup-hours/pickup-hours-template.php';
-        $template_path = trailingslashit(FAND_PICKUP_PLUGIN_DIR) . 'views/pickup-hours/pickup-hours-template.php';
+        // include FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-hours/pickup-hours-template.php';
+        $template_path = trailingslashit(FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR) . 'views/pickup-hours/pickup-hours-template.php';
         if ( file_exists( $template_path ) ) {
             include $template_path;
         } 

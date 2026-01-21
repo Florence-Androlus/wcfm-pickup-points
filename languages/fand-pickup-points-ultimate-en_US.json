@@ -2,7 +2,7 @@
     "domain":"messages",
     "locale_data":{
         "messages":{
-            "pickup-points-ultimate":[null,"pickup-points-ultimate"],
+            "fand-pickup-points-ultimate":[null,"fand-pickup-points-ultimate"],
             "Échec de la vérification de sécurité.":[null,"Security check failed."],
             "":{"domain":"messages","plural_forms":"nplurals=2; plural=(n != 1);",
             "lang":"en_US"}}}}

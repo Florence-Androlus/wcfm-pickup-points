@@ -136,7 +136,7 @@ class RoutesController {
                 setup_postdata( $post ); 
 
                 // Remplacer le template :
-                $new_template = FAND_PICKUP_PLUGIN_DIR . 'views/single-branch/single-branch-view.php'; 
+                $new_template = FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/single-branch/single-branch-view.php'; 
                 if ( file_exists( $new_template ) ) {
                     return $new_template; 
                 }
@@ -159,11 +159,11 @@ class RoutesController {
 
             // Mapping des slugs d'onglets pour un affichage convivial
             $tab_titles = [
-                'products'  => __( 'Produits', 'pickup-points-ultimate' ), // Pour la page de base (pas d'onglet)
-                'about'     => __( 'À propos', 'pickup-points-ultimate' ),
-                'policies'  => __( 'Politiques', 'pickup-points-ultimate' ),
-                'reviews'   => __( 'Avis', 'pickup-points-ultimate' ),
-                'followers' => __( 'Abonnés', 'pickup-points-ultimate' ),
+                'products'  => __( 'Produits', 'fand-pickup-points-ultimate' ), // Pour la page de base (pas d'onglet)
+                'about'     => __( 'À propos', 'fand-pickup-points-ultimate' ),
+                'policies'  => __( 'Politiques', 'fand-pickup-points-ultimate' ),
+                'reviews'   => __( 'Avis', 'fand-pickup-points-ultimate' ),
+                'followers' => __( 'Abonnés', 'fand-pickup-points-ultimate' ),
             ];
 
             // Déterminer le titre de l'onglet (Produits par défaut si $active_tab_slug n'est pas trouvé)

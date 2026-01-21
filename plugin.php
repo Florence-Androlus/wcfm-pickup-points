@@ -38,10 +38,10 @@ class FANDPickupSettings {
 
 		// Ajouter le menu principal "Fournisseurs"
 		add_menu_page(
-			'Pickup Points Ultimate', // Le titre de votre page de paramètres
-			'Pickup Points Ultimate', // Le nom du menu
+			'FAND Pickup Points Ultimate', // Le titre de votre page de paramètres
+			'FAND Pickup Points Ultimate', // Le nom du menu
 			'manage_options', // La capacité requise
-			'pickup-points-ultimate-settings', // Le slug de la page
+			'fand-pickup-points-ultimate-settings', // Le slug de la page
 			[$this, 'render_liste_categories_page'], // La fonction de rappel pour afficher le contenu de la page
 			'dashicons-location', // L'icône à utiliser pour ce menu
 			59 // La position dans l'ordre du menu où celui-ci doit apparaître
@@ -98,9 +98,9 @@ class FANDPickupSettings {
     }
 
     public function register_activation_logic() {
-        if (get_option('fand_pickup_flush_rewrite')) {
+        if (get_option('fand_pickup_points_ultimate_flush_rewrite')) {
             flush_rewrite_rules();
-            delete_option('fand_pickup_flush_rewrite');
+            delete_option('fand_pickup_points_ultimate_flush_rewrite');
         }
     }
 }

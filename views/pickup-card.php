@@ -10,9 +10,16 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="store-info" style="background-image: url('<?php echo esc_url($fand_banner_image); ?>');"></div>
         </div>
         <div class="store-footer">
-            <div id="avatar-branch-<?php echo esc_attr($fand_branch_id); ?>" class="store-avatar lft <?php echo $fand_is_currently_open ? 'is-open' : 'is-closed'; ?>">
+            <div id="avatar-branch-<?php echo esc_attr($fand_branch_id); ?>" 
+                class="store-avatar lft <?php 
+                    // On n'affiche les classes de statut QUE si la version PRO est active
+                    if ( defined('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE') && FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE ) {
+                        echo $fand_is_currently_open ? 'is-open' : 'is-closed'; 
+                    }
+                ?>">
                 <img src="<?php echo esc_url($fand_avatar); ?>" alt="Logo">
             </div>
+
             <div class="store-data-container rgt">
                 <div class="store-data">
                     <h2 class="branch-title"><?php echo esc_html($fand_branch_name); ?></h2>
