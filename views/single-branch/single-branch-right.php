@@ -17,7 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'policies/' ); ?>#tab_links_area">Politiques</a>
             </li>
             <li class="<?php echo esc_attr( ( $fand_active_tab == 'reviews' ) ? 'active' : '' ); ?>">
-                <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'reviews/' ); ?>#tab_links_area">Avis (<span class="wcfm_reviews_count">0</span>)</a>
+                <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'reviews/' ); ?>#tab_links_area">
+                    Avis (<span class="wcfm_reviews_count"><?php echo $fand_data['rating_count']; ?></span>)
+                </a>
             </li>
         </ul>
     </div>
@@ -137,11 +139,61 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
         </div>
         
-        <?php elseif ( $fand_active_tab == 'reviews' ) : ?>
-            <div class="_area" id="wcfmmp_store_<?php echo esc_attr( $fand_active_tab ); ?>">
-                <h2>Contenu <?php echo esc_html( ucfirst( $fand_active_tab ) ); ?></h2>
+       <?php elseif ( $fand_active_tab == 'reviews' ) : ?>
+<div class="_area" id="reviews">
+    <div class="reviews_area">
+        <div class="reviews_heading">Avis</div>
+        
+        <div class="recent_reviews">
+            <div class="bd_review_section">
+                <?php if ( ! empty( $fand_data['reviews'] ) ) : ?>
+                    <?php foreach ( $fand_data['reviews'] as $review ) : ?>
+                        <div class="review_section">
+                            <div class="lft user_photo">
+                                <div class="review_photo">
+                                    <img src="<?php echo esc_url(site_url()); ?>/wp-content/plugins/wc-frontend-manager/assets/images/avatar.png" alt="Review">
+                                </div>
+                                <div class="rated">
+                                    <strong>évalué</strong>
+                                    <div class="user_rated"><?php echo number_format($review['rating'], 1); ?></div>
+                                </div>
+                            </div>
+
+                            <div class="rgt user_review_sec">
+                                <div class="user_review_sec_left" style="display: inline-block; float: left; width: 60%;">
+                                    <div class="user_name"><?php echo esc_html( $review['comment_author'] ); ?></div>
+                                    <div class="user_review_area">
+                                        <span class="user_date"><?php echo date_i18n( 'j F Y G\hi', strtotime( $review['comment_date'] ) ); ?></span>
+                                    </div>
+                                    <div class="user_review_text">
+                                        <p><?php echo nl2br( esc_html( $review['comment_content'] ) ); ?></p>
+                                    </div>
+                                </div>
+
+                                <div class="bd_rating_area" style="float: right; width: 35%;">
+                                    <?php if ( !empty($review['sub_ratings']) ) : ?>
+                                        <?php foreach ( $review['sub_ratings'] as $sub ) : 
+                                            $val = floatval($sub['value']);
+                                        ?>
+                                            <div class="rating_box">
+                                                <?php for ( $i = 1; $i <= 5; $i++ ) : ?>
+                                                    <i class="wcfmfa fa-star <?php echo ( $i <= $val ) ? 'selected' : ''; ?>" aria-hidden="true" style="color: <?php echo ( $i <= $val ) ? '#ffb600' : '#ccc'; ?>;"></i>
+                                                <?php endfor; ?>
+                                                <span><?php echo number_format($val, 1); ?>&nbsp;<?php echo esc_html($sub['key']); ?></span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="spacer"></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <p>Aucun avis pour le moment.</p>
+                <?php endif; ?>
             </div>
-            <?php $WCFMmp->template->get_template( 'store/wcfmmp-view-store-reviews.php', array( 'store_user' => $fand_store_user, 'store_info' => $fand_store_info ) );?>
         </div>
-    <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 </div>

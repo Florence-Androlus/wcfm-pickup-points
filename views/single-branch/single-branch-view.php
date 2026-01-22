@@ -164,18 +164,22 @@ $fand_counter = 0;
                                     </a>
                                 </div>
                                 <div class="logo_area_after">
-                                    <div class="wcfmmp-store-rating" title="Aucun avis pour le moment !">
-                                        <span style="width: 0%">
-                                            <strong class="rating">0</strong> sur 5				
+                                    <div class="wcfmmp-store-rating" title="<?php echo $fand_data['rating_count']; ?> avis">
+                                        <span style="width: <?php echo ($fand_data['rating_avg'] / 5) * 100; ?>%">
+                                            <strong class="rating"><?php echo $fand_data['rating_avg']; ?></strong> sur 5             
                                         </span>
                                     </div>
-                                
+                                    
+                                    <div class="review-count-caption" style="font-size: 11px; color: #666;">
+                                        (<?php echo $fand_data['rating_count']; ?> avis clients)
+                                    </div>
+
                                     <div class="wcfmmp_store_mobile_badges">
                                         <div class="wcfm_vendor_badges"></div>
                                         <div class="spacer"></div> 
                                     </div>
                                     <div class="spacer"></div>  
-				                </div>
+                                </div>
                                 <div class="address rgt" >                                            
                                     <p class=" wcfmmp_store_header_address">
                                     <i class="wcfmfa fa-map-marker" aria-hidden="true"></i>
@@ -223,16 +227,16 @@ $fand_counter = 0;
                         ?>
                         </div>
                     </div>
-                </div>
-                <div class="lft left_sidebar widget-area sidebar"> 
-                    <?php
-                    include "single-branch-left.php";
-                    ?>
-                </div>
+ 
+                    <div class="lft left_sidebar widget-area sidebar"> 
+                        <?php
+                        include "single-branch-left.php";
+                        ?>
+                    </div>
                 
-                <div class="spacer"></div>
-                </div>
-                <div class="wcfm-clearfix"></div>
+                    <div class="spacer"></div>
+                    </div>
+                    <div class="wcfm-clearfix"></div>
             </div>
         </div>
     </main>

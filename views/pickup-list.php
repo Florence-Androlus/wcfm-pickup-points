@@ -118,7 +118,8 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                                 $fand_branch['vendor_email']     = $fand_v_data['vendor_email'] ?? '';
                                 $fand_branch['vendor_phone']     = $fand_v_data['vendor_phone'] ?? '';
                                 $fand_branch['category']         = $fand_v_data['group_id'] ?? ''; // On récupère la catégorie
-                                
+                                $fand_branch['rating_avg']       = $fand_v_data['rating_avg'] ?? 0;
+                                $fand_branch['rating_count']     = $fand_v_data['rating_count'] ?? 0;
                                 $fand_flat_list[] = $fand_branch;
                             }
                         }
@@ -154,7 +155,6 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     $fand_vendor =  $fand_branch['vendor_data_node'];
                     $fand_branch_name = strtolower( $fand_branch['branch_name'] ??  $fand_branch['name'] ?? '');
                     $fand_vendor_name = strtolower($fand_vendor->display_name ?? '');
-
                     // Mise à jour du lien "Visiter le Magasin"
                     // NOUVELLE URL : /pickup/emplacement/mon-emplacement-agreable/
                     $fand_location_url = home_url( '/pickup/emplacement/' . esc_attr(sanitize_title(  $fand_branch_name )) . '/' );
@@ -257,6 +257,9 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     $fand_v_id = isset($fand_vendor->ID) ? intval($fand_vendor->ID) : 0;
                     // Sécuriser l'URL de la boutique (on s'assure que $v_id n'est pas 0)
                     $fand_store_url = ($fand_v_id > 0) ? wcfmmp_get_store_url($fand_v_id) : '#';
+                    error_log('$fand_branch : '.print_r($fand_branch,true));
+                    $fand_rating_avg   = $fand_branch['rating_avg'] ?? 0;
+                    $fand_rating_count = $fand_branch['rating_count'] ?? 0;
                     
                     include FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-card.php';
 

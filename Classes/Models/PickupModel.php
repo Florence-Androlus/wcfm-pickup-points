@@ -151,6 +151,15 @@ class PickupModel {
 
         foreach ($vendors as $vendor) {
             $vendor_id = intval($vendor->ID);
+            // --- AJOUT : RÉCUPÉRATION DES NOTES DU VENDEUR ---
+            $review_stats = $wpdb->get_row($wpdb->prepare("
+                SELECT COUNT(ID) as count, AVG(review_rating) as avg 
+                FROM {$wpdb->prefix}wcfm_marketplace_reviews 
+                WHERE vendor_id = %d AND approved = 1
+            ", $vendor_id));
+
+            $rating_avg   = $review_stats->avg ? round($review_stats->avg, 1) : 0;
+            $rating_count = $review_stats->count ? $review_stats->count : 0;
 
             // --- LOGIQUE DES CATÉGORIES PERSONNALISÉES ---
             // On récupère le tableau des catégories choisies par le vendeur
@@ -272,9 +281,12 @@ class PickupModel {
                     'vendor'   => $vendor, 
                     'branches' => $pickup_only_branches,
                     'group_id' => $assigned_category,
+                    'rating_avg'   => $rating_avg,   
+                    'rating_count' => $rating_count, 
                 ];
             }
-        }
+        }   
+        error_log('vendors_data : '.print_r($vendors_data,true));
 
         // --- 3. Retour des données ---
         return [

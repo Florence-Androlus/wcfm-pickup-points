@@ -29,9 +29,14 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </h3>
 
                     <div class="bd_rating">
-                        <div class="wcfmmp-store-rating" title="Aucun avis pour le moment !">
-                            <span style="width:0%"><strong class="rating">0</strong> sur 5</span>
+                        <div class="wcfmmp-store-rating" title="<?php echo esc_attr($fand_rating_count); ?> avis">
+                            <span style="width:<?php echo (floatval($fand_rating_avg) / 5) * 100; ?>%">
+                                <strong class="rating"><?php echo number_format($fand_rating_avg, 1); ?></strong> sur 5
+                            </span>
                         </div>
+                        <span class="review-count" style="font-size: 11px; color: #777; margin-left: 5px;">
+                            (<?php echo $fand_rating_count; ?>)
+                        </span>
                         <div class="spacer"></div>
                     </div>
 
