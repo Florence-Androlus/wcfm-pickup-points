@@ -165,22 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-   /* iconClosed = L.icon({
-        iconUrl: fandPickupPluginUrl + "assets/images/fand_map_icon_rouge.png",
-        iconSize: [40, 57],
-        iconAnchor: [20, 57],
-        popupAnchor: [0, -57]
-    });
-
-    iconOpen = L.icon({
-        iconUrl: fandPickupPluginUrl + "assets/images/fand_map_icon_vert.png",
-        iconSize: [40, 57],
-        iconAnchor: [20, 57],
-        popupAnchor: [0, -57]
-    });*/
     // Définition de l'icône par défaut (WCFM Original)
     // On construit l'URL pour pointer vers le dossier de WCFM
-    //const wcfmIconUrl = fandPickupPluginUrl.replace('fand-pickup-points-ultimate/', 'wc-multivendor-marketplace/') + "assets/images/wcfmmp_map_icon-original.png";
     const wcfmIconUrl = window.location.origin + "/wp-content/plugins/wc-frontend-manager/includes/libs/leaflet/images/marker-icon.png";
     // On initialise les icônes avec l'image par défaut
     // Elles sont déclarées SANS 'const' ou 'let' car elles ont été déclarées globalement au début du fichier
@@ -333,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 6. Mise à jour périodique du statut (ouvert/fermé)
     // On ne lance le timer que si on est en mode PRO (updateMarkers a été remplacé)
-    if (typeof PickupProData === 'function') {
+    if (typeof PickupProData !== 'undefined' && PickupProData.is_licensed == 1) {
         updateMarkers();
         setInterval(updateMarkers, 60000);
     }

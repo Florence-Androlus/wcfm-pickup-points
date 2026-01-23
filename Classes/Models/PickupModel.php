@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+
 namespace fandWCFMPickupPoints\Classes\Models;
 
 class PickupModel {
@@ -286,8 +288,7 @@ class PickupModel {
                 ];
             }
         }   
-        error_log('vendors_data : '.print_r($vendors_data,true));
-
+        
         // --- 3. Retour des données ---
         return [
             'countries'        => $countries,
@@ -301,3 +302,4 @@ class PickupModel {
         ];
     }
 }
+// phpcs:enable

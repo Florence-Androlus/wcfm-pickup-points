@@ -164,14 +164,14 @@ $fand_counter = 0;
                                     </a>
                                 </div>
                                 <div class="logo_area_after">
-                                    <div class="wcfmmp-store-rating" title="<?php echo $fand_data['rating_count']; ?> avis">
-                                        <span style="width: <?php echo ($fand_data['rating_avg'] / 5) * 100; ?>%">
-                                            <strong class="rating"><?php echo $fand_data['rating_avg']; ?></strong> sur 5             
+                                    <div class="wcfmmp-store-rating" title="<?php echo esc_attr( $fand_data['rating_count'] ); ?> avis">
+                                        <span style="width: <?php echo esc_attr( ($fand_data['rating_avg'] / 5) * 100 ); ?>%">
+                                            <strong class="rating"><?php echo esc_html( $fand_data['rating_avg'] ); ?></strong> sur 5             
                                         </span>
                                     </div>
                                     
                                     <div class="review-count-caption" style="font-size: 11px; color: #666;">
-                                        (<?php echo $fand_data['rating_count']; ?> avis clients)
+                                        (<?php echo esc_html( $fand_data['rating_count'] ); ?> avis clients)
                                     </div>
 
                                     <div class="wcfmmp_store_mobile_badges">
@@ -249,7 +249,7 @@ $fand_counter = 0;
     // Ajout des coordonnées pour le centrage de la carte
     const currentLat = <?php echo json_encode($fand_lat); ?>;
     const currentLng = <?php echo json_encode($fand_lng); ?>;
-    const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL ); ?>';
+    const fandPickupPluginUrl = '<?php echo esc_url( FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_URL ); ?>';
     const isSingleView = true; // Flag pour le script général
 
 </script>

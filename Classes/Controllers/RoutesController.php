@@ -15,23 +15,40 @@ class RoutesController {
         add_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
 
         add_filter('document_title_parts', function($title_parts) {
-            $slug = get_query_var('emplacement');
+            // 1. On récupère les variables de requête que vous avez déjà définies
+            $branch_slug = get_query_var('branch_slug');
+            $tab_slug    = get_query_var('tab_slug');
+            $branch_data = get_query_var('current_branch_data');
 
-            if (empty($slug) && isset($_SERVER['REQUEST_URI'])) {
-                // CORRECTION : Unslash + Sanitize de REQUEST_URI
-                $request_uri = esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) );
-                $parsed_url = wp_parse_url( $request_uri );
-                $path = isset( $parsed_url['path'] ) ? trim( $parsed_url['path'], '/' ) : '';
-                $segments = explode('/', $path);
+            // 2. Si on est sur une page de branche (avec ou sans onglet)
+            if ( ! empty( $branch_slug ) ) {
                 
-                if (count($segments) >= 3 && $segments[0] === 'pickup' && $segments[1] === 'emplacement') {
-                    $slug = end($segments);
+                // On récupère le nom propre de la branche (depuis la DB si dispo, sinon via le slug)
+                if ( ! empty( $branch_data['branch_name'] ) ) {
+                    $name = $branch_data['branch_name'];
+                } else {
+                    $name = ucwords(str_replace('-', ' ', sanitize_title($branch_slug)));
                 }
-            }
 
-            if (!empty($slug)) {
-                $name = ucwords(str_replace('-', ' ', sanitize_title($slug)));
-                $title_parts['title'] = $name;
+                // 3. Mapping des titres d'onglets
+                $tab_titles = [
+                    'about'     => 'À propos',
+                    'policies'  => 'Politiques',
+                    'reviews'   => 'Avis',
+                    'followers' => 'Abonnés',
+                ];
+
+                // 4. Construction du titre
+                if ( ! empty( $tab_slug ) && isset( $tab_titles[$tab_slug] ) ) {
+                    // Si on est sur un onglet spécifique (ex: Avis)
+                    // Résultat : "Intermarche Express - Avis"
+                    $title_parts['title'] = $name . ' - ' . $tab_titles[$tab_slug];
+                } else {
+                    // Si on est sur la page par défaut (Produits)
+                    $title_parts['title'] = $name;
+                }
+
+                // On supprime le slogan (tagline) pour éviter que le titre soit trop long dans Chrome
                 unset($title_parts['tagline']); 
             }
 

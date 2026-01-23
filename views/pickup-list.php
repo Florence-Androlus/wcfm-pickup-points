@@ -257,7 +257,6 @@ $fand_vendors_data = $data['vendors_data'] ?? [];
                     $fand_v_id = isset($fand_vendor->ID) ? intval($fand_vendor->ID) : 0;
                     // Sécuriser l'URL de la boutique (on s'assure que $v_id n'est pas 0)
                     $fand_store_url = ($fand_v_id > 0) ? wcfmmp_get_store_url($fand_v_id) : '#';
-                    error_log('$fand_branch : '.print_r($fand_branch,true));
                     $fand_rating_avg   = $fand_branch['rating_avg'] ?? 0;
                     $fand_rating_count = $fand_branch['rating_count'] ?? 0;
                     

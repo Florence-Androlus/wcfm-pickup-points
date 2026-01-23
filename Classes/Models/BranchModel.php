@@ -1,4 +1,9 @@
 <?php
+/**
+ * Pickup Model
+ * * phpcs:disable WordPress.DB.DirectDatabaseQuery
+ */
+
 namespace fandWCFMPickupPoints\Classes\Models;
 
 use Automattic\WooCommerce\Internal\Admin\ProductReviews\Reviews;
@@ -150,41 +155,37 @@ class BranchModel {
      */
     public function getVendorReviews($vendor_id) {
         global $wpdb;
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared
+
         $table_reviews = $wpdb->prefix . 'wcfm_marketplace_reviews';
         $table_meta    = $wpdb->prefix . 'wcfm_marketplace_review_rating_meta';
 
-        $query = $wpdb->prepare("
-            SELECT 
-                ID as comment_ID,
-                author_name as comment_author,
-                review_description as comment_content,
-                created as comment_date,
-                review_rating as rating
-            FROM $table_reviews
-            WHERE vendor_id = %d AND approved = 1
-            ORDER BY created DESC
-        ", intval($vendor_id));
+        $results = $wpdb->get_results( $wpdb->prepare(
+            "SELECT ID as comment_ID, author_name as comment_author, review_description as comment_content, created as comment_date, review_rating as rating
+            FROM %i WHERE vendor_id = %d AND approved = 1 ORDER BY created DESC",
+            $table_reviews,
+            intval($vendor_id)
+        ), ARRAY_A );
 
-        $results = $wpdb->get_results($query, ARRAY_A);
-
-        if ( !empty($results) ) {
+        if ( ! empty($results) ) {
             foreach ( $results as &$review ) {
-                // Récupération des sous-notes (Fonctionnalité, Variété, etc.)
-                $meta_query = $wpdb->prepare("
-                    SELECT `key`, `value` 
-                    FROM $table_meta 
-                    WHERE review_id = %d AND type = 'rating_category'
-                ", $review['comment_ID']);
-                
-                $review['sub_ratings'] = $wpdb->get_results($meta_query, ARRAY_A);
+                $review['sub_ratings'] = $wpdb->get_results( $wpdb->prepare(
+                    "SELECT `key`, `value` FROM %i WHERE review_id = %d AND type = 'rating_category'",
+                    $table_meta,
+                    intval($review['comment_ID'])
+                ), ARRAY_A );
             }
         }
 
         $total_rating = 0;
         $count = count($results);
         if ($count > 0) {
-            foreach ($results as $r) { $total_rating += floatval($r['rating']); }
+            foreach ($results as $r) { 
+                $total_rating += floatval($r['rating']); 
+            }
         }
+
+        // phpcs:enable
 
         return [
             'list'  => $results ? $results : [],
@@ -193,3 +194,4 @@ class BranchModel {
         ];
     }
 }
+// phpcs:enable

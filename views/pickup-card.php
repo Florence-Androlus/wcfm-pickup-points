@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             </span>
                         </div>
                         <span class="review-count" style="font-size: 11px; color: #777; margin-left: 5px;">
-                            (<?php echo $fand_rating_count; ?>)
+                            (<?php echo esc_html( $fand_rating_count ); ?>)
                         </span>
                         <div class="spacer"></div>
                     </div>
