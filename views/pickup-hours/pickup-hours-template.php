@@ -37,9 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_0">
           <strong><?php echo esc_html( $fand_jours[$fand_day] ) ?> : Time Slots</strong>
           <?php 
-            // On définit le nom complet avec le namespace
-            $fand_func_pro = '\fandWCFMPickupPoints\wcfm_pickup_is_premium_active';
-            if ( function_exists($fand_func_pro) && $fand_func_pro() ) : 
+            if ( FAND_PICKUP_POINTS_ULTIMATE_PRO_LICENCE_STATUS ) : 
           ?>
             <a href="#" class="duplicate-hours-btn" data-day="<?php echo esc_attr( $fand_day ) ?>" title="Dupliquer les horaires">
 
@@ -113,7 +111,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="wcfm-clearfix"></div>
       <div class="wcfm_clearfix"></div>
       <?php
-            if ( function_exists($fand_func_pro) && $fand_func_pro() ) : 
+            if ( FAND_PICKUP_POINTS_ULTIMATE_PRO_LICENCE_STATUS ) : 
       ?>
 			<div class="wcfm_pickup_settings_heading"><h2>Mode vacances</h2></div>
 			<div class="wcfm_clearfix"></div>

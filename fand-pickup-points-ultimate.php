@@ -1,13 +1,12 @@
 <?php
 /**
- * Plugin Name: Fand Pickup Points : Ultimate Edition - FAND Addon
+ * Plugin Name: Pickup Points : Ultimate Edition - FAND Addon
  * Description: Gestion avancée des points de retrait pour WCFM Marketplace. Développé par Fan-develop.
  * Version:            1.0.0
  * Requires at least:  6.9
  * Requires PHP:       8.2
  * Author: Fan-develop
  * Text Domain: fand-pickup-points-ultimate
- * Domain Path: /languages
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * */
@@ -61,19 +60,35 @@
     define('FAND_PICKUP_POINTS_ULTIMATE_MAIN_FILE', __FILE__);
     define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL', plugin_dir_url(__FILE__));
     define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR', plugin_dir_path(__FILE__));
-    define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN', 'fand-pickup-points-ultimate-pro/fand-pickup-points-ultimate-pro.php');
+    define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN', 'fand-pickup-points-ultimate-pro/pickup-points-ultimate-pro.php');
+    
     register_activation_hook(__FILE__, function() {
         PluginActivator::createPage();
         PluginActivator::createTables();
         flush_rewrite_rules();
     });
 
+    // On ne définit le statut à FALSE que si le PRO n'est pas là pour le faire
+    if (!is_plugin_active(FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN)) {
+        if (!defined('FAND_PICKUP_POINTS_ULTIMATE_PRO_LICENCE_STATUS')) {
+            define('FAND_PICKUP_POINTS_ULTIMATE_PRO_LICENCE_STATUS', false);
+        }
+    }
 
-    // Vérification si la version Pro est active
-    if (is_plugin_active(FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN)) {
-        define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE', true);
+    // Maintenant on crée l'interrupteur général
+    // On vérifie si la constante a été définie (par le pro ou par le bloc au-dessus)
+    if (is_plugin_active(FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN) && $final_status) {
+        define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_ACTIVE', true);
     } else {
-        define('FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE', false);
+        define('FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_ACTIVE', false);
+    }
+    
+    // Sécurité : Si le pro est absent, on définit des valeurs par défaut vides
+    if ( ! defined( 'FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_URL' ) ) {
+        define( 'FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_URL', '' );
+    }
+    if ( ! defined( 'FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE' ) ) {
+        define( 'FAND_PICKUP_POINTS_ULTIMATE_PRO_PLUGIN_ACTIVE', false );
     }
 
     // Inclure le fichier principal du plugin

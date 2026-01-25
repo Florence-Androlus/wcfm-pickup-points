@@ -10,12 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
             <li class="<?php echo esc_attr( ( $fand_active_tab == 'products' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $fand_base_url_for_tabs ); ?>#tab_links_area">Produits</a>
             </li>
-            <li class="<?php echo esc_attr( ( $fand_active_tab == 'about' ) ? 'active' : '' ); ?>">
-                <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'about/' ); ?>#tab_links_area">à propos</a>
-            </li>
-            <li class="<?php echo esc_attr( ( $fand_active_tab == 'policies' ) ? 'active' : '' ); ?>">
-                <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'policies/' ); ?>#tab_links_area">Politiques</a>
-            </li>
             <li class="<?php echo esc_attr( ( $fand_active_tab == 'reviews' ) ? 'active' : '' ); ?>">
                 <a href="<?php echo esc_url( $fand_base_url_for_tabs . 'reviews/' ); ?>#tab_links_area">
                     Avis (<span class="wcfm_reviews_count"><?php echo esc_html( $fand_data['rating_count'] ); ?></span>)
