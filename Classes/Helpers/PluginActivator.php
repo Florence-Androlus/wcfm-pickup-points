@@ -8,9 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PluginActivator {
 
-    public static function createPage() {
-        $page_id = get_option('fand_pickup_page_id');
-
+    public static function fandpipo_createPage() {
+        $page_id = get_option('fandpipo_pickup_page_id');
         // Si la page n'existe plus on la recrée
         if (!$page_id || !get_post($page_id)) {
             $page_id = wp_insert_post([
@@ -18,7 +17,7 @@ class PluginActivator {
                 'post_name'     => 'emplacements-pickup', 
                 'post_type'     => 'page',
                 'post_status'   => 'publish',
-                'post_content'  => '[pickup_points_map]',
+                'post_content'  => '[fandpipo_map]',
                 'page_template' => 'fand-pickup-template.php',
                 'meta_input'    => [
                     '_wp_page_template' => 'fand-pickup-template.php' 
@@ -26,12 +25,12 @@ class PluginActivator {
             ]);
 
             if ($page_id && !is_wp_error($page_id)) {
-               update_option('fand_pickup_page_id', (int) $page_id);
+               update_option('fandpipo_pickup_page_id', (int) $page_id);
             }
         }
     }
 
-    public static function createTables() {
+    public static function fandpipo_createTables() {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
 

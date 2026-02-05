@@ -23,26 +23,36 @@ class FANDPickupSettings {
         new StoreCategoryController();
         new pickuphoursController;
         
-        add_shortcode('pickup_points_map', [ShortcodesController::class, 'renderPickupMapShortcode']);
+        add_shortcode('fandpipo_map', [ShortcodesController::class, 'fandpipo_renderPickupMapShortcode']);
         
         // Initialisation des réglages Admin        
-        add_action('admin_menu', [$this, 'register_pickup_points_menu']);
+        add_action('admin_menu', [$this, 'fandpipo_register_menu']);
         
-        add_action('init', [$this, 'register_activation_logic']);
+        add_action('init', [$this, 'fandpipo_register_activation_logic']);
+        add_action( 'plugins_loaded', [$this, 'fandpipo_init_constants'], 10 );
+
+    }
+
+    function fandpipo_init_constants() {
+        global $WCFM;
+
+        if ( is_object( $WCFM ) ) {
+            define( 'FANDPIPO_AVATAR_DEFAULT', $WCFM->plugin_url . 'assets/images/wcfmmp-blue.png' );
+        } 
     }
 
     /**
      * Ajout de la page dans le menu Réglages de WordPress
      */
-	public function register_pickup_points_menu() {
+	public function fandpipo_register_menu() {
 
 		// Ajouter le menu principal "Fournisseurs"
 		add_menu_page(
 			'FAND Pickup Points Ultimate', // Le titre de votre page de paramètres
 			'FAND Pickup Points Ultimate', // Le nom du menu
 			'manage_options', // La capacité requise
-			'fand-pickup-points-ultimate-settings', // Le slug de la page
-			[$this, 'render_liste_categories_page'], // La fonction de rappel pour afficher le contenu de la page
+			'fandpipo-settings', // Le slug de la page
+			[$this, 'fandpipo_render_liste_categories_page'], // La fonction de rappel pour afficher le contenu de la page
 			'dashicons-location', // L'icône à utiliser pour ce menu
 			59 // La position dans l'ordre du menu où celui-ci doit apparaître
 		);
@@ -52,23 +62,25 @@ class FANDPickupSettings {
     /**
      * Rendu HTML de la page principale (Liste des Catégories)
      */
-    public function render_liste_categories_page() {
+    public function fandpipo_render_liste_categories_page() {
         // 1. Traitement manuel de la sauvegarde
-        if (isset($_POST['save_fand_categories'])) {
-            // Vérification de sécurité
-            check_admin_referer('fand_save_categories_action'); 
+        if (isset($_POST['fandpipo_save_categories'])) {
+            check_admin_referer('fandpipo_save_categories_action'); 
             
-        if ( isset( $_POST['liste_categories_boutique'] ) ) {
-            $categories = sanitize_text_field( wp_unslash( $_POST['liste_categories_boutique'] ) );
-            update_option( 'liste_categories_boutique', $categories );
-        }
-            
-            echo '<div class="updated notice is-dismissible"><p>✅ Catégories mises à jour avec succès !</p></div>';
+            if ( isset( $_POST['fandpipo_liste_categories_boutique'] ) ) {
+                // On nettoie et on sauvegarde
+                $categories_brutes = sanitize_text_field( wp_unslash( $_POST['fandpipo_liste_categories_boutique'] ) );
+                update_option( 'fandpipo_liste_categories_boutique', $categories_brutes );
+                
+                echo '<div class="updated notice is-dismissible"><p>✅ Liste globale mise à jour !</p></div>';
+            }
         }
 
-        // 2. Récupération de la valeur actuelle
-        $val = get_option('liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
+        // 2. Récupération de la valeur (On force une valeur par défaut si vide)
+        $val = get_option('fandpipo_liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
         ?>
+        <input type="text" name="fandpipo_liste_categories_boutique" value="<?php echo esc_attr($val); ?>" class="regular-text" />
+        
 
         <div class="wrap">
             <h1><span class="dashicons dashicons-location"></span> Pickup Points Ultimate</h1>
@@ -78,29 +90,29 @@ class FANDPickupSettings {
                 <p>Définissez ici les catégories globales que les vendeurs pourront choisir.</p>
                 
                 <form method="post" action="">
-                    <?php wp_nonce_field('fand_save_categories_action'); ?>
+                    <?php wp_nonce_field('fandpipo_save_categories_action'); ?>
                     
                     <table class="form-table">
                         <tr>
-                            <th scope="row"><label for="liste_categories_boutique">Liste des activités</label></th>
+                            <th scope="row"><label for="fandpipo_liste_categories_boutique">Liste des activités</label></th>
                             <td>
-                                <input type="text" name="liste_categories_boutique" id="liste_categories_boutique" value="<?php echo esc_attr($val); ?>" class="regular-text" />
+                                <input type="text" name="fandpipo_liste_categories_boutique" id="fandpipo_liste_categories_boutique" value="<?php echo esc_attr($val); ?>" class="regular-text" />
                                 <p class="description">Séparez chaque catégorie par une virgule (ex: Bar, Magasin, Foodtruck).</p>
                             </td>
                         </tr>
                     </table>
                     
-                    <?php submit_button('Enregistrer les catégories', 'primary', 'save_fand_categories'); ?>
+                    <?php submit_button('Enregistrer les catégories', 'primary', 'fandpipo_save_categories'); ?>
                 </form>
             </div>
         </div>
         <?php
     }
 
-    public function register_activation_logic() {
-        if (get_option('fand_pickup_points_ultimate_flush_rewrite')) {
+    public function fandpipo_register_activation_logic() {
+        if (get_option('fandpipo_flush_rewrite')) {
             flush_rewrite_rules();
-            delete_option('fand_pickup_points_ultimate_flush_rewrite');
+            delete_option('fandpipo_flush_rewrite');
         }
     }
 }

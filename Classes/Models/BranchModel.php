@@ -142,11 +142,11 @@ class BranchModel {
         }
 
         return wp_get_object_terms( $product_ids, 'product_cat', array(
-            'fields'     => 'all',
-            'orderby'    => 'name',
-            'order'      => 'ASC',
-            'hide_empty' => true,
-            'parent'     => 0, // Top-Level seulement
+            'fields'                => 'all',
+            'fandpipo_orderby'      => 'name',
+            'order'                 => 'ASC',
+            'hide_empty'            => true,
+            'parent'                => 0, // Top-Level seulement
         ) );
     }
 

@@ -1,8 +1,8 @@
 // Les variables mapMarkers, defaultCategory, i18n, etc. sont disponibles
 // car le script est chargé après la balise <script> qui les définit.
 
-if (typeof markers === 'undefined') {
-    var markers = []; // Marqueurs Leaflet
+if (typeof fandpipo_markers === 'undefined') {
+    var fandpipo_markers = []; // Marqueurs Leaflet
 } 
 var popupThreshold = 10; // minutes avant ouverture/fermeture
 
@@ -85,9 +85,9 @@ function applyFilters() {
     const pickupDay = pickupDayValue !== "" ? parseInt(pickupDayValue, 10) : null;
     const pickupStatus = document.getElementById("wcfmmp_pickup_store_status")?.value || null;
 
-    if (typeof markers === 'undefined' || markers.length === 0) return;
+    if (typeof fandpipo_markers === 'undefined' || fandpipo_markers.length === 0) return;
 
-    markers.forEach(p => {
+    fandpipo_markers.forEach(p => {
         let visible = true;
 
         // --- A. Filtre Recherche (Live) ---
@@ -107,7 +107,7 @@ function applyFilters() {
             }
         }
 
-        // --- C. Filtre Pays (CORRIGÉ) ---
+        // --- C. Filtre Pays  ---
         if (visible && country && country !== "") {
             const pCountry = String(p.country || "").toUpperCase();
             const fCountry = String(country).toUpperCase();
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         p.marker = marker;
         p.popupType = null;
-        markers.push(p);
+        fandpipo_markers.push(p);
     });
 
     // 3. Initialisation Select2 (doit être fait après le chargement du DOM)

@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Scripts {
 
     public function __construct() {
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
+        add_action('wp_enqueue_scripts', [$this, 'fandpipo_enqueue_scripts']);
         add_action('wp_enqueue_scripts', function() {
             wp_deregister_script('wcfmmp_store_lists_script');
         }, 999);
@@ -22,8 +22,8 @@ class Scripts {
 	 * @param string $hook_suffix Identifiant de la page actuelle
 	 */
 
-	public function enqueue_scripts() {
-        global $WCFM, $WCFMmp;
+	public function fandpipo_enqueue_scripts() {
+        
         // --- Conditions de chargement ---
         // 1. Est-on sur la page WCFM (Admin Vendeur) ?// On sécurise la récupération du paramètre endpoint
         $endpoint = filter_input(INPUT_GET, 'endpoint', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -56,52 +56,50 @@ class Scripts {
         wp_enqueue_style('wcfmicon', $wcfm_assets_url . 'fonts/font-awesome/css/wcfmicon.min.css', [],WCFMmp_VERSION);
 
         // JS spécifique pickup
-        wp_enqueue_script('pickup-admin', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
+        wp_enqueue_script('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
 
         // On ne cherche plus l'ID ici, car il n'est pas fiable au chargement
-        $liste_brute = get_option('liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
+        $liste_brute = get_option('fandpipo_liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
         $categories_array = array_map('trim', explode(',', $liste_brute));
 
         $common_data = [
             'ajax_url'           => admin_url('admin-ajax.php'),
-            'loadPickupNonce'    => wp_create_nonce('load_pickup_hours_nonce'),
-            'savePickupNonce'    => wp_create_nonce('save_pickup_hours_nonce'),
-            'getCategoriesNonce' => wp_create_nonce('get_categories_nonce'),
+            'fandpipoloadPickupNonce'    => wp_create_nonce('fandpipo_load_pickup_hours_nonce'),
+            'fandpiposavePickupNonce'    => wp_create_nonce('fandpipo_save_pickup_hours_nonce'),
+            'fandpipogetCategoriesNonce' => wp_create_nonce('fandpipo_get_categories_nonce'),
             'categories'         => $categories_array,
         ];
 
         // 2. Chargement du script ADMIN (WCFM)
-        wp_enqueue_script('pickup-admin', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
+        wp_enqueue_script('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
         wp_localize_script('pickup-admin', 'FAND_PICKUP_DATA', $common_data);
 
         // 3. Chargement du script FRONT (La Carte)
         if ( $is_frontend_map_page ) {
-            wp_enqueue_script('fand-pickup-map', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
+            wp_enqueue_script('fand-pickup-map', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
             // On peut utiliser le même objet common_data pour la carte
             wp_localize_script('fand-pickup-map', 'FAND_PICKUP_DATA', $common_data);
 
             // CSS spécifique pickup
-            wp_enqueue_style('pickup-admin', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/css/style.css', [],FAND_PICKUP_POINTS_ULTIMATE_VERSION);
-            wp_enqueue_script('fand-pickup-map-script', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FAND_PICKUP_POINTS_ULTIMATE_VERSION,true );
+            wp_enqueue_style('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/css/style.css', [],FANDPIPO_VERSION);
+            wp_enqueue_script('fand-pickup-map-script', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FANDPIPO_VERSION,true );
             
             // Enqueue le Select2 CSS depuis le CDN
-            //wp_enqueue_style('select2-css','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',[],'4.1.0');
-            wp_enqueue_style('select2-css', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/css/select2.min.css', [], '4.1.0');
-            //wp_enqueue_style( 'font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4' );
-            wp_enqueue_style('font-awesome', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/css/all.min.css', [], '5.15.4');
+            wp_enqueue_style('select2-css', FANDPIPO_PLUGIN_URL . 'assets/css/select2.min.css', [], '4.1.0');
+            wp_enqueue_style('font-awesome', FANDPIPO_PLUGIN_URL . 'assets/css/all.min.css', [], '5.15.4');
         
-            wp_enqueue_script('view-script-branch-list', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/view-script-branch-list.js', ['jquery'], '1.0', true);
-            wp_localize_script('view-script-branch-list', 'ajaxurl', admin_url('admin-ajax.php'));
+            wp_enqueue_script('view-script-branch-list', FANDPIPO_PLUGIN_URL . 'assets/js/view-script-branch-list.js', ['jquery'], '1.0', true);
+            wp_localize_script('view-script-branch-list', 'fandpipo_data', [
+                'ajaxurl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('fandpipo_filter_nonce') // Le jeton de sécurité
+            ]);
 
             //Enqueue le Select2 JS si ce n'est pas fait
-            //wp_enqueue_script('select2-js','https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',['jquery'],'4.1.0',true);
-            wp_enqueue_script('select2-js', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/select2.min.js', ['jquery'], '4.1.0', true);
+            wp_enqueue_script('select2-js', FANDPIPO_PLUGIN_URL . 'assets/js/select2.min.js', ['jquery'], '4.1.0', true);
             
             // Leaflet
-            //wp_enqueue_style('leaflet-css', 'https://unpkg.com/leaflet/dist/leaflet.css');
-            wp_enqueue_style('leaflet-css', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/css/leaflet.css', [], '1.9.4');
-            //wp_enqueue_script('leaflet-js', 'https://unpkg.com/leaflet/dist/leaflet.js', [], null, true);
-            wp_enqueue_script('leaflet-js', FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_URL . 'assets/js/leaflet.js', [], '1.9.4', true);
+            wp_enqueue_style('leaflet-css', FANDPIPO_PLUGIN_URL . 'assets/css/leaflet.css', [], '1.9.4');
+            wp_enqueue_script('leaflet-js', FANDPIPO_PLUGIN_URL . 'assets/js/leaflet.js', [], '1.9.4', true);
 
             wp_enqueue_style( 'kadence-shop-styles' );
         

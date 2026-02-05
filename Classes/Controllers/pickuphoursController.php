@@ -12,16 +12,16 @@ use fandWCFMPickupPoints\Classes\Models\PickupModel;
 class pickuphoursController {
 
     public function __construct() {
-        add_action('wp_ajax_save_pickup_hours', [$this, 'savePickupHours']);
-        add_action('wp_ajax_nopriv_save_pickup_hours', [$this, 'savePickupHours']);
-        add_action('wp_ajax_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
-        add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'loadPickupHoursTemplate']);
+        add_action('wp_ajax_fandpipo_save_pickup_hours', [$this, 'fandpipo_savePickupHours']);
+        add_action('wp_ajax_nopriv_fandpipo_save_pickup_hours', [$this, 'fandpipo_savePickupHours']);
+        add_action('wp_ajax_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
+        add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
     }
 
-    public function savePickupHours() {
+    public function fandpipo_savePickupHours() {
         // --- Nonce (Sanitized)
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-        if (! wp_verify_nonce($nonce, 'save_pickup_hours_nonce')) {
+        if (! wp_verify_nonce($nonce, 'fandpipo_save_pickup_hours_nonce')) {
             wp_send_json_error(['message' => 'Nonce invalide']);
         }
 
@@ -39,16 +39,16 @@ class pickuphoursController {
 
         // --- Sauvegarde
         $model = new PickupModel();
-        $model->saveHours($branch_id, $day_times);
+        $model->fandpipo_saveHours($branch_id, $day_times);
 
         wp_send_json_success(['message' => 'Horaires sauvegardés !']);
     }
 
-    public function loadPickupHoursTemplate() {
+    public function fandpipo_loadPickupHoursTemplate() {
         
         // --- Nonce (Sanitized)
         $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-        if (! wp_verify_nonce($nonce, 'load_pickup_hours_nonce')) {
+        if (! wp_verify_nonce($nonce, 'fandpipo_load_pickup_hours_nonce')) {
             wp_send_json_error(['message' => 'Nonce invalide']);
         }
 
@@ -64,13 +64,12 @@ class pickuphoursController {
 
         // --- Récupération données
         $model = new PickupModel();
-        $fand_hours = $model->getHours($branch_id);
-        $fand_holidays = $model->getHolidays($branch_id);
+        $fand_hours = $model->fandpipo_getHours($branch_id);
+        $fand_holidays = $model->fandpipo_getHolidays($branch_id);
 
         ob_start();
 
-        // include FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/pickup-hours/pickup-hours-template.php';
-        $template_path = trailingslashit(FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR) . 'views/pickup-hours/pickup-hours-template.php';
+        $template_path = trailingslashit(FANDPIPO_PLUGIN_DIR) . 'views/pickup-hours/fandpipo-pickup-hours-template.php';
         if ( file_exists( $template_path ) ) {
             include $template_path;
         } 

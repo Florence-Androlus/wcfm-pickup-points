@@ -1,5 +1,5 @@
-# Translation of Plugins - fand-pickup-points-ultimate - Stable (latest release) in French (France)
-# This file is distributed under the same license as the Plugins - fand-pickup-points-ultimate - Stable (latest release) package.
+# Translation of Plugins - fand-pickup-points-ultimate-edition-for-wcfm - Stable (latest release) in French (France)
+# This file is distributed under the same license as the Plugins - fand-pickup-points-ultimate-edition-for-wcfm - Stable (latest release) package.
 #, fuzzy
 msgid ""
 msgstr ""

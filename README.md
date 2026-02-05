@@ -1,4 +1,4 @@
-=== Fand Pickup Points : Ultimate Edition - FAND Addon ===
+=== Fand Pickup Points : Ultimate Edition for WCFM ===
 Contributors: fandevelop
 Tags: wcfm, woocommerce, pickup points, marketplace, vendor locations
 Requires at least: 6.9
@@ -12,7 +12,7 @@ WCFM Pickup Points allows each store on a marketplace to individualize their own
 
 == Description ==
 
-FAND Pickup Points : Ultimate Edition - FAND Addon is a powerful extension for WCFM Marketplace. It gives vendors the ability to create and manage their own pickup points independently. 
+FAND Pickup Points : Ultimate Edition for WCFM is a powerful extension for WCFM Marketplace. It gives vendors the ability to create and manage their own pickup points independently. 
 
 Each vendor can set specific locations and define custom opening hours for every branch, providing more flexibility to customers and simplifying the management of individual stores.
 

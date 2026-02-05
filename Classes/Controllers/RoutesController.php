@@ -8,11 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RoutesController {
 
     public function __construct() {
-        add_action('init', [$this, 'register_rewrite_rules']);
-        add_filter('query_vars', [$this, 'register_query_vars']);
-        add_filter( 'template_include', [$this, 'fand_wcfm_load_branch_template'], 999 );
-        add_action( 'wp', [ $this, 'afficher_excerpt_en_vue_liste' ] );
-        add_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
+        add_action('init', [$this, 'fandpipo_register_rewrite_rules']);
+        add_filter('query_vars', [$this, 'fandpipo_register_query_vars']);
+        add_filter( 'template_include', [$this, 'fandpipo_load_branch_template'], 999 );
+        add_action( 'wp', [ $this, 'fandpipo_excerpt_en_vue_liste' ] );
+        add_action( 'woocommerce_after_shop_loop_item', [ $this, 'fandpipo_description_en_vue_liste' ], 1 );
 
         add_filter('document_title_parts', function($title_parts) {
             // 1. On récupère les variables de requête que vous avez déjà définies
@@ -54,9 +54,23 @@ class RoutesController {
 
             return $title_parts;
         }, 100);
+
+        add_filter('body_class', [$this, 'fandpipo_add_branch_page_body_classes']);
     }
 
-    public function register_rewrite_rules() {
+    public function fandpipo_add_branch_page_body_classes($classes) {
+        $branch_slug = get_query_var('branch_slug');
+        
+        // Si on est sur notre page de branche
+        if ( ! empty($branch_slug) ) {
+            $classes[] = 'wcfm-store-page';
+            $classes[] = 'wcfmmp-store-page';
+        }
+        
+        return $classes;
+    }
+
+    public function fandpipo_register_rewrite_rules() {
 
         //Pages Single Branch
         add_rewrite_tag('%tab_slug%', '([^&]+)'); 
@@ -65,7 +79,7 @@ class RoutesController {
         add_rewrite_rule('pickup/emplacement/([^/]+)/?$', 'index.php?branch_slug=$matches[1]', 'top');
     }
 
-    public function register_query_vars($vars) {
+    public function fandpipo_register_query_vars($vars) {
         $vars[] = 'branch_slug';
         $vars[] = 'tab_slug';
         $vars[] = 'emplacement';
@@ -75,7 +89,7 @@ class RoutesController {
     /**
      * Gère l'affichage de la page single branch pickup
      */
-    function fand_wcfm_load_branch_template( $template ) {
+    function fandpipo_load_branch_template( $template ) {
         $branch_slug = get_query_var( 'branch_slug' );
         $tab_slug    = get_query_var( 'tab_slug' ); 
         $valid_tabs  = array('about', 'policies', 'reviews', 'followers');
@@ -99,7 +113,7 @@ class RoutesController {
         if ( ! empty( $branch_slug ) ) {
             
             // --- Étape 2 : Récupération des données uniquement si on a le slug ---
-            $branch_data = self::fand_wcfm_get_branch_by_slug( $branch_slug ); 
+            $branch_data = self::fandpipo_get_branch_by_slug( $branch_slug ); 
 
             if ( $branch_data ) {
                 
@@ -153,7 +167,7 @@ class RoutesController {
                 setup_postdata( $post ); 
 
                 // Remplacer le template :
-                $new_template = FAND_PICKUP_POINTS_ULTIMATE_PLUGIN_DIR . 'views/single-branch/single-branch-view.php'; 
+                $new_template = FANDPIPO_PLUGIN_DIR . 'views/single-branch/fandpipo-single-branch-view.php'; 
                 if ( file_exists( $new_template ) ) {
                     return $new_template; 
                 }
@@ -163,7 +177,7 @@ class RoutesController {
         return $template;
     }
 
-    // Dans la même classe que fand_wcfm_load_branch_template
+    // Dans la même classe que fandpipo_load_branch_template
     public function fand_wcfm_custom_branch_title( $title ) {
         // On vérifie d'abord si nous sommes dans le contexte de notre 'branch' custom
         $branch_slug = get_query_var( 'branch_slug' );
@@ -176,11 +190,11 @@ class RoutesController {
 
             // Mapping des slugs d'onglets pour un affichage convivial
             $tab_titles = [
-                'products'  => __( 'Produits', 'fand-pickup-points-ultimate' ), // Pour la page de base (pas d'onglet)
-                'about'     => __( 'À propos', 'fand-pickup-points-ultimate' ),
-                'policies'  => __( 'Politiques', 'fand-pickup-points-ultimate' ),
-                'reviews'   => __( 'Avis', 'fand-pickup-points-ultimate' ),
-                'followers' => __( 'Abonnés', 'fand-pickup-points-ultimate' ),
+                'products'  => __( 'Produits', 'fand-pickup-points-ultimate-edition-for-wcfm' ), // Pour la page de base (pas d'onglet)
+                'about'     => __( 'À propos', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'policies'  => __( 'Politiques', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'reviews'   => __( 'Avis', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'followers' => __( 'Abonnés', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
             ];
 
             // Déterminer le titre de l'onglet (Produits par défaut si $active_tab_slug n'est pas trouvé)
@@ -216,7 +230,7 @@ class RoutesController {
      * @param string $branch_slug Le slug de l'emplacement recherché.
      * @return array|false Un tableau contenant l'ID de la branche, l'ID du vendeur, et le nom.
      */
-    public static function fand_wcfm_get_branch_by_slug( $branch_slug ) {
+    public static function fandpipo_get_branch_by_slug( $branch_slug ) {
         global $wpdb;
 
         // 1. Définir une clé de cache unique (basée sur le slug ou la requête)
@@ -245,17 +259,17 @@ class RoutesController {
                 $db_name = $location['name']; 
                 if ( sanitize_title( $db_name ) === $branch_slug ) {
                     return [
-                        'branch_id'   => $location['ID'],
-                        'vendor_id'   => $location['store_id'],
-                        'branch_name' => $location['name'], 
-                        'lat'         => $location['latitude'],
-                        'lng'         => $location['longitude'],
-                        'map_address' => $location['map_address'],
-                        'address'     => $location['address'],
-                        'city'        => $location['city'],
-                        'postal_code' => $location['postal_code'],
-                        'state'       => $location['state'],
-                        'country'     => $location['country'],
+                        'branch_id'         => $location['ID'],
+                        'vendor_id'         => $location['store_id'],
+                        'branch_name'       => $location['name'], 
+                        'lat'               => $location['latitude'],
+                        'lng'               => $location['longitude'],
+                        'map_address'       => $location['map_address'],
+                        'address'           => $location['address'],
+                        'city'              => $location['city'],
+                        'postal_code'       => $location['postal_code'],
+                        'state'             => $location['state'],
+                        'fandpipo_country'  => $location['country'],
                     ];
                 }
             }
@@ -266,7 +280,7 @@ class RoutesController {
     /**
      * Gère l'activation de l'extrait en mode liste.
      */
-    public function afficher_excerpt_en_vue_liste() {
+    public function fandpipo_excerpt_en_vue_liste() {
         if ( is_shop() || is_product_category() || is_product_tag() ) {
             
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -278,7 +292,7 @@ class RoutesController {
             if ( 'list' === $view_mode || 'list' === $get_view ) {
                 remove_action( 'woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_product_excerpt', 30 );
             } else {
-                remove_action( 'woocommerce_after_shop_loop_item', [ $this, 'ma_description_en_vue_liste' ], 1 );
+                remove_action( 'woocommerce_after_shop_loop_item', [ $this, 'fandpipo_description_en_vue_liste' ], 1 );
             }
         }
     }
@@ -286,7 +300,7 @@ class RoutesController {
     /**
      * Affiche le contenu de la description courte à l'intérieur du div .product-excerpt.
      */
-    public function ma_description_en_vue_liste() {
+    public function fandpipo_description_en_vue_liste() {
         global $product;
         if ( $product && method_exists($product, 'get_short_description') && $product->get_short_description() ) {
             echo '<div class="product-excerpt">';

@@ -25,7 +25,7 @@
                         data: {
                             action: 'load_pickup_hours_template',
                             branch_id: branchId,
-                            _wpnonce: config.loadPickupNonce
+                            _wpnonce: config.fandpipoloadPickupNonce
                         },
                         success: function(response){
                             if(response.success && response.data.html){
@@ -36,8 +36,8 @@
                                     var $form = $(this);
 
                                     var data = {
-                                        action: 'save_pickup_hours',
-                                        _wpnonce: config.savePickupNonce,
+                                        action: 'fandpipo_save_pickup_hours',
+                                        _wpnonce: config.fandpiposavePickupNonce,
                                         branch_id: $form.find('[name="branch_id"]').val(),
                                         wcfm_pickup_hours: JSON.stringify({ day_times: getPickupHoursData() })
                                     };
@@ -69,10 +69,11 @@
             var day_times = {};
 
             $('.multi_input_holder').each(function() {
-                var day_index = $(this).data('day'); // data-day="0..6"
+                // CORRECTION : On utilise .attr('data-fandpipo_day') pour lire la valeur
+                var day_index = $(this).attr('data-fandpipo_day'); 
                 day_times[day_index] = [];
 
-                $(this).find('.multi_input_block').each(function(i) {
+                $(this).find('.multi_input_block').each(function() {
                     var start = $(this).find('input[data-name="start"]').val();
                     var end   = $(this).find('input[data-name="end"]').val();
                     var id    = $(this).find('input[data-name="id"]').val() || 0;
@@ -95,11 +96,11 @@
         // Gestionnaire pour ajouter un nouveau créneau
         $(document).on('click', '.add_multi_input_block', function() {
             var holder = $(this).closest('.multi_input_holder');
-            var day = holder.data('day');
+            // CORRECTION : Utiliser le bon attribut data
+            var day = holder.attr('data-fandpipo_day'); 
             var index = holder.find('.multi_input_block').length;
             var template = $($('#new-time-slot-template').html());
 
-            // Mettre à jour les name des inputs
             template.find('input[data-name="start"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][start]');
             template.find('input[data-name="end"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][end]');
             template.find('input[data-name="id"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][id]').val(0);
@@ -110,10 +111,10 @@
         // Supprimer un créneau
         $(document).on('click', '.remove_multi_input_block', function() {
             var holder = $(this).closest('.multi_input_holder');
-            $(this).closest('.multi_input_block').remove(); // Supprime l'élément HTML
+            $(this).closest('.multi_input_block').remove();
 
-            // Réindexer les inputs pour le jour
-            var day = holder.data('day');
+            // Réindexer avec le bon attribut
+            var day = holder.attr('data-fandpipo_day');
             holder.find('.multi_input_block').each(function(i){
                 $(this).find('input[data-name="start"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + i + '][start]');
                 $(this).find('input[data-name="end"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + i + '][end]');
@@ -140,7 +141,7 @@
             data: {
                 action: 'get_vendor_categories',
                 vendor_id: vendorId,
-                security: config.getCategoriesNonce // Assurez-vous que ce nom correspond au PHP
+                security: config.fandpipogetCategoriesNonce // Assurez-vous que ce nom correspond au PHP
             },
             success: function(response) {
                 const savedValues = (response.success && response.data) ? response.data : [];
