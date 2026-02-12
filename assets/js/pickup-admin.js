@@ -1,7 +1,7 @@
 (function($){
     $(document).ready(function() {
         // On détecte quelle variable est disponible
-        const config = window.config || window.FAND_PICKUP_DATA;
+        const config = window.config || window.fandpipo_pickup_data;
 
         if (!config) {
             console.error("Aucune configuration trouvée pour le plugin Pickup.");
@@ -23,7 +23,7 @@
                         url: config.ajax_url,
                         method: 'POST',
                         data: {
-                            action: 'load_pickup_hours_template',
+                            action: 'fandpipo_load_pickup_hours_template',
                             branch_id: branchId,
                             _wpnonce: config.fandpipoloadPickupNonce
                         },
@@ -139,7 +139,7 @@
             url: config.ajax_url, // On utilise config partout
             type: 'POST',
             data: {
-                action: 'get_vendor_categories',
+                action: 'fandpipo_get_vendor_categories',
                 vendor_id: vendorId,
                 security: config.fandpipogetCategoriesNonce // Assurez-vous que ce nom correspond au PHP
             },

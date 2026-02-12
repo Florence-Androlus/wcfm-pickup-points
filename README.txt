@@ -16,6 +16,21 @@ FAND Pickup Points : Ultimate Edition for WCFM is a powerful extension for WCFM 
 
 Each vendor can set specific locations and define custom opening hours for every branch, providing more flexibility to customers and simplifying the management of individual stores.
 
+== External Services ==
+
+This plugin relies on third-party services to provide full functionality:
+
+1. Google Maps (Directions)
+* Service: Provides directions and location links for pickup points.
+* Data sent: The pickup point's address is sent to Google's servers when a user clicks on the "Get Directions" link. No personal user data is sent automatically.
+* Terms of Service: https://www.google.com/intl/en/help/terms_maps/
+* Privacy Policy: https://policies.google.com/privacy
+
+2. OpenStreetMap (via Leaflet)
+* Service: Provides the map tiles displayed on the pickup points map.
+* Data sent: The user's browser requests map tiles directly from OpenStreetMap servers. The user's IP address is visible to the service during these requests.
+* Privacy Policy: https://osmfoundation.org/wiki/Privacy_Policy
+
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/fand-pickup-points-ultimate` directory, or install the plugin through the WordPress plugins screen directly.

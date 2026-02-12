@@ -36,14 +36,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     ?>
         <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_0">
           <strong><?php echo esc_html( $fandpipo_jours[$fandpipo_day] ) ?> : Time Slots</strong>
-          <?php 
-            if ( FANDPIPO_PRO_LICENCE_STATUS ) : 
-          ?>
-            <a href="#" class="duplicate-hours-btn" data-fandpipo_day="<?php echo esc_attr( $fandpipo_day ) ?>" title="Dupliquer les horaires">
-
-          <span class="wcfmfa fa-copy"></span>
-          </a>
-          <?php endif; ?>
         </p>
 
         <label class="screen-reader-text" for="wcfm_store_hours_mon_times"><?php echo esc_html( $fandpipo_jours[$fandpipo_day] ) ?> : Time Slots</label>
@@ -110,55 +102,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 			<div class="wcfm-clearfix"></div>
       <div class="wcfm_clearfix"></div>
-      <?php
-            if ( FANDPIPO_PRO_LICENCE_STATUS ) : 
-      ?>
-			<div class="wcfm_pickup_settings_heading"><h2>Mode vacances</h2></div>
-			<div class="wcfm_clearfix"></div>
-						
-			<div class="store_address">
-        <p class="wcfm_vacation_mode wcfm_title checkbox_title wcfm_ele">
-          <strong>Activer le mode vacances</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_vacation_mode">Activer le mode vacances</label>
-        <input type="checkbox" id="wcfm_vacation_mode" name="wcfm_vacation_mode" class="wcfm-checkbox wcfm_ele" value="yes">
-        <p class="wcfm_disable_vacation_purchase wcfm_title wcfm_ele">
-          <strong>Désactiver l'achat pendant les vacances</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_disable_vacation_purchase">Désactiver l'achat pendant les vacances</label>
-        <input type="checkbox" id="wcfm_disable_vacation_purchase" name="wcfm_disable_vacation_purchase" class="wcfm-checkbox wcfm_ele" value="yes">
-        <p class="wcfm_vacation_mode_type wcfm_title wcfm_ele">
-          <strong>Vacation Type</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_vacation_mode_type">Vacation Type</label>
-        <select id="wcfm_vacation_mode_type" name="wcfm_vacation_mode_type" class="wcfm-select wcfm_ele">
-          <option value="instant" selected="selected">Instantly Close</option>
-          <option value="date_wise">Date wise close</option>
-        </select>
-        <p class="wcfm_vacation_start_date wcfm_title wcfm_ele date_wise_vacation_ele wcfm_ele_hide">
-          <strong>Message</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_vacation_start_date">Message</label>
-        <input type="text" id="wcfm_vacation_start_date" name="wcfm_vacation_start_date" class="wcfm-text wcfm_ele date_wise_vacation_ele wcfm_ele_hide hasDatepicker" value="" placeholder="Message ... YYYY-MM-DD">
-        <p class="wcfm_vacation_end_date wcfm_title wcfm_ele date_wise_vacation_ele wcfm_ele_hide">
-          <strong>Jusqu'à</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_vacation_end_date">Jusqu'à</label>
-        <input type="text" id="wcfm_vacation_end_date" name="wcfm_vacation_end_date" class="wcfm-text wcfm_ele date_wise_vacation_ele wcfm_ele_hide hasDatepicker" value="" placeholder="À ... YYYY-MM-DD">
-        <p class="wcfm_vacation_mode_msg wcfm_title wcfm_ele">
-          <strong>Message de vacances</strong>
-        </p>
-        <label class="screen-reader-text" for="wcfm_vacation_mode_msg">Message de vacances</label>
-        <textarea id="wcfm_vacation_mode_msg" name="wcfm_vacation_mode_msg" class="wcfm-textarea wcfm_ele" placeholder="" rows="2" cols="20"></textarea>						
-      </div>
-
-			<div class="wcfm-clearfix"></div>
-      <div class="wcfm-message" tabindex="-1" style="display: none;"></div>
-      <div class="wcfm-clearfix"></div>
-      <div class="wcfm_messages_submit">
-        <input type="submit" name="save-data" value="Mise à jour " id="wcfm_store_vacation_setting_save_button" class="wcfm_submit_button">
-      </div>
-    <?php endif; ?>
+      
       <div class="wcfm-clearfix"></div>
 														
   </form>

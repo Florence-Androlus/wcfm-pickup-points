@@ -59,17 +59,11 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
                     </select>
 
                     <?php
-                        // On ignore le manque de Nonce car c'est un formulaire GET de filtrage public
-                        // phpcs:disable WordPress.Security.NonceVerification.Recommended
-                        if(!empty($_GET)){
-                            foreach($_GET as $fandpipo_key => $fandpipo_value){
-                                // On nettoie systématiquement la clé et la valeur
-                                $fandpipo_safe_key = sanitize_text_field(wp_unslash($fandpipo_key));
-                                $fandpipo_safe_value = sanitize_text_field(wp_unslash($fandpipo_value));
+                        $fandpipo_required_params = ['page', 'wcfm_screen', 'tab'];
 
-                                if(in_array($fandpipo_safe_key, ['fandpipo_pickup_orderby', 'fandpipo_pickup_day', 'fandpipo_pickup_status', 'fandpipo_country','fandpipo_category', 'fandpipo_pickup_search'])) continue;
-                                
-                                echo '<input type="hidden" name="' . esc_attr($fandpipo_safe_key) . '" value="' . esc_attr($fandpipo_safe_value) . '">';
+                        foreach ( $fandpipo_required_params as $fandpipo_param ) {
+                            if ( ! empty( $_GET[ $fandpipo_param ] ) ) {
+                                echo '<input type="hidden" name="' . esc_attr( $fandpipo_param ) . '" value="' . esc_attr( sanitize_text_field( wp_unslash( $_GET[ $fandpipo_param ] ) ) ) . '">';
                             }
                         }
                     ?>
@@ -157,7 +151,7 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
                     $fandpipo_vendor_name = strtolower($fandpipo_vendor->display_name ?? '');
                     // Mise à jour du lien "Visiter le Magasin"
                     // NOUVELLE URL : /pickup/emplacement/mon-emplacement-agreable/
-                    $fandpipo_location_url = home_url( '/pickup/emplacement/' . esc_attr(sanitize_title(  $fandpipo_branch_name )) . '/' );
+                    $fandpipo_location_url = home_url( '/pickup/emplacement/' . sanitize_title(  $fandpipo_branch_name ) . '/' );
 
                     // --- FILTRAGE PAR RECHERCHE (NOM) ---
                     if (!empty($fandpipo_search_query)) {
@@ -252,7 +246,8 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
                     $fandpipo_avatar = wp_get_attachment_url($fandpipo_avatar_id);
                     if (!$fandpipo_avatar) { $fandpipo_avatar = FANDPIPO_AVATAR_DEFAULT; }
                     $fandpipo_banner_id = $fandpipo_profile_settings['banner'] ?? 0;
-                    $fandpipo_banner_image =  $fandpipo_banner_id ? wp_get_attachment_url( $fandpipo_banner_id) : plugins_url('wc-multivendor-marketplace/assets/images/default_banner.jpg');
+                    $fandpipo_banner_image = $fandpipo_banner_id ? wp_get_attachment_url($fandpipo_banner_id) : FANDPIPO_PLUGIN_URL . 'assets/images/default_banner.jpg';
+
                     $fandpipo_country_name = isset($countries[ $fandpipo_branch['country']]) ? $countries[ $fandpipo_branch['country']] : 'France';
                     //Sécuriser les métadonnées de branche (on force une chaîne vide si null)
                     $fandpipo_address = ( $fandpipo_branch['postal_code'] ?? '') . ' ' . ( $fandpipo_branch['city'] ?? '');

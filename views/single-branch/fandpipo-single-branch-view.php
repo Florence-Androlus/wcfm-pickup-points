@@ -186,9 +186,9 @@ $fandpipo_counter = 0;
                                     <i class="wcfmfa fa-map-marker" aria-hidden="true"></i>
                                     <?php 
                                         // Nettoyage et encodage de l'adresse pour l'URL
-                                        $google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode( $fandpipo_address );
+                                        $fandpipo_google_maps_url = "https://www.google.com/maps/search/?api=1&query=" . urlencode( $fandpipo_address );
                                     ?>
-                                    <a href="<?php echo esc_url( $google_maps_url ); ?>" target="_blank">
+                                    <a href="<?php echo esc_url( $fandpipo_google_maps_url ); ?>" target="_blank">
                                         <span><?php echo esc_html( $fandpipo_address ); ?></span>
                                     </a>
                                     </p>
@@ -248,18 +248,7 @@ $fandpipo_counter = 0;
         </div>
     </main>
 </div>
-<script>
-    // Variables PHP rendues pour le JavaScript
-    // mapMarkers ne contient maintenant qu'un seul élément (la branche actuelle)
-    const mapMarkers = <?php echo wp_json_encode( $fandpipo_markers ); ?>;
 
-    // Ajout des coordonnées pour le centrage de la carte
-    const currentLat = <?php echo json_encode($fandpipo_lat); ?>;
-    const currentLng = <?php echo json_encode($fandpipo_lng); ?>;
-    const fandPickupPluginUrl = '<?php echo esc_url( FANDPIPO_PRO_PLUGIN_URL ); ?>';
-    const isSingleView = true; // Flag pour le script général
-
-</script>
 <?php
     wp_enqueue_script('fand-pickup-map-script'); 
 ?>

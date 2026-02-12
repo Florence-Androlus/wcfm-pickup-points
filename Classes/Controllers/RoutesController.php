@@ -145,20 +145,29 @@ class RoutesController {
                 $wp_query->is_singular = true; 
                 $wp_query->is_main_query = true; 
                 $wp_query->query_vars['post_type'] = 'wcfm_branch';
-                
+                $fake_post_id = -99;
                 $fake_post = (object) [
-                    'ID'                      => 0,
+                    'ID'                      => $fake_post_id,
                     'post_type'               => 'wcfm_branch',
                     'post_title'              => $branch_data['branch_name'],
                     'post_content'            => '',
                     'post_status'             => 'publish',
                     'post_name'               => $branch_slug,
-                    'post_date'               => current_time('mysql'),
+                    'post_date'             => current_time('mysql'),
+                    'post_date_gmt'         => current_time('mysql', 1),
+                    'post_modified'         => current_time('mysql'),
+                    'post_modified_gmt'     => current_time('mysql', 1),
                     'post_author'             => 1, 
+                    'comment_status'        => 'closed',
+                    'ping_status'           => 'closed',
+                    'guid'                  => home_url('/' . $branch_slug),
+                    'filter'                => 'raw', // Important pour éviter certains traitements
                 ];
 
-                $wp_query->posts = [ $fake_post ]; 
                 $wp_query->post = $fake_post;
+                $wp_query->posts = [ $fake_post ];
+                $wp_query->queried_object = $fake_post;
+                $wp_query->queried_object_id = $fake_post_id;
                 $wp_query->found_posts = 1;
                 $wp_query->post_count = 1;
 

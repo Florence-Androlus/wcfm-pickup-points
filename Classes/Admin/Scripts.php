@@ -2,6 +2,9 @@
 
 namespace fandWCFMPickupPoints\Classes\Admin;
 
+use fandWCFMPickupPoints\Classes\Models\BranchModel;
+use fandWCFMPickupPoints\Classes\Models\PickupModel;
+
 // Empêche l'accès direct au fichier
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -38,14 +41,11 @@ class Scripts {
         $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_url(wp_unslash($_SERVER['REQUEST_URI'])) : '';
 
         $is_single_emplacement = is_singular('emplacement') || (strpos($request_uri, '/pickup/emplacement/') !== false);
-
         $is_frontend_map_page = $is_map_page || $is_single_emplacement;
         
         // WCFM CSS/JS
-        $wcmm_plugin_file = WP_PLUGIN_DIR . '/wc-multivendor-marketplace/wc-multivendor-marketplace.php';
-        $wcmm_assets_url = plugin_dir_url($wcmm_plugin_file) . 'assets/';
-        $wcfm_plugin_file = WP_PLUGIN_DIR . '/wc-frontend-manager/wc-frontend-manager.php';
-        $wcfm_assets_url = plugin_dir_url($wcfm_plugin_file) . 'assets/';
+        $wcmm_assets_url = plugins_url( 'wc-multivendor-marketplace/assets/' );
+        $wcfm_assets_url = plugins_url( 'wc-frontend-manager/assets/' );
 
         // CSS WCFM
         wp_enqueue_style('wcfmmp-style-stores-list', $wcmm_assets_url . 'css/min/store-lists/wcfmmp-style-stores-list.css', [],WCFMmp_VERSION);
@@ -72,18 +72,59 @@ class Scripts {
 
         // 2. Chargement du script ADMIN (WCFM)
         wp_enqueue_script('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
-        wp_localize_script('pickup-admin', 'FAND_PICKUP_DATA', $common_data);
+        wp_localize_script('pickup-admin', 'fandpipo_pickup_data', $common_data);
 
         // 3. Chargement du script FRONT (La Carte)
         if ( $is_frontend_map_page ) {
-            wp_enqueue_script('fand-pickup-map', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js', ['jquery'], '1.0', true);
+            $map_markers = [];
+            $lat = 46.6;
+            $lng = 2.4;
+            $is_single = false;
+            
+            // On prépare TOUTES les variables nécessaires
+            if ( $is_single_emplacement ) {
+                // --- CAS PAGE SINGLE ---
+                // On récupère les données via le BranchModel (comme dans ton template)
+                $vendor_id = get_query_var('current_vendor_id');
+                $branch_raw = get_query_var('current_branch_data');
+                
+                $branch_model = new BranchModel();
+                $single_data = $branch_model->getSingleBranchData($vendor_id, $branch_raw);
+                $is_single = true;
+                if ($single_data) {
+                    $map_markers = [$single_data]; // Un seul marqueur dans le tableau
+                    $lat = $single_data['lat'];
+                    $lng = $single_data['lng'];
+                }
+            } else {
+                // --- CAS PAGE CARTE GLOBALE ---
+                $data = PickupModel::fandpipo_getPickupData([]);
+                $map_markers = $data['fandpipo_markers'];
+                $lat = get_query_var('fandpipo_lat', 46.6);
+                $lng = get_query_var('fandpipo_lng', 2.4);
+            }
+
+            $map_settings = [
+                'markers'         => $map_markers,
+                'currentLat'      => $lat,
+                'currentLng'      => $lng,
+                'isSingleView'    => $is_single,
+                'defaultCategory' => trim(explode(',', get_option('fandpipo_liste_categories_boutique'))[0]),
+            ];
+
+            // Chargement unique du script
+            wp_enqueue_script('fand-pickup-map', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map.js', array('jquery', 'leaflet-js'), FANDPIPO_VERSION, true);
+            
+            // Injection des données sous le nom "fandpipoData"
+            wp_localize_script('fand-pickup-map', 'fandpipoData', $map_settings);
+
+            wp_enqueue_script('fand-pickup-map-script', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FANDPIPO_VERSION,true );
             // On peut utiliser le même objet common_data pour la carte
-            wp_localize_script('fand-pickup-map', 'FAND_PICKUP_DATA', $common_data);
+            wp_localize_script('fand-pickup-map-script', 'fandpipo_pickup_data', $common_data);
 
             // CSS spécifique pickup
             wp_enqueue_style('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/css/style.css', [],FANDPIPO_VERSION);
-            wp_enqueue_script('fand-pickup-map-script', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FANDPIPO_VERSION,true );
-            
+
             // Enqueue le Select2 CSS depuis le CDN
             wp_enqueue_style('select2-css', FANDPIPO_PLUGIN_URL . 'assets/css/select2.min.css', [], '4.1.0');
             wp_enqueue_style('font-awesome', FANDPIPO_PLUGIN_URL . 'assets/css/all.min.css', [], '5.15.4');

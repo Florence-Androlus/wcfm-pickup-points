@@ -14,8 +14,8 @@ class pickuphoursController {
     public function __construct() {
         add_action('wp_ajax_fandpipo_save_pickup_hours', [$this, 'fandpipo_savePickupHours']);
         add_action('wp_ajax_nopriv_fandpipo_save_pickup_hours', [$this, 'fandpipo_savePickupHours']);
-        add_action('wp_ajax_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
-        add_action('wp_ajax_nopriv_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
+        add_action('wp_ajax_fandpipo_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
+        add_action('wp_ajax_nopriv_fandpipo_load_pickup_hours_template', [$this, 'fandpipo_loadPickupHoursTemplate']);
     }
 
     public function fandpipo_savePickupHours() {
@@ -33,7 +33,7 @@ class pickuphoursController {
         }
 
         // --- Horaires (Sanitized avant json_decode)
-        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? sanitize_text_field(wp_unslash($_POST['wcfm_pickup_hours'])) : '';
+        $hours_raw = isset($_POST['wcfm_pickup_hours']) ? map_deep(wp_unslash($_POST['wcfm_pickup_hours']), 'sanitize_text_field') : '';
         $hours = json_decode($hours_raw, true) ?: [];
         $day_times = $hours['day_times'] ?? [];
 

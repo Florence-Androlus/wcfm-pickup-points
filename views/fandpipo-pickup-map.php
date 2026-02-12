@@ -77,11 +77,3 @@ $fandpipo_default_state = isset($fandpipo_default_state) ? $fandpipo_default_sta
 
 </form>
 
-<script>
-    // Variables PHP rendues pour le JavaScript
-    const mapMarkers     = <?php echo json_encode($fandpipo_markers); ?>;
-    const defaultCategory= '<?php echo esc_js($fandpipo_default_category); ?>';
-    const defaultCountry = '<?php echo esc_js($fandpipo_default_country); ?>';
-    const defaultState = '<?php echo esc_js($fandpipo_default_state); ?>' || '';
-    const fandPickupPluginUrl = '<?php echo esc_url(FANDPIPO_PLUGIN_URL ); ?>';
-</script>

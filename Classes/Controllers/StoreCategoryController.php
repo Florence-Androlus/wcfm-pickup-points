@@ -13,8 +13,8 @@ class StoreCategoryController {
         add_action('wcfm_vendor_settings_update', [$this, 'fandpipo_saveVendorCategories'], 10, 2);
     
         // Ajout des routes AJAX
-        add_action('wp_ajax_get_vendor_categories', [$this, 'fandpipo_ajaxGetCategories']);
-        add_action('wp_ajax_nopriv_get_vendor_categories', [$this, 'fandpipo_ajaxGetCategories']);
+        add_action('wp_ajax_fandpipo_get_vendor_categories', [$this, 'fandpipo_ajaxGetCategories']);
+        add_action('wp_ajax_nopriv_fandpipo_get_vendor_categories', [$this, 'fandpipo_ajaxGetCategories']);
     }
 
     /**

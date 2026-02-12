@@ -34,11 +34,10 @@ class FANDPickupSettings {
     }
 
     function fandpipo_init_constants() {
-        global $WCFM;
-
-        if ( is_object( $WCFM ) ) {
-            define( 'FANDPIPO_AVATAR_DEFAULT', $WCFM->plugin_url . 'assets/images/wcfmmp-blue.png' );
-        } 
+        if ( !defined( 'FANDPIPO_AVATAR_DEFAULT' ) ) {
+            // On utilise ton propre dossier d'assets
+            define( 'FANDPIPO_AVATAR_DEFAULT', FANDPIPO_PLUGIN_URL . 'assets/images/wcfmmp-blue.png' );
+        }
     }
 
     /**

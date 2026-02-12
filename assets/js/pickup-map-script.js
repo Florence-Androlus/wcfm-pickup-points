@@ -102,7 +102,7 @@ function applyFilters() {
         // --- B. Filtre Catégorie ---
         // On ne filtre en JS que si le PHP ne l'a pas déjà fait (sécurité)
         if (visible && category && category !== "") {
-            if (String(p.category).trim() !== String(category).trim()) {
+            if (String(p.fandpipo_category).trim() !== String(category).trim()) {
                 visible = false;
             }
         }
@@ -153,8 +153,24 @@ var iconClosed, iconOpen;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Initialisation Leaflet
-    //map = L.map('pickup-map').setView([46.6, 2.4], 6);
+    // --- 1. RÉCUPÉRATION (Le coffre-fort) ---
+    if (typeof fandpipoData === 'undefined') {
+        console.error("fandpipoData est introuvable");
+        return;
+    }
+
+    // On vérifie si l'objet injecté par PHP existe
+    if (typeof fandpipoData !== 'undefined') {
+        mapMarkers   = fandpipoData.markers || [];
+        isSingleView = fandpipoData.isSingleView || false;
+        currentLat   = fandpipoData.currentLat || 46.6;
+        currentLng   = fandpipoData.currentLng || 2.4;
+    } else {
+        console.error("L'objet fandpipoData est manquant. Vérifiez Scripts.php");
+    }
+
+    // --- 2. INITIALISATION LEAFLET (Ton code existant) ---
+    // Maintenant startLat va trouver currentLat sans erreur !
     const startLat = (typeof currentLat !== 'undefined' && currentLat) ? currentLat : 46.6;
     const startLng = (typeof currentLng !== 'undefined' && currentLng) ? currentLng : 2.4;
     const startZoom = (typeof isSingleView !== 'undefined' && isSingleView) ? 15 : 6;

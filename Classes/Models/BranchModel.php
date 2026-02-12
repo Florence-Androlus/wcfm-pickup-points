@@ -45,8 +45,7 @@ class BranchModel {
 
         // AJOUT : Récupération de la bannière
         $banner_id = isset($profile_settings['banner']) ? $profile_settings['banner'] : 0;
-        $banner_url = $banner_id ? wp_get_attachment_url($banner_id) : plugins_url('wc-multivendor-marketplace/assets/images/default_banner.jpg');
-        
+        $banner_url = $banner_id ? wp_get_attachment_url($banner_id) : FANDPIPO_PLUGIN_URL . 'assets/images/default_banner.jpg';
         // 4. Catégories de Produits Spécifiques au Vendeur
         $product_ids_by_vendor = $this->getVendorProductIds($vendor_id);
         $category_terms_to_show = $this->getVendorTopLevelCategories($product_ids_by_vendor);

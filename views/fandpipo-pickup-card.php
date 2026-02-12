@@ -11,12 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
         <div class="store-footer">
             <div id="avatar-branch-<?php echo esc_attr($fandpipo_branch_id); ?>" 
-                class="store-avatar lft <?php 
-                    // On n'affiche les classes de statut QUE si la version PRO est active
-                    if ( defined('FANDPIPO_PRO_PLUGIN_ACTIVE') && FANDPIPO_PRO_PLUGIN_ACTIVE ) {
-                        echo $fandpipo_is_currently_open ? 'is-open' : 'is-closed'; 
-                    }
-                ?>">
+                class="store-avatar lft ">
                 <img src="<?php echo esc_url($fandpipo_avatar); ?>" alt="Logo">
             </div>
 
