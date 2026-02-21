@@ -18,6 +18,11 @@
     
     defined('ABSPATH') || exit;
 
+    // ON DÉCLARE LA FONCTION ICI (Avant le namespace pour qu'elle soit globale)
+    function fandpipo_is_advanced_active() {
+        return apply_filters( 'fandpipo_feature_status', false );
+    }
+
     // Charger l'autoloader Composer
     if (file_exists(__DIR__ . '/vendor/autoload.php')) {
         require_once __DIR__ . '/vendor/autoload.php';
@@ -45,4 +50,8 @@
 
     // Inclure le fichier principal du plugin
     require_once FANDPIPO_PLUGIN_DIR . 'plugin.php';
+    add_action('wp_loaded', function() {
+        fandpipo_is_advanced_active(); 
+    });
+
     new FANDPickupSettings();

@@ -2,6 +2,15 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
+global $post;
+if ( ! isset( $post ) || is_null( $post ) ) {
+    $post = new \stdClass();
+    $post->ID = 0;
+    $post->post_type = 'fandpipo_view';
+    $post->filter = 'sample';
+}
+// On retire l'action qui cause le warning dans le header pour cette vue
+remove_action( 'wp_head', 'wp_shortlink_wp_head', 10 );
 
 // single-branch-view.php
 get_header();

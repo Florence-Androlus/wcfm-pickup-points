@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     foreach(range(0,6) as $fandpipo_day): 
         $fandpipo_day_slots = $fand_hours[$fandpipo_day] ?? [];
     ?>
-        <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_0">
+        <p class="wcfm_store_hours_mon_times wcfm_title wcfm_store_hours_fields wcfm_store_hours_fields_<?php echo $fandpipo_day; ?>">
           <strong><?php echo esc_html( $fandpipo_jours[$fandpipo_day] ) ?> : Time Slots</strong>
         </p>
 

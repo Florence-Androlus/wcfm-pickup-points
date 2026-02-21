@@ -11,7 +11,5 @@ document.addEventListener('DOMContentLoaded', function() {
     currentLat      = fandpipoData.currentLat || 46.6;
     currentLng      = fandpipoData.currentLng || 2.4;
     const defaultCategory = fandpipoData.defaultCategory;
-    console.log("Données defaultCategory     :", defaultCategory);
-    console.log("Données chargées :", mapMarkers);
 
 });
