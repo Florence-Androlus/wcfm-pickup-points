@@ -10,11 +10,15 @@ class ShortcodesController {
         }
         // 1. Entrées sécurisées
         $filters = [
-            'fandpipo_day'     => isset($_GET['fandpipo_pickup_day']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_day'])) : null,
-            'fandpipo_status'  => isset($_GET['fandpipo_pickup_status']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_status'])) : '',
-            'fandpipo_sort'    => isset($_GET['fandpipo_pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_orderby'])) : 'newness_asc',
-            'fandpipo_country' => isset($_GET['fandpipo_country']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_country'])) : 'FR',
-            'fandpipo_search'  => isset($_GET['fandpipo_pickup_search']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_search'])) : ''
+            'fandpipo_day'      => isset($_GET['fandpipo_pickup_day']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_day'])) : null,
+            'fandpipo_status'   => isset($_GET['fandpipo_pickup_status']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_status'])) : '',
+            'fandpipo_sort'     => isset($_GET['fandpipo_pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_orderby'])) : 'newness_asc',
+            'fandpipo_country'  => isset($_GET['fandpipo_country']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_country'])) : 'FR',
+            'fandpipo_search'   => isset($_GET['fandpipo_pickup_search']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_search'])) : '',
+            'radius_lat' => isset($_GET['wcfmmp_radius_lat']) ? (float) sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lat'])) : '',
+'radius_lng' => isset($_GET['wcfmmp_radius_lng']) ? (float) sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lng'])) : '',
+            'radius_range'      => isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslash($_GET['wcfmmp_radius_range'])) : 50,
+            'fandpipo_category' => isset($_GET['fandpipo_category']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_category'])) : '',
         ];
 
         // 2. Modèle

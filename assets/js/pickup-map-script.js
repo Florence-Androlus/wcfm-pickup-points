@@ -150,6 +150,7 @@ function applyFilters() {
 
 var map; // Déclarer la carte globalement si nécessaire
 var iconClosed, iconOpen;
+var searchCircle; // Variable pour garder une trace du cercle
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -318,17 +319,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (navigator.geolocation && (typeof isSingleView === 'undefined' || !isSingleView)) {
+    
+    // Logique de géolocalisation automatique :
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasRadiusSearch = urlParams.has('wcfmmp_radius_lat') && urlParams.get('wcfmmp_radius_lat') !== "";
+
+    if (hasRadiusSearch) {
+        const rLat = parseFloat(urlParams.get('wcfmmp_radius_lat'));
+        const rLng = parseFloat(urlParams.get('wcfmmp_radius_lng'));
+        const rRange = parseInt(urlParams.get('wcfmmp_radius_range')) || 50;
+
+        // Calcul du zoom approximatif pour Leaflet selon le rayon (Km)
+        // Plus le rayon est grand, plus le zoom doit être petit
+        let zoomLevel = 10;
+        if (rRange <= 5) zoomLevel = 13;
+        else if (rRange <= 15) zoomLevel = 11;
+        else if (rRange <= 50) zoomLevel = 9;
+        else if (rRange <= 150) zoomLevel = 7;
+        else if (rRange <= 300) zoomLevel = 6;
+        else zoomLevel = 5;
+
+        map.setView([rLat, rLng], zoomLevel);
+
+        //Nettoyage du cercle précédent s'il existe
+        if (searchCircle) {
+            map.removeLayer(searchCircle);
+        }
+
+        // OPTIONNEL : Dessiner le cercle bleu du rayon sur la carte
+        searchCircle = L.circle([rLat, rLng], {
+            color: '#0073aa',
+            fillColor: '#0073aa',
+            fillOpacity: 0.15,
+            weight: 2,
+            radius: rRange * 1000 // Conversion Km en Mètres
+        }).addTo(map);
+
+        initialUpdate();
+    } else if (navigator.geolocation && (typeof isSingleView === 'undefined' || !isSingleView)) {
+        // Nettoyage immédiat d'un éventuel cercle résiduel d'une recherche précédente
+        if (searchCircle) {
+            map.removeLayer(searchCircle);
+            searchCircle = null;
+        }
+        
         navigator.geolocation.getCurrentPosition(function(position) {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
 
             map.setView([lat, lng], 13);
+            // On remplit les champs pour le script de filtrage JS
             if(document.getElementById("pickup-lat")) document.getElementById("pickup-lat").value = lat;
             if(document.getElementById("pickup-lng")) document.getElementById("pickup-lng").value = lng;
+            
+            // On remplit aussi les champs pour le calcul PHP (Radius)
+            if(document.getElementById("wcfmmp_radius_lat")) document.getElementById("wcfmmp_radius_lat").value = lat;
+            if(document.getElementById("wcfmmp_radius_lng")) document.getElementById("wcfmmp_radius_lng").value = lng;
+
             initialUpdate();
         }, initialUpdate); 
     } else {
+        // Si on arrive ici, c'est qu'il n'y a pas de recherche active
+        // On nettoie le cercle au cas où
+        if (searchCircle) {
+            map.removeLayer(searchCircle);
+            searchCircle = null;
+        }
         // Si on est en Single View, on reste sur les coordonnées du PHP
         initialUpdate();
     }

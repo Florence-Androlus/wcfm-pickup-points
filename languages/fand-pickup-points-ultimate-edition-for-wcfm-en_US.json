@@ -4,5 +4,16 @@
         "messages":{
             "fand-pickup-points-ultimate":[null,"fand-pickup-points-ultimate"],
             "Échec de la vérification de sécurité.":[null,"Security check failed."],
+            "Horaires quotidiens d'ouverture et de fermeture":[null,"Daily opening and closing hours"],
+            "Créneaux horaires":[null,"Time slots"],
+            "lundi":[null,"Monday"],
+            "mardi":[null,"Tuesday"],
+            "mercredi":[null,"Wednesday"],
+            "jeudi":[null,"Thursday"],
+            "vendredi":[null,"Friday"],
+            "samedi":[null,"Saturday"],
+            "dimanche":[null,"Sunday"],
+            "Ouvert":[null,"Open"],
+            "Fermé":[null,"Closed"],
             "":{"domain":"messages","plural_forms":"nplurals=2; plural=(n != 1);",
             "lang":"en_US"}}}}

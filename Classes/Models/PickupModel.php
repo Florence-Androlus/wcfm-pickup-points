@@ -258,6 +258,27 @@ class PickupModel {
                 $lng = $branch['longitude'] ?? '';
 
                 if (!empty($lat) && !empty($lng)) {
+                    // --- LOGIQUE DE FILTRE PAR RAYON ---
+                    if (!empty($filters['radius_lat']) && !empty($filters['radius_lng'])) {
+                        $lat_from = deg2rad(floatval($filters['radius_lat']));
+                        $lng_from = deg2rad(floatval($filters['radius_lng']));
+                        $lat_to   = deg2rad(floatval($lat));
+                        $lng_to   = deg2rad(floatval($lng));
+
+                        // Formule de la Grande Cercle (Haversine simplifiée)
+                        $inner_val = cos($lat_from) * cos($lat_to) * cos($lng_to - $lng_from) + sin($lat_from) * sin($lat_to);
+                        
+                        // Sécurité pour acos (ne doit jamais dépasser 1 ou -1)
+                        if ($inner_val > 1) $inner_val = 1;
+                        if ($inner_val < -1) $inner_val = -1;
+
+                        $distance = 6371 * acos($inner_val);
+
+                        if ($distance > $filters['radius_range']) {
+                            continue; // Trop loin !
+                        }
+                    }
+                    // -----------------------------------
                     $branch_name = $branch['name'] ?? 'Pickup';
                     $branch_slug = sanitize_title($branch_name); 
                     $location_url = home_url('/pickup/emplacement/' . esc_attr($branch_slug) . '/');

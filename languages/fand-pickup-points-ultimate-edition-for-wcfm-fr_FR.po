@@ -27,3 +27,36 @@ msgstr "fand-pickup-points-ultimate"
 msgid "Échec de la vérification de sécurité."
 msgstr "Échec de la vérification de sécurité."
 
+msgid "Horaires quotidiens d'ouverture et de fermeture"
+msgstr "Horaires quotidiens d'ouverture et de fermeture"
+
+msgid "Créneaux horaires"
+msgstr "Créneaux horaires"
+
+msgid "Lundi"
+msgstr "Lundi"
+
+msgid "Mardi"
+msgstr "Mardi"
+
+msgid "Mercredi"
+msgstr "Mercredi"
+
+msgid "Jeudi"
+msgstr "Jeudi"
+
+msgid "Vendredi"
+msgstr "Vendredi"
+
+msgid "Samedi"
+msgstr "Samedi"
+
+msgid "Dimanche"
+msgstr "Dimanche"
+
+msgid "Ouvert"
+msgstr "Ouvert"
+
+msgid "Fermé"
+msgstr "Fermé"
+

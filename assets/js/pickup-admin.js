@@ -31,6 +31,14 @@
                             if(response.success && response.data.html){
                                 $('#vendor_edit_branch').after(response.data.html);
 
+								// 2. --- MISE À JOUR DE LA HAUTEUR ICI ---
+								var $tabWrap = $('.wcfm-tabWrap');
+								if ($tabWrap.length > 0) {
+									var currentHeight = parseInt($tabWrap.css('height'), 10);
+									var newHeight = currentHeight + 1000;
+									$tabWrap.css('height', newHeight + 'px');
+								}
+
                                 $('#wcfm_vendor_manage_pickup_hours_setting_form').on('submit', function(e){
                                     e.preventDefault();
                                     var $form = $(this);
@@ -106,6 +114,17 @@
             template.find('input[data-name="id"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][id]').val(0);
 
             holder.append(template);
+			var $tabWrap = $('.wcfm-tabWrap');
+			if ($tabWrap.length > 0) {
+				// On récupère la hauteur actuelle (numérique)
+				var currentHeight = parseInt($tabWrap.css('height'), 10);
+
+				// On ajoute 430px à la valeur actuelle
+				var newHeight = currentHeight + 103;
+
+				// On applique la nouvelle hauteur en style inline
+				$tabWrap.css('height', newHeight + 'px');
+			}
         });
 
         // Supprimer un créneau
@@ -113,6 +132,17 @@
             var holder = $(this).closest('.multi_input_holder');
             $(this).closest('.multi_input_block').remove();
 
+			var $tabWrap = $('.wcfm-tabWrap');
+
+			// On ne réduit que si la hauteur est supérieure à la base (1100px)
+			if ($tabWrap.length > 0) {
+				var currentHeight = parseInt($tabWrap.css('height'), 10);
+				if (currentHeight > 1100) {
+					var newHeight = currentHeight - 103;
+					// On s'assure de ne pas descendre en dessous du minimum
+					$tabWrap.css('height', Math.max(1100, newHeight) + 'px');
+				}
+			}
             // Réindexer avec le bon attribut
             var day = holder.attr('data-fandpipo_day');
             holder.find('.multi_input_block').each(function(i){

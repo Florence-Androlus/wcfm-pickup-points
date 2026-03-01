@@ -8,6 +8,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RoutesController {
 
     public function __construct() {
+        // Créer une route AJAX pour récupérer l'adresse sans blocage
+        add_action('wp_ajax_fandpipo_get_address_from_gps', [$this, 'fandpipo_get_address_from_gps']);
+        add_action('wp_ajax_nopriv_fandpipo_get_address_from_gps', [$this, 'fandpipo_get_address_from_gps']);
+
         add_action('init', [$this, 'fandpipo_register_rewrite_rules']);
         add_filter('query_vars', [$this, 'fandpipo_register_query_vars']);
         add_filter( 'template_include', [$this, 'fandpipo_load_branch_template'], 999 );
@@ -56,6 +60,43 @@ class RoutesController {
         }, 100);
 
         add_filter('body_class', [$this, 'fandpipo_add_branch_page_body_classes']);
+    }
+
+    
+    function fandpipo_get_address_from_gps() {
+        // 1. Vérification du Nonce (Sécurité indispensable pour les appels AJAX/API)
+        // Assurez-vous d'envoyer un nonce nommé 'fandpipo_nonce' dans votre appel JS
+        if ( ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['nonce'] ), 'fandpipo_gps_action' ) ) {
+            wp_send_json_error( 'Accès non autorisé (Nonce invalide)' );
+        }
+
+        $lat = isset( $_GET['lat'] ) ? sanitize_text_field( wp_unslash( $_GET['lat'] ) ) : '';
+        $lng = isset( $_GET['lng'] ) ? sanitize_text_field( wp_unslash( $_GET['lng'] ) ) : '';
+        
+        $url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={$lat}&lon={$lng}&addressdetails=1&accept-language=fr";
+        
+        $args = array(
+            'timeout'    => 15,
+            'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        );
+
+        $response = wp_remote_get($url, $args);
+
+        if (is_wp_error($response)) {
+            wp_send_json_error('Erreur serveur');
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        // Si le JSON est invalide ou vide
+        if (empty($data)) {
+            wp_send_json_error('Données GPS invalides');
+        }
+
+        // wp_send_json envoie les headers, échappe les données et fait wp_die()
+        wp_send_json($data);
+        wp_die();
     }
 
     public function fandpipo_add_branch_page_body_classes($classes) {
@@ -313,6 +354,7 @@ class RoutesController {
         global $product;
         if ( $product && method_exists($product, 'get_short_description') && $product->get_short_description() ) {
             echo '<div class="product-excerpt">';
+            // the_excerpt() contient déjà ses propres filtres d'échappement
             the_excerpt(); 
             echo '</div>';
         }

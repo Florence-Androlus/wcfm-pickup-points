@@ -28,6 +28,41 @@ msgstr ""
 msgid "Échec de la vérification de sécurité."
 msgstr ""
 
+msgid "Horaires quotidiens d'ouverture et de fermeture"
+msgstr ""
+
+msgid "Créneaux horaires"
+msgstr ""
+
+msgid "Lundi"
+msgstr ""
+
+msgid "Mardi"
+msgstr ""
+
+msgid "Mercredi"
+msgstr ""
+
+msgid "Jeudi"
+msgstr ""
+
+msgid "Vendredi"
+msgstr ""
+
+msgid "Samedi"
+msgstr ""
+
+msgid "Dimanche"
+msgstr ""
+
+msgid "Ouvert"
+msgstr ""
+
+msgid "Fermé"
+msgstr ""
+
+
+
 
 
 

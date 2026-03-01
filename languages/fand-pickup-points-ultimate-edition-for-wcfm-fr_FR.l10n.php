@@ -13,5 +13,16 @@ return [
     'messages'=>[
         'fand-pickup-points-ultimate'=>'fand-pickup-points-ultimate',
         'Échec de la vérification de sécurité.'=>'Échec de la vérification de sécurité.',
+        'Horaires quotidiens d\'ouverture et de fermeture'=>'Horaires quotidiens d\'ouverture et de fermeture',
+        'Créneaux horaires'=>'Créneaux horaires',
+        'lundi'=>'lundi',
+        'mardi'=>'mardi',
+        'mercredi'=>'mercredi',
+        'jeudi'=>'jeudi',
+        'vendredi'=>'vendredi',
+        'samedi'=>'samedi',
+        'dimanche'=>'dimanche',
+        'Ouvert'=>'Ouvert',
+        'Fermé'=>'Fermé',
         ]
 ];

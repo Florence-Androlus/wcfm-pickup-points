@@ -70,6 +70,9 @@ class Scripts {
             'categories'         => $categories_array,
         ];
 
+        // CSS spécifique pickup
+        wp_enqueue_style('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/css/style.css', [],FANDPIPO_VERSION);
+
         // 2. Chargement du script ADMIN (WCFM)
         wp_enqueue_script('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
         wp_localize_script('pickup-admin', 'fandpipo_pickup_data', $common_data);
@@ -113,6 +116,8 @@ class Scripts {
             ];
 
             // Chargement unique du script
+            wp_enqueue_script('fand-pickup-raduis', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-raduis.js', array('jquery'), FANDPIPO_VERSION, true);
+          
             wp_enqueue_script('fand-pickup-map', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map.js', array('jquery', 'leaflet-js'), FANDPIPO_VERSION, true);
             
             // Injection des données sous le nom "fandpipoData"
@@ -121,9 +126,6 @@ class Scripts {
             wp_enqueue_script('fand-pickup-map-script', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-script.js',array('jquery'), [], FANDPIPO_VERSION,true );
             // On peut utiliser le même objet common_data pour la carte
             wp_localize_script('fand-pickup-map-script', 'fandpipo_pickup_data', $common_data);
-
-            // CSS spécifique pickup
-            wp_enqueue_style('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/css/style.css', [],FANDPIPO_VERSION);
 
             // Enqueue le Select2 CSS depuis le CDN
             wp_enqueue_style('select2-css', FANDPIPO_PLUGIN_URL . 'assets/css/select2.min.css', [], '4.1.0');
@@ -139,8 +141,10 @@ class Scripts {
             wp_enqueue_script('select2-js', FANDPIPO_PLUGIN_URL . 'assets/js/select2.min.js', ['jquery'], '4.1.0', true);
             
             // Leaflet
+            wp_enqueue_style('leaflet-search-css', FANDPIPO_PLUGIN_URL . 'assets/css/leaflet-search.css',[], '2.9.0');
             wp_enqueue_style('leaflet-css', FANDPIPO_PLUGIN_URL . 'assets/css/leaflet.css', [], '1.9.4');
             wp_enqueue_script('leaflet-js', FANDPIPO_PLUGIN_URL . 'assets/js/leaflet.js', [], '1.9.4', true);
+            //wp_enqueue_script('leaflet-search-js', FANDPIPO_PLUGIN_URL . 'assets/js/leaflet-search.js', [], '2.9.0', true);
 
             wp_enqueue_style( 'kadence-shop-styles' );
         

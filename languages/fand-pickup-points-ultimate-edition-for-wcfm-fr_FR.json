@@ -5,5 +5,16 @@
             "domain":"messages",
             "plural_forms":"nplurals=2; plural=n > 1;","lang":"fr_FR"},
             "fand-pickup-points-ultimate":[null,"fand-pickup-points-ultimate"],
-            "Échec de la vérification de sécurité.":[null,"Échec de la vérification de sécurité."]
+            "Échec de la vérification de sécurité.":[null,"Échec de la vérification de sécurité."],
+            "Horaires quotidiens d'ouverture et de fermeture":[null,"Horaires quotidiens d'ouverture et de fermeture"],
+            "Créneaux horaires":[null,"Créneaux horaires"],
+            "lundi":[null,"lundi"],
+            "mardi":[null,"mardi"],
+            "mercredi":[null,"mercredi"],
+            "jeudi":[null,"jeudi"],
+            "vendredi":[null,"vendredi"],
+            "samedi":[null,"samedi"],
+            "dimanche":[null,"dimanche"],
+            "Ouvert":[null,"Ouvert"],
+            "Fermé":[null,"Fermé"]
 }}}

@@ -12,6 +12,17 @@ return [
     'language'=>'en_US',
     'messages'=>[
         'fand-pickup-points-ultimate'=>'fand-pickup-points-ultimate',
-        'Échec de la vérification de sécurité.'=>'Échec de la vérification de sécurité.',
+        'Échec de la vérification de sécurité.'=>'Security check failed.',
+        'Horaires quotidiens d\'ouverture et de fermeture'=>'Daily opening and closing hours',
+        'Créneaux horaires'=>'Time slots',
+        'lundi'=>'Monday',
+        'mardi'=>'Tuesday',
+        'mercredi'=>'Wednesday',
+        'jeudi'=>'Thursday',
+        'vendredi'=>'Friday',
+        'samedi'=>'Saturday',
+        'dimanche'=>'Sunday',
+        'Ouvert'=>'Open',
+        'Fermé'=>'Closed',
     ]
 ];

@@ -8,7 +8,15 @@ if (defined('DOING_AJAX') && DOING_AJAX) {
 }
 $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
 
-?>
+// 1. On prépare la variable une seule fois de manière sécurisée
+$fandpipo_current_orderby = isset($_GET['fandpipo_pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_orderby'])) : 'newness_asc';
+$fandpipo_current_day    = isset($_GET['fandpipo_pickup_day']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_day'])) : '';
+$fandpipo_current_status = isset($_GET['fandpipo_pickup_status']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_status'])) : '';
+$fandpipo_selected_category   = isset($_GET['fandpipo_category']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_category'])) : '';
+$fandpipo_current_lat  = isset($_GET['wcfmmp_radius_lat']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lat'])) : '';
+$fandpipo_current_lng  = isset($_GET['wcfmmp_radius_lng']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lng'])) : '';
+$fandpipo_current_addr = isset($_GET['wcfmmp_radius_addr']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_addr'])) : '';
+$fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslash($_GET['wcfmmp_radius_range'])) : 50;?>
 
 <div id="wcfmmp-stores-wrap-holder" class="rgt right_side right_side_full">
     <div id="wcfmmp-stores-wrap">
@@ -17,15 +25,13 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
 
             <div class="wcfmmp-store-lists-sorting">
                 <form class="wcfm-woocommerce-ordering" action="" method="GET">
-                    <input type="hidden" id="pickup-lat">
-                    <input type="hidden" id="pickup-lng">
+                    <input type="hidden" name="wcfmmp_radius_lat" id="pickup-lat" value="<?php echo esc_attr($fandpipo_current_lat); ?>">
+                    <input type="hidden" name="wcfmmp_radius_lng" id="pickup-lng" value="<?php echo esc_attr($fandpipo_current_lng); ?>">
+                    <input type="hidden" name="wcfmmp_radius_addr" value="<?php echo esc_attr($fandpipo_current_addr); ?>">
+                    <input type="hidden" name="wcfmmp_radius_range" value="<?php echo esc_attr($fandpipo_current_range); ?>">
+                    <input type="hidden" name="fandpipo_category" value="<?php echo esc_attr($fandpipo_selected_category); ?>">
+                    <input type="hidden" name="fandpipo_pickup_search" value="<?php echo isset($_GET['fandpipo_pickup_search']) ? esc_attr( sanitize_text_field( wp_unslash( $_GET['fandpipo_pickup_search'] ) ) ) : ''; ?>">
 
-                    <?php
-                    // 1. On prépare la variable une seule fois de manière sécurisée
-                    $fandpipo_current_orderby = isset($_GET['fandpipo_pickup_orderby']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_orderby'])) : 'newness_asc';
-                    $fandpipo_current_day    = isset($_GET['fandpipo_pickup_day']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_day'])) : '';
-                    $fandpipo_current_status = isset($_GET['fandpipo_pickup_status']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_pickup_status'])) : '';
-                    ?>
                     <select id="wcfmmp_pickup_store_orderby" name="fandpipo_pickup_orderby" class="orderby" onchange="this.form.submit()">
                         <option value="newness_asc" <?php selected($fandpipo_current_orderby, 'newness_asc'); ?>>
                             Trier plus vieux au plus récent
@@ -179,15 +185,15 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
                     }
 
                     // --- FILTRAGE category---
-                    if (!empty($fand_selected_category)) {
+                    if (!empty($fandpipo_selected_category)) {
                         $fandpipo_valeur_boutique = $fandpipo_branch['fandpipo_category'] ?? '';
 
                         if (is_array($fandpipo_valeur_boutique)) {
-                            if (!in_array($fand_selected_category, $fandpipo_valeur_boutique)) {
+                            if (!in_array($fandpipo_selected_category, $fandpipo_valeur_boutique)) {
                                 continue;
                             }
                         } else {
-                            if (strval($fandpipo_valeur_boutique) !== strval($fand_selected_category)) {
+                            if (strval($fandpipo_valeur_boutique) !== strval($fandpipo_selected_category)) {
                                 continue;
                             }
                         }
@@ -269,6 +275,17 @@ $fandpipo_vendors_data = $data['fandpipo_vendors_data'] ?? [];
                 <div class="wcfm-clearfix"></div>
 
             </ul>
+
+            <div class="wcfm-clearfix"></div>
+
+            <?php 
+            // Vérification APRES la fin de la boucle foreach
+            if ( 0 === $fandpipo_displayed_count ) : 
+            ?>
+                <div class="wcfm-info" style="display: block; clear: both; margin: 20px 0; padding: 15px; background-color: #e7f7ff; border-left: 4px solid #2196f3;">
+                    Aucun point de retrait ne correspond à vos critères de recherche.
+                </div>
+            <?php endif; ?>
 
             <p class="woocommerce-result-count">
                 Montrer <?php echo esc_html( $fandpipo_displayed_count ); ?> résultat<?php echo ($fandpipo_displayed_count > 1 ? 's' : ''); ?>

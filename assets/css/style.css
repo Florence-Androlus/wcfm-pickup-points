@@ -363,3 +363,14 @@ ul.products.list li.product .short-description {
 #wcfmmp_pickup_store_orderby,#wcfmmp_pickup_store_day {
         margin-right: 20px !important;
 }
+
+#wcfm_settings_form .wcfm-tabWrap {
+    min-height: 1100px; /* Garde la hauteur minimale actuelle */
+    padding-bottom: 50px; /* Espace de sécurité en bas */
+}
+
+#custom_branch_hours{
+    display: flex;
+    flex-direction: column;
+    width: 100% !important;
+}

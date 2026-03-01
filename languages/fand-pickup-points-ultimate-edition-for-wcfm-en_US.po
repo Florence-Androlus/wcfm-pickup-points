@@ -26,3 +26,36 @@ msgstr "fand-pickup-points-ultimate"
 #: plugin.php
 msgid "Échec de la vérification de sécurité."
 msgstr "Security check failed."
+
+msgid "Horaires quotidiens d'ouverture et de fermeture"
+msgstr "Daily opening and closing times"
+
+msgid "Créneaux horaires"
+msgstr "Time Slots"
+
+msgid "Lundi"
+msgstr "Monday"
+
+msgid "Mardi"
+msgstr "Tuesday"
+
+msgid "Mercredi"
+msgstr "Wednesday"
+
+msgid "Jeudi"
+msgstr "THURSDAY"
+
+msgid "Vendredi"
+msgstr "Friday"
+
+msgid "Samedi"
+msgstr "Saturday"
+
+msgid "Dimanche"
+msgstr "Sunday"
+
+msgid "Ouvert"
+msgstr "Open"
+
+msgid "Fermé"
+msgstr "Closed"
