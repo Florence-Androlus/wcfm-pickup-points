@@ -16,20 +16,20 @@ function timeToMinutes(timeStr) {
 }
 
 function getCurrentDayIndex() {
-    const jsDay = new Date().getDay(); // 0 = dimanche
-    // Convention ISO/PHP : lundi = 0 ... dimanche = 6
+    const jsDay = new Date().getDay(); // 0 = Sunday
+    // Convention ISO/PHP : Monday = 0 ... Sunday = 6
     return jsDay === 0 ? 6 : jsDay - 1;
 }
 
 function getMainPopupContent(p) {
     const dayIndex = getCurrentDayIndex();
-    const daysNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+    const daysNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const currentDayName = daysNames[dayIndex];
     
     const allHours = p.opening_hours || {};
     let hours = allHours[dayIndex];
 
-    let hoursDisplay = 'Fermé aujourd\'hui';
+    let hoursDisplay = 'Closed to day';
 
     if (hours && (Array.isArray(hours) || typeof hours === 'object')) {
         // 1. Conversion en tableau et Tri pour éviter l'inversion (ex: 07:00 avant 22:00)
@@ -123,7 +123,7 @@ function applyFilters() {
         // --- D. Filtre par Jour ---
         if (visible && pickupDay !== null) {
             const hasDay = p.opening_hours && p.opening_hours[pickupDay] && p.opening_hours[pickupDay].length > 0;
-            if (!hasDay && pickupStatus !== "closed") visible = false;
+            if (!hasDay && pickupStatus !== "Closed") visible = false;
         }
 
         // --- E. Filtre par Statut ---
@@ -177,6 +177,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const startZoom = (typeof isSingleView !== 'undefined' && isSingleView) ? 15 : 6;
 
     map = L.map('pickup-map').setView([startLat, startLng], startZoom);
+
+
+map.on('moveend', function() {
+    // Vérifie si un verrou est actif dans la mémoire persistante du navigateur
+    if (sessionStorage.getItem('isUpdating') === 'true') return;
+    
+    clearTimeout(window.moveTimer);
+    window.moveTimer = setTimeout(function() {
+        const center = map.getCenter();
+        const lat = center.lat.toFixed(4);
+        const lng = center.lng.toFixed(4);
+
+        if (lat === window.lastLat && lng === window.lastLng) return;
+        window.lastLat = lat;
+        window.lastLng = lng;
+
+        // --- VERROUILLAGE PERSISTANT ---
+        sessionStorage.setItem('isUpdating', 'true');
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById("wcfmmp_radius_lat").value = lat;
+            document.getElementById("wcfmmp_radius_lng").value = lng;
+            document.getElementById("wcfmmp_radius_addr").value = data.display_name;
+
+            // Déclenchement de la soumission
+            jQuery('.wcfmmp-store-search-form').trigger('submit');
+        })
+        .catch(() => { 
+            sessionStorage.removeItem('isUpdating'); 
+        });
+    }, 1000);
+});
+
+// Nettoyage : On déverrouille dès que la page a fini de charger
+window.addEventListener('load', () => {
+    setTimeout(() => { sessionStorage.removeItem('isUpdating'); }, 2000);
+});
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
@@ -327,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hasRadiusSearch) {
         const rLat = parseFloat(urlParams.get('wcfmmp_radius_lat'));
         const rLng = parseFloat(urlParams.get('wcfmmp_radius_lng'));
-        const rRange = parseInt(urlParams.get('wcfmmp_radius_range')) || 50;
+        const rRange = parseInt(urlParams.get('wcfmmp_radius_range')) || 5; // Rayon en Km, par défaut 5 Km
 
         // Calcul du zoom approximatif pour Leaflet selon le rayon (Km)
         // Plus le rayon est grand, plus le zoom doit être petit
@@ -347,13 +386,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // OPTIONNEL : Dessiner le cercle bleu du rayon sur la carte
-        searchCircle = L.circle([rLat, rLng], {
-            color: '#0073aa',
-            fillColor: '#0073aa',
-            fillOpacity: 0.15,
-            weight: 2,
-            radius: rRange * 1000 // Conversion Km en Mètres
-        }).addTo(map);
+        if (rRange > 1) {
+            searchCircle = L.circle([rLat, rLng], {
+                color: '#0073aa',
+                fillColor: '#0073aa',
+                fillOpacity: 0.15,
+                weight: 2,
+                radius: rRange * 1000 // Conversion Km en Mètres
+            }).addTo(map);
+        }
 
         initialUpdate();
     } else if (navigator.geolocation && (typeof isSingleView === 'undefined' || !isSingleView)) {

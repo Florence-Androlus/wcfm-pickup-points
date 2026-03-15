@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="custom_branch_hours">
 
-  <h2><?php esc_html_e( "Horaires quotidiens d'ouverture et de fermeture", 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></h2>
+  <h2><?php esc_html_e( "Daily opening and closing times", 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></h2>
   
   <!-- DIV pour afficher les messages AJAX -->
   <div id="pickup_hours_message"></div>
@@ -31,13 +31,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <?php 
         $fandpipo_jours = [
-            __( 'Lundi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Mardi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Mercredi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Jeudi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Vendredi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Samedi', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
-            __( 'Dimanche', 'fand-pickup-points-ultimate-edition-for-wcfm' )
+            __( 'Monday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Tuesday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Wednesday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Thursday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Friday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Saturday', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+            __( 'Sunday', 'fand-pickup-points-ultimate-edition-for-wcfm' )
         ];
         foreach(range(0,6) as $fandpipo_day): 
             $fandpipo_day_slots = $fand_hours[$fandpipo_day] ?? [];
@@ -46,7 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <strong>
                 <?php 
                 printf( 
-                    /* translators: %s: Nom du jour */ esc_html__( '%s : Créneaux horaires', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
+                    /* translators: %s: Nom du jour */ esc_html__( '%s : Time Slots', 'fand-pickup-points-ultimate-edition-for-wcfm' ), 
                     esc_html( $fandpipo_jours[$fandpipo_day] ) 
                 ); 
                 ?>
@@ -61,15 +61,15 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <div class="multi_input_block ui-sortable-handle">
                         <div class="wcfm_clearfix"></div>
                         
-                        <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
-                        <label class="screen-reader-text"><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+                        <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
+                        <label class="screen-reader-text"><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
                         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
                               data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fandpipo_day) ?>][<?php echo esc_attr($fandpipo_slot_index) ?>][start]" 
                               value="<?php echo esc_attr($fandpipo_slot['start'] ?? '') ?>">                       
                         <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label">
-                          <strong><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong>
+                          <strong><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong>
                         </p>
-                        <label class="screen-reader-text"><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+                        <label class="screen-reader-text"><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
                         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
                               data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fandpipo_day) ?>][<?php echo esc_attr($fandpipo_slot_index) ?>][end]" 
                               value="<?php echo esc_attr($fandpipo_slot['end'] ?? '') ?>">
@@ -90,13 +90,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                     <span class="wcfmfa fa-arrows-alt wcfm_multiblock_sortable"></span>
                     <div class="wcfm_clearfix"></div>
                     
-                    <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
-                    <label class="screen-reader-text"><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+                    <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
+                    <label class="screen-reader-text"><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
                     <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
                           data-name="start" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fandpipo_day) ?>][0][start]" value="">
                     
-                    <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
-                    <label class="screen-reader-text"><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+                    <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
+                    <label class="screen-reader-text"><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
                     <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" 
                           data-name="end" name="wcfm_pickup_hours[day_times][<?php echo esc_attr($fandpipo_day) ?>][0][end]" value="">
                     
@@ -128,12 +128,12 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="multi_input_block ui-sortable-handle">
         <div class="wcfm_clearfix"></div>
 
-        <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
-        <label class="screen-reader-text"><?php esc_html_e( 'Ouvert', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+        <p class="wcfm_store_hours_start wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
+        <label class="screen-reader-text"><?php esc_html_e( 'Open', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" data-name="start">
 
-        <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
-        <label class="screen-reader-text"><?php esc_html_e( 'Fermé', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
+        <p class="wcfm_store_hours_end wcfm_title wcfm_store_hours_label"><strong><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></strong></p>
+        <label class="screen-reader-text"><?php esc_html_e( 'Closed', 'fand-pickup-points-ultimate-edition-for-wcfm' ); ?></label>
         <input type="time" class="wcfm-text wcfm_store_hours_field multi_input_block_element" data-name="end">
 
         <span class="multi_input_block_manupulate remove_multi_input_block wcfmfa fa-times-circle"></span>

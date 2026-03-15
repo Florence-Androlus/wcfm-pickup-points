@@ -115,15 +115,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
     // Utilisation des données préparées $fandpipo_branch_hours
     if ( ! empty( $fandpipo_branch_hours ) ) {
-        // Les jours sont indexés de 0 (Lundi) à 6 (Dimanche) selon votre description
+        // Les jours sont indexés de 0 (Monday) à 6 (Sunday) selon votre description
         $fandpipo_days_map = array(
-            0 => 'Lundi',
-            1 => 'Mardi',
-            2 => 'Mercredi',
-            3 => 'Jeudi',
-            4 => 'Vendredi',
-            5 => 'Samedi',
-            6 => 'Dimanche',
+            0 => 'Monday',
+            1 => 'Tuesday',
+            2 => 'Wednesday',
+            3 => 'Thursday',
+            4 => 'Friday',
+            5 => 'Saturday',
+            6 => 'Sunday',
         );
         ?>
         <aside class="widget">
@@ -144,7 +144,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         
                         if ( $fandpipo_day_data && $fandpipo_day_data['closed'] ) {
                             // Jour marqué comme fermé
-                            $fandpipo_hours_display = 'Fermé';
+                            $fandpipo_hours_display = 'Closed';
                             $fandpipo_css_style = 'color: red; font-weight: bold;';
                         } elseif ( $fandpipo_day_data && ! empty( $fandpipo_day_data['periods'] ) ) {
                             // Afficher les plages horaires (gestion des multiples plages)
@@ -156,7 +156,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                             $fandpipo_hours_display = implode('<br>', $fandpipo_periods_text); // Afficher les plages sur plusieurs lignes
                         } else {
                             // Pas de données spécifiques (peut être considéré comme fermé si non renseigné)
-                            $fandpipo_hours_display = 'Non spécifié / Fermé';
+                            $fandpipo_hours_display = 'Non spécifié / Closed';
                             $fandpipo_css_style = 'color: #888;';
                         }
                         ?>

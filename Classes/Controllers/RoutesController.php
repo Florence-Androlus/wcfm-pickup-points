@@ -240,11 +240,11 @@ class RoutesController {
 
             // Mapping des slugs d'onglets pour un affichage convivial
             $tab_titles = [
-                'products'  => __( 'Produits', 'fand-pickup-points-ultimate-edition-for-wcfm' ), // Pour la page de base (pas d'onglet)
-                'about'     => __( 'À propos', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
-                'policies'  => __( 'Politiques', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
-                'reviews'   => __( 'Avis', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
-                'followers' => __( 'Abonnés', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'products'  => __( 'products', 'fand-pickup-points-ultimate-edition-for-wcfm' ), // Pour la page de base (pas d'onglet)
+                'about'     => __( 'about', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'policies'  => __( 'policies', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'reviews'   => __( 'reviews', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
+                'followers' => __( 'followers', 'fand-pickup-points-ultimate-edition-for-wcfm' ),
             ];
 
             // Déterminer le titre de l'onglet (Produits par défaut si $active_tab_slug n'est pas trouvé)

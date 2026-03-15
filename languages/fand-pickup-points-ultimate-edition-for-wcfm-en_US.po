@@ -17,6 +17,7 @@ msgstr ""
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-SearchPath-0: .\n"
 
+
 #. Author URI of the plugin
 #. Plugin Name of the plugin
 #: fand-pickup-points-ultimate.php
@@ -59,3 +60,5 @@ msgstr "Open"
 
 msgid "Fermé"
 msgstr "Closed"
+
+Closed to day

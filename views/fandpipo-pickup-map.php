@@ -17,7 +17,7 @@ $fandpipo_is_radius_enabled = ( isset( $fandpipo_wcfm_options['enable_wcfm_store
 // On cast immédiatement pour rassurer le scanner sur l'origine des données $_GET
 $fandpipo_search_lat   = isset($_GET['wcfmmp_radius_lat']) ? (float) sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lat'])) : 0;
 $fandpipo_search_lng   = isset($_GET['wcfmmp_radius_lng']) ? (float) sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lng'])) : 0;
-$fandpipo_search_range = isset($_GET['wcfmmp_radius_range']) ? intval(sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_range']))) : 50;
+$fandpipo_search_range = isset($_GET['wcfmmp_radius_range']) ? intval(sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_range']))) : 5;
 $fandpipo_current_range = $fandpipo_search_range;
 
 $fandpipo_results = []; 
@@ -71,22 +71,22 @@ if ( ! empty( $fandpipo_params ) ) {
     <input class="search-field wcfmmp-store-search" type="search" id="pickup-search" placeholder="Recherche..." name="fandpipo_pickup_search" value="<?php echo esc_attr($fandpipo_search_value); ?>"/>
 
     <select name="fandpipo_category" id="pickup-category" class="select2 select2-container select2-container--default" onchange="this.form.submit()">
-        <option value="">Toutes catégories</option>
+        <option value=""><?php echo __('All categories', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
         <?php
-            // 1. Récupérer ta liste personnalisée depuis les options (comme dans Scripts.php)
-            $fandpipo_liste_brute = get_option('fandpipo_liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
-            
-            // 2. Transformer la chaîne en tableau propre
-            $fandpipo_categories_array = array_map('trim', explode(',', $fandpipo_liste_brute));
+            global $wpdb;
+            // 1. On récupère les catégories depuis TA table SQL (fandpipo_categories)
+            // Note : remplace 'fandpipo_categories' par le nom exact de ta table si besoin
+            $fandpipo_table_categories = $wpdb->prefix . "fandpipo_categories";
+            $fandpipo_categories_db = $wpdb->get_results( "SELECT nom FROM $fandpipo_table_categories ORDER BY nom ASC", ARRAY_A );
 
-            // 3. Boucler sur tes catégories pour créer les options
-            if (!empty($fandpipo_categories_array)) {
-                foreach ($fandpipo_categories_array as $fandpipo_category_name) {
-                    // 1. Préparation sécurisée de la catégorie sélectionnée
-                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                    $fandpipo_current_category = isset($_GET['fandpipo_category']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_category'])) : '';
+            // 2. On récupère la catégorie actuellement sélectionnée dans l'URL
+            $fandpipo_current_category = isset($_GET['fandpipo_category']) ? sanitize_text_field(wp_unslash($_GET['fandpipo_category'])) : '';
+
+            // 3. Boucle sur les résultats de la BDD
+            if ( ! empty( $fandpipo_categories_db ) ) {
+                foreach ( $fandpipo_categories_db as $cat_row ) {
+                    $fandpipo_category_name = $cat_row['nom']; // On extrait le nom de l'objet
                     ?>
-
                     <option value="<?php echo esc_attr($fandpipo_category_name); ?>" <?php selected($fandpipo_current_category, $fandpipo_category_name); ?>>
                         <?php echo esc_html($fandpipo_category_name); ?>
                     </option>
@@ -121,8 +121,6 @@ if ( ! empty( $fandpipo_params ) ) {
     
             <input class="search-input wcfmmp-radius-addr" type="text" size="9" autocomplete="off" autocapitalize="off" placeholder="Rechercher une adresse..." role="search" id="wcfmmp_radius_addr" name="wcfmmp_radius_addr" style="display: block; float: none;" value="<?php echo isset($_GET['wcfmmp_radius_addr']) ? esc_attr(sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_addr']))) : ''; ?>">
             <ul class="search-tooltip" style="display: none;"></ul>
-            <a class="search-cancel" id="wcfm_radius_search_clear" href="#" title="Cancel" style="display: none;">
-            <span>⊗</span>
             </a>
             <a class="search-button" href="#" title="Search..."></a>
             <div class="search-alert" style="display: none;"></div>
@@ -142,7 +140,7 @@ if ( ! empty( $fandpipo_params ) ) {
     <?php // phpcs:enable WordPress.Security.NonceVerification.Recommended
     else : ?>
         <select name="fandpipo_country" id="pickup-country" onchange="this.form.submit()"> 
-            <option value="">Tous les pays</option>
+            <option value=""><?php echo __('All countries', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
             <?php foreach ($countries as $fandpipo_code => $fandpipo_name) : ?>
                 <option value="<?php echo esc_attr($fandpipo_code); ?>" <?php selected($fandpipo_selected_country, $fandpipo_code); ?>>
                     <?php echo esc_html($fandpipo_name); ?>
@@ -151,7 +149,7 @@ if ( ! empty( $fandpipo_params ) ) {
         </select>
 
         <select name="state" id="pickup-state" class="select2 select2-container select2-container--default">
-            <option value="">Départements / Régions</option> <!-- obligatoire pour allowClear -->
+            <option value=""><?php echo __('Departments / Regions', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option> <!-- obligatoire pour allowClear -->
             <?php
             global $wpdb;
             $fandpipo_states = [];//$wpdb->get_col( "SELECT DISTINCT state FROM {$wpdb->prefix}ultimate_pickup_locations WHERE state != '' ORDER BY state ASC" );

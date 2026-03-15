@@ -23,40 +23,89 @@ msgstr ""
 msgid "fand-pickup-points-ultimate"
 msgstr "fand-pickup-points-ultimate"
 
-#: plugin.php
-msgid "Échec de la vérification de sécurité."
-msgstr "Échec de la vérification de sécurité."
+msgid "Pickup Locations Page"
+msgstr "Page Emplacements Pickup"
 
-msgid "Horaires quotidiens d'ouverture et de fermeture"
-msgstr "Horaires quotidiens d'ouverture et de fermeture"
-
-msgid "Créneaux horaires"
+msgid "Time Slots"
 msgstr "Créneaux horaires"
 
-msgid "Lundi"
+msgid "All days"
+msgstr "Tous les jours"
+
+msgid "Monday"
 msgstr "Lundi"
 
-msgid "Mardi"
+msgid "Tuesday"
 msgstr "Mardi"
 
-msgid "Mercredi"
+msgid "Wednesday"
 msgstr "Mercredi"
 
-msgid "Jeudi"
+msgid "Thursday"
 msgstr "Jeudi"
 
-msgid "Vendredi"
+msgid "Friday"
 msgstr "Vendredi"
 
-msgid "Samedi"
+msgid "Saturday"
 msgstr "Samedi"
 
-msgid "Dimanche"
+msgid "Sunday"
 msgstr "Dimanche"
 
-msgid "Ouvert"
+msgid "Open"
 msgstr "Ouvert"
 
-msgid "Fermé"
+msgid "Closed"
 msgstr "Fermé"
 
+msgid "Closed to day"
+msgstr "Fermé aujourd’hui"
+
+msgid "Products"
+msgstr "Produits"
+
+msgid "about"
+msgstr "À propos"
+
+msgid "policies"
+msgstr "Politiques"
+
+msgid "reviews"
+msgstr "Avis"
+
+msgid "followers"
+msgstr "Abonnés"
+
+msgid "All categories"
+msgstr "Toutes catégories"
+
+msgid "All countries"
+msgstr "Tous les pays"
+
+msgid "Departments / Regions"
+msgstr "Départements / Régions"
+
+msgid "Sort by oldest to newest"
+msgstr "Trier par ordre chronologique, du plus ancien au plus récent."
+
+msgid "Sort by newest to oldest"
+msgstr "Trier par ordre croissant ou décroissant"
+
+msgid "Alphabetical"
+msgstr "Alphabétique"
+
+msgid "Daily opening and closing times"
+msgstr "Horaires d’ouverture et de fermeture quotidiens"
+
+msgid "Showing %1$s of %2$s results"
+msgstr "Affichage de %1$s sur %2$s résultats"
+
+msgid "No pickup points match your search criteria"
+msgstr "Aucun point de retrait ne correspond à vos critères de recherche"
+
+msgid "All statuses"
+msgstr "Tous les statuts"
+
+msgid "All statuses"
+msgstr "Tous les statuts"

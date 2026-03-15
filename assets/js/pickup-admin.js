@@ -157,7 +157,7 @@
          */
 
         // Tentative de récupération de l'ID
-        let vendorId = $('#vendor_id').val() || $('#user_id').val();
+        /*let vendorId = $('#vendor_id').val() || $('#user_id').val();
         if (!vendorId) {
             const urlParams = new URLSearchParams(window.location.search);
             vendorId = urlParams.get('ID') || urlParams.get('vendor_id');
@@ -234,5 +234,120 @@
                 }
             }
         }
+    });*/
+// --- 3. GESTION DES CATÉGORIES VENDEUR ---
+        // On récupère l'ID du vendeur
+        let vendorId = $('#vendor_id').val() || $('#user_id').val();
+        if (!vendorId) {
+            const urlParams = new URLSearchParams(window.location.search);
+            vendorId = urlParams.get('ID') || urlParams.get('vendor_id');
+        }
+
+        if (vendorId && config.ajax_url) {
+            $.ajax({
+                url: config.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'fandpipo_get_vendor_categories',
+                    vendor_id: vendorId,
+                    security: config.fandpipogetCategoriesNonce
+                },
+                success: function(response) {
+                    const savedValues = (response.success && response.data) ? response.data : [];
+                    const categories = config.categories || [];
+                    if (categories.length > 0) {
+                        injectCategoryField(categories, savedValues);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erreur AJAX catégories :", error);
+                    injectCategoryField(config.categories || [], []);
+                }
+            });
+        }
+
+        // --- FONCTIONS UTILITAIRES ---
+
+        function injectCategoryField(allCategories, savedValues) {
+            if (!allCategories || !Array.isArray(allCategories)) return; 
+
+            const selectedList = Array.isArray(savedValues) ? savedValues : [];
+
+            let optionsHtml = allCategories.map(cat => {
+                let displayValue = (typeof cat === 'object' && cat !== null) ? (cat.nom || cat.name || "") : cat;
+                const isSelected = selectedList.includes(displayValue) ? 'selected="selected"' : '';
+                return `<option value="${displayValue}" ${isSelected}>${displayValue}</option>`;
+            }).join('');
+
+            let htmlInject = `
+                <p class="store_main_category wcfm_title wcfm_ele">
+                    <strong>Catégories d'activité (choix multiples)<span class="required">*</span></strong>
+                    <br>
+                    <span style="font-weight: normal; font-size: 11px; color: #666; display: block; margin-top: 2px;">
+                        Maintenez Ctrl (ou Cmd) pour sélectionner plusieurs activités.
+                    </span>
+                </p>
+                <select id="wcfm_store_main_category" name="wcfm_store_main_category[]" class="wcfm-select wcfm_ele" multiple="multiple" style="margin-bottom: 15px; height: auto; min-height: 100px; width: 60%;">
+                    ${optionsHtml}
+                </select>`;
+
+            const $slugInput = $('#store_slug');
+            if ($slugInput.length > 0 && $('#wcfm_store_main_category').length === 0) {
+                $slugInput.after(htmlInject);
+                if ($.fn.select2) {
+                    $('#wcfm_store_main_category').select2({ placeholder: "Choisir des activités..." });
+                }
+            }
+        }
+
+        function getPickupHoursData() {
+            var day_times = {};
+            $('.multi_input_holder').each(function() {
+                var day_index = $(this).attr('data-fandpipo_day'); 
+                day_times[day_index] = [];
+                $(this).find('.multi_input_block').each(function() {
+                    var start = $(this).find('input[data-name="start"]').val();
+                    var end   = $(this).find('input[data-name="end"]').val();
+                    var id    = $(this).find('input[data-name="id"]').val() || 0;
+                    if (start || end) {
+                        day_times[day_index].push({ start: start, end: end, id: id });
+                    }
+                });
+            });
+            return day_times;
+        }
+
+        $(document).on('click', '.branch-header-wrap .back', function(e) { 
+            e.preventDefault(); 
+            $('#custom_branch_hours').remove(); 
+        }); 
+
+        $(document).on('click', '.add_multi_input_block', function() {
+            var holder = $(this).closest('.multi_input_holder');
+            var day = holder.attr('data-fandpipo_day'); 
+            var index = holder.find('.multi_input_block').length;
+            var template = $($('#new-time-slot-template').html());
+            template.find('input[data-name="start"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][start]');
+            template.find('input[data-name="end"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][end]');
+            template.find('input[data-name="id"]').attr('name', 'wcfm_pickup_hours[day_times][' + day + '][' + index + '][id]').val(0);
+            holder.append(template);
+            var $tabWrap = $('.wcfm-tabWrap');
+            if ($tabWrap.length > 0) {
+                var currentHeight = parseInt($tabWrap.css('height'), 10);
+                $tabWrap.css('height', (currentHeight + 103) + 'px');
+            }
+        });
+
+        $(document).on('click', '.remove_multi_input_block', function() {
+            var holder = $(this).closest('.multi_input_holder');
+            $(this).closest('.multi_input_block').remove();
+            var $tabWrap = $('.wcfm-tabWrap');
+            if ($tabWrap.length > 0) {
+                var currentHeight = parseInt($tabWrap.css('height'), 10);
+                if (currentHeight > 1100) {
+                    $tabWrap.css('height', Math.max(1100, currentHeight - 103) + 'px');
+                }
+            }
+        });
     });
 })(jQuery);

@@ -5,7 +5,7 @@ Mots-clés : wcfm, woocommerce, pickup points, marketplace, vendor locations
 Version minimale requise : 6.9
 Testé jusqu'à : 6.9
 PHP requis : 8.2
-Version stable : 1.0.1
+Version stable : 1.0.3
 Licence : GPLv2 ou ultérieure
 URI de la licence : https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,12 @@ L'édition Ultimate inclut des marqueurs par défaut, mais elle est également c
 4. **Carte client :** Carte interactive Leaflet affichant les points de retrait avec des filtres d'activité.
 
 == Journal des modifications ==
+
+= 1.0.3 =
+* Ajout traduction
+
+= 1.0.2 =
+* Ajout de la recherche par géolocalisation dynamique
 
 = 1.0.1 =
 * Ajout de la recherche par géolocalisation

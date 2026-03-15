@@ -16,7 +16,7 @@ $fandpipo_selected_category   = isset($_GET['fandpipo_category']) ? sanitize_tex
 $fandpipo_current_lat  = isset($_GET['wcfmmp_radius_lat']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lat'])) : '';
 $fandpipo_current_lng  = isset($_GET['wcfmmp_radius_lng']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_lng'])) : '';
 $fandpipo_current_addr = isset($_GET['wcfmmp_radius_addr']) ? sanitize_text_field(wp_unslash($_GET['wcfmmp_radius_addr'])) : '';
-$fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslash($_GET['wcfmmp_radius_range'])) : 50;?>
+$fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslash($_GET['wcfmmp_radius_range'])) : 5;?>
 
 <div id="wcfmmp-stores-wrap-holder" class="rgt right_side right_side_full">
     <div id="wcfmmp-stores-wrap">
@@ -34,34 +34,34 @@ $fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslas
 
                     <select id="wcfmmp_pickup_store_orderby" name="fandpipo_pickup_orderby" class="orderby" onchange="this.form.submit()">
                         <option value="newness_asc" <?php selected($fandpipo_current_orderby, 'newness_asc'); ?>>
-                            Trier plus vieux au plus récent
+                            <?php echo __('Sort by oldest to newest', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?>
                         </option>
                         <option value="newness_desc" <?php selected($fandpipo_current_orderby, 'newness_desc'); ?>>
-                            Trier du plus récent au plus vieux
+                            <?php echo __('Sort by newest to oldest', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?>
                         </option>
                         <option value="alphabetical_asc" <?php selected($fandpipo_current_orderby, 'alphabetical_asc'); ?>>
-                            Alphabétique : A → Z
+                            <?php echo __('Alphabetical : A → Z', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?>
                         </option>
                         <option value="alphabetical_desc" <?php selected($fandpipo_current_orderby, 'alphabetical_desc'); ?>>
-                            Alphabétique : Z → A
+                            <?php echo __('Alphabetical : Z → A', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?>
                         </option>
                     </select>
 
                     <select id="wcfmmp_pickup_store_day" name="fandpipo_pickup_day" class="orderby" onchange="this.form.submit()">
-                        <option value="">Tous les jours</option>
-                        <option value="0" <?php selected($fandpipo_current_day, '0'); ?>>Lundi</option>
-                        <option value="1" <?php selected($fandpipo_current_day, '1'); ?>>Mardi</option>
-                        <option value="2" <?php selected($fandpipo_current_day, '2'); ?>>Mercredi</option>
-                        <option value="3" <?php selected($fandpipo_current_day, '3'); ?>>Jeudi</option>
-                        <option value="4" <?php selected($fandpipo_current_day, '4'); ?>>Vendredi</option>
-                        <option value="5" <?php selected($fandpipo_current_day, '5'); ?>>Samedi</option>
-                        <option value="6" <?php selected($fandpipo_current_day, '6'); ?>>Dimanche</option>
+                        <option value=""><?php echo __('All days', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="0" <?php selected($fandpipo_current_day, '0'); ?>><?php echo __('Monday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="1" <?php selected($fandpipo_current_day, '1'); ?>><?php echo __('Tuesday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="2" <?php selected($fandpipo_current_day, '2'); ?>><?php echo __('Wednesday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="3" <?php selected($fandpipo_current_day, '3'); ?>><?php echo __('Thursday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="4" <?php selected($fandpipo_current_day, '4'); ?>><?php echo __('Friday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="5" <?php selected($fandpipo_current_day, '5'); ?>><?php echo __('Saturday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="6" <?php selected($fandpipo_current_day, '6'); ?>><?php echo __('Sunday', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
                     </select>
 
                     <select id="wcfmmp_pickup_store_status" name="fandpipo_pickup_status" class="orderby" onchange="this.form.submit()">
-                        <option value="" <?php selected($fandpipo_current_status, ''); ?>>Tout</option>
-                        <option value="open" <?php selected($fandpipo_current_status, 'open'); ?>>Ouvert</option>
-                        <option value="closed" <?php selected($fandpipo_current_status, 'closed'); ?>>Fermé</option>
+                        <option value="" <?php selected($fandpipo_current_status, ''); ?>><?php echo __('All statuses', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="open" <?php selected($fandpipo_current_status, 'open'); ?>><?php echo __('Open', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
+                        <option value="closed" <?php selected($fandpipo_current_status, 'closed'); ?>><?php echo __('Closed', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?></option>
                     </select>
 
                     <?php
@@ -127,8 +127,16 @@ $fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslas
 
                     // 4. LE TRI FONCTIONNEL
                     usort($fandpipo_flat_list, function($fand_a,  $fand_b) use ($fandpipo_orderby) {
+                        // Si vous avez calculé la distance dans le modèle et l'avez passée dans l'objet branch
+                        // vous pouvez ajouter ce bloc :
+                        
+                        if ($fandpipo_orderby === 'distance_asc') {
+                            return ($fand_a['distance'] ?? 0) <=> ($fand_b['distance'] ?? 0);
+                        }
+                        
                         $nameA = $fand_a['branch_name'] ?? $fand_a['name'] ?? '';
                         $nameB =  $fand_b['branch_name'] ??  $fand_b['name'] ?? '';
+                        
                         if ($fandpipo_orderby === 'alphabetical_asc') return strcmp($nameA, $nameB);
                         if ($fandpipo_orderby === 'alphabetical_desc') return strcmp($nameB, $nameA);
                         if ($fandpipo_orderby === 'newness_asc') return $fand_a['ID'] -  $fand_b['ID'];
@@ -201,7 +209,7 @@ $fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslas
 
                     $fandpipo_branch_id =  $fandpipo_branch['ID'];
 
-                    // --- LOGIQUE HORAIRES & OUVERTURE ---
+                    // --- LOGIQUE HORAIRES & OpenURE ---
                     $fandpipo_now = current_time('H:i:s'); // Heure locale WordPress
                     $fandpipo_php_day_index = (int) current_time( 'w' );
                     $fandpipo_current_real_day = ($fandpipo_php_day_index == 0) ? 6 : $fandpipo_php_day_index - 1;
@@ -283,12 +291,19 @@ $fandpipo_current_range = isset($_GET['wcfmmp_radius_range']) ? intval(wp_unslas
             if ( 0 === $fandpipo_displayed_count ) : 
             ?>
                 <div class="wcfm-info" style="display: block; clear: both; margin: 20px 0; padding: 15px; background-color: #e7f7ff; border-left: 4px solid #2196f3;">
-                    Aucun point de retrait ne correspond à vos critères de recherche.
+                    <?php echo __('No pickup points match your search criteria.', 'fand-pickup-points-ultimate-edition-for-wcfm'); ?>
                 </div>
             <?php endif; ?>
 
             <p class="woocommerce-result-count">
-                Montrer <?php echo esc_html( $fandpipo_displayed_count ); ?> résultat<?php echo ($fandpipo_displayed_count > 1 ? 's' : ''); ?>
+                <?php
+                $total_results = count($fandpipo_flat_list);
+                printf(
+                    __('Showing %1$s of %2$s results', 'fand-pickup-points-ultimate-edition-for-wcfm'),
+                    esc_html($fandpipo_displayed_count),
+                    esc_html($total_results)
+                );
+                ?>
             </p>
 
             </div></div></div><div class="spacer"></div>

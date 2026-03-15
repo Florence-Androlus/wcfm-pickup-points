@@ -2,6 +2,7 @@
 
 namespace fandWCFMPickupPoints\Classes\Admin;
 
+use fandWCFMPickupPoints\Classes\Database\Database;
 use fandWCFMPickupPoints\Classes\Models\BranchModel;
 use fandWCFMPickupPoints\Classes\Models\PickupModel;
 
@@ -58,16 +59,16 @@ class Scripts {
         // JS spécifique pickup
         wp_enqueue_script('pickup-admin', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-admin.js', ['jquery'], '1.0', true);
 
-        // On ne cherche plus l'ID ici, car il n'est pas fiable au chargement
-        $liste_brute = get_option('fandpipo_liste_categories_boutique', 'Alimentation, Évènementiel, Foodtruck');
-        $categories_array = array_map('trim', explode(',', $liste_brute));
+        // --- RÉCUPÉRATION DES CATÉGORIES DEPUIS LA BDD ---
+        // On utilise ta nouvelle classe Database
+        $categories_objets = Database::get_all_categories();
 
         $common_data = [
-            'ajax_url'           => admin_url('admin-ajax.php'),
+            'ajax_url'                  => admin_url('admin-ajax.php'),
             'fandpipoloadPickupNonce'    => wp_create_nonce('fandpipo_load_pickup_hours_nonce'),
             'fandpiposavePickupNonce'    => wp_create_nonce('fandpipo_save_pickup_hours_nonce'),
             'fandpipogetCategoriesNonce' => wp_create_nonce('fandpipo_get_categories_nonce'),
-            'categories'         => $categories_array,
+            'categories'                 => $categories_objets,
         ];
 
         // CSS spécifique pickup
@@ -103,8 +104,8 @@ class Scripts {
                 // --- CAS PAGE CARTE GLOBALE ---
                 $data = PickupModel::fandpipo_getPickupData([]);
                 $map_markers = $data['fandpipo_markers'];
-                $lat = get_query_var('fandpipo_lat', 46.6);
-                $lng = get_query_var('fandpipo_lng', 2.4);
+                $lat = filter_input(INPUT_GET, 'fandpipo_lat', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) ?: 43.1785; 
+                $lng = filter_input(INPUT_GET, 'fandpipo_lng', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) ?: 6.5208;
             }
 
             $map_settings = [

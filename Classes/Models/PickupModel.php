@@ -253,31 +253,40 @@ class PickupModel {
                 // On ne garde que les branches qui acceptent le pickup
                 if (empty($offers_pickup_map[$branch['ID']]) || $offers_pickup_map[$branch['ID']] != '1') continue;
 
-                $pickup_only_branches[] = $branch;
+                //$pickup_only_branches[] = $branch;
                 $lat = $branch['latitude'] ?? '';
                 $lng = $branch['longitude'] ?? '';
 
                 if (!empty($lat) && !empty($lng)) {
                     // --- LOGIQUE DE FILTRE PAR RAYON ---
                     if (!empty($filters['radius_lat']) && !empty($filters['radius_lng'])) {
-                        $lat_from = deg2rad(floatval($filters['radius_lat']));
-                        $lng_from = deg2rad(floatval($filters['radius_lng']));
-                        $lat_to   = deg2rad(floatval($lat));
-                        $lng_to   = deg2rad(floatval($lng));
+                        $lat_from = floatval($filters['radius_lat']);
+                        $lng_from = floatval($filters['radius_lng']);
+                        $lat_to   = floatval($lat);
+                        $lng_to   = floatval($lng);
+                        $radius_range = floatval($filters['radius_range']);
 
-                        // Formule de la Grande Cercle (Haversine simplifiée)
-                        $inner_val = cos($lat_from) * cos($lat_to) * cos($lng_to - $lng_from) + sin($lat_from) * sin($lat_to);
+                        // Rayon de la Terre en km
+                        $earth_radius = 6371;
+
+                        $dLat = deg2rad($lat_to - $lat_from);
+                        $dLon = deg2rad($lng_to - $lng_from);
+
+                        $a = sin($dLat / 2) * sin($dLat / 2) +
+                            cos(deg2rad($lat_from)) * cos(deg2rad($lat_to)) *
+                            sin($dLon / 2) * sin($dLon / 2);
                         
-                        // Sécurité pour acos (ne doit jamais dépasser 1 ou -1)
-                        if ($inner_val > 1) $inner_val = 1;
-                        if ($inner_val < -1) $inner_val = -1;
+                        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                        $distance = $earth_radius * $c;
 
-                        $distance = 6371 * acos($inner_val);
-
-                        if ($distance > $filters['radius_range']) {
-                            continue; // Trop loin !
+                        if ($distance > $radius_range) {
+                            continue; // La branche est en dehors du rayon, on passe à la suivante
                         }
                     }
+
+                    // 3. Si on arrive ici, la branche est valide et dans le rayon
+                    $pickup_only_branches[] = $branch;
+
                     // -----------------------------------
                     $branch_name = $branch['name'] ?? 'Pickup';
                     $branch_slug = sanitize_title($branch_name); 
