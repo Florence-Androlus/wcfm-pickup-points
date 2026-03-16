@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Fand Pickup Points : Ultimate Edition for WCFM
  * Description: Gestion avancée des points de retrait pour WCFM Marketplace. Développé par Fan-develop.
- * Version:            1.0.3
+ * Version:            1.0.4
  * Requires at least:  6.9
  * Requires PHP:       8.2
  * Requires Plugins:   woocommerce,wc-frontend-manager
@@ -37,7 +37,7 @@
 
     add_filter('doing_it_wrong_trigger_error', '__return_false');
 
-    define('FANDPIPO_VERSION', '1.0.3');
+    define('FANDPIPO_VERSION', '1.0.4');
     define('FANDPIPO_MAIN_FILE', __FILE__);
     define('FANDPIPO_PLUGIN_URL', plugin_dir_url(__FILE__));
     define('FANDPIPO_PLUGIN_DIR', plugin_dir_path(__FILE__));

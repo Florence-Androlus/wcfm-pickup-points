@@ -122,7 +122,7 @@ class PickupModel {
         // --- 1. Initialisation des variables ---
         $fandpipo_markers = [];
         $fandpipo_vendors_data = [];
-        $fandpipo_day = $filters['day'] ?? '';
+        $fandpipo_day = $filters['fandpipo_day'] ?? '';
         $fandpipo_status = $filters['fandpipo_status'] ?? '';
         $fandpipo_orderby = $filters['fandpipo_orderby'] ?? '';
 

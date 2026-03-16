@@ -4,7 +4,7 @@ Tags: wcfm, woocommerce, pickup points, marketplace, vendor locations
 Requires at least: 6.9
 Tested up to:      6.9
 Requires PHP:      8.2
-Stable tag:        1.0.3
+Stable tag:        1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -88,6 +88,8 @@ The Ultimate Edition includes default markers, but it is also compatible with st
 4. **Customer Map:** Interactive Leaflet map displaying pickup locations with activity filters.
 
 == Changelog ==
+= 1.0.4 =
+* Added pickup list based on dynamic geolocation
 
 = 1.0.3 =
 * Added traduct
