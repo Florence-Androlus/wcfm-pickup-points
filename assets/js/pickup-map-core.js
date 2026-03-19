@@ -1,5 +1,9 @@
 window.map = null;
 window.searchCircle = null;
+var fandpipo_markers = []; // INDISPENSABLE pour la version PRO
+window.iconClosed = null; 
+window.iconOpen = null;
+var popupThreshold = 10;
 window.FandPipoState = {
     debounceTimer: null,
     lastLat: 0,
@@ -48,18 +52,50 @@ document.addEventListener('DOMContentLoaded', () => {
         window.map.fitBounds(circle.getBounds(), { padding: [20, 20] });
     };
 
-    // 4. Marqueurs
-    const icon = L.icon({ 
-        iconUrl: window.location.origin + "/wp-content/plugins/wc-frontend-manager/includes/libs/leaflet/images/marker-icon.png", 
-        iconSize: [25, 41], iconAnchor: [20, 57], popupAnchor: [0, -57] 
-    });
+   // 4. Icônes et Marqueurs
+    const wcfmIconUrl = window.location.origin + "/wp-content/plugins/wc-frontend-manager/includes/libs/leaflet/images/marker-icon.png";
+    window.iconClosed = L.icon({ iconUrl: wcfmIconUrl, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] });
+    window.iconOpen = window.iconClosed;
 
-    fandpipoData.markers.forEach(p => {
-        const marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(window.map);
-        if (!fandpipoData.isSingleView && typeof getMainPopupContent === 'function') {
-            marker.bindPopup(getMainPopupContent(p));
-        }
-    });
+    if (typeof window.setupProIcons === 'function') {
+        window.setupProIcons(); 
+    }
+
+    // 4. CRÉATION DES MARQUEURS
+    if (fandpipoData && fandpipoData.markers) {
+        console.log("Nombre de marqueurs à créer :", fandpipoData.markers.length);
+
+        fandpipoData.markers.forEach((p, index) => {
+            // Vérification que les coordonnées existent pour ce point précis
+            if (!p.lat || !p.lng) {
+                console.warn(`Le marqueur ${index} n'a pas de coordonnées valides.`);
+                return; // On passe au suivant au lieu de tout bloquer
+            }
+
+            const isPro = (typeof PickupProData !== 'undefined' && PickupProData.is_licensed == 1);
+            let currentIcon = window.iconClosed;
+
+            // Calcul de l'icône Pro
+            if (isPro && typeof window.checkIsOpen === 'function') {
+                currentIcon = window.checkIsOpen(p) ? window.iconOpen : window.iconClosed;
+            }
+
+            // Création physique du marqueur
+            const marker = L.marker([p.lat, p.lng], { icon: currentIcon }).addTo(window.map);
+
+            // Bind du popup
+            if (isPro && typeof getMainPopupContent === 'function') {
+                marker.bindPopup(getMainPopupContent(p));
+            } else {
+                marker.bindTooltip(p.branch_name || "Point de retrait");
+            }
+
+            // Stockage pour la mise à jour dynamique
+            p.marker = marker;
+            p.popupType = null;
+            window.fandpipo_markers.push(p);
+        });
+    }
 
     // 5. Événement : Déplacement (Début)
     window.map.on('movestart', () => {
@@ -77,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const range = parseInt(document.getElementById("wcfmmp_radius_range")?.value) || 5;
 
         // Mise à jour fluide du cercle existant
-        updateSearchCircle(startLat, startLng, startRange);
+       updateSearchCircle(center.lat, center.lng, range)
 
         document.getElementById("wcfmmp_radius_lat").value = center.lat.toFixed(4);
         document.getElementById("wcfmmp_radius_lng").value = center.lng.toFixed(4);
@@ -124,6 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const form = document.querySelector('.wcfmmp-store-search-form');
         if (form) form.submit();
     };
+
+    // 8. Lancement Initial PRO
+    if (typeof window.updateMarkers === 'function' && typeof PickupProData !== 'undefined' && PickupProData.is_licensed == 1) {
+        window.updateMarkers();
+        setInterval(window.updateMarkers, 60000);
+    }
 
     updateSearchCircle(startLat, startLng, startRange);
 });

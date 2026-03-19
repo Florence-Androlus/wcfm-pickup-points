@@ -160,7 +160,7 @@ class Scripts {
             wp_enqueue_script('pickup-map-filter-system', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-filter-system.js', ['jquery', 'pickup-map-time-utils'], FANDPIPO_VERSION, true);
             //wp_enqueue_script('pickup-map-geoloc', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-geoloc.js', ['jquery', 'leaflet-js'], FANDPIPO_VERSION, true);
             wp_enqueue_script('pickup-map-core', FANDPIPO_PLUGIN_URL . 'assets/js/pickup-map-core.js', ['jquery', 'leaflet-js', 'pickup-map-filter-system'], FANDPIPO_VERSION, true);
-            
+            wp_localize_script('pickup-map-time-utils', 'fandpipoData', $map_settings);
             // Localisation (indispensable pour passer les données PHP vers JS)
             wp_localize_script('pickup-map-core', 'fandpipoData', $map_settings);
 
@@ -174,6 +174,7 @@ class Scripts {
                 'ajaxurl' => admin_url('admin-ajax.php'),
                 'nonce'   => wp_create_nonce('fandpipo_filter_nonce')
             ]);
+
             wp_enqueue_script('select2-js', FANDPIPO_PLUGIN_URL . 'assets/js/select2.min.js', ['jquery'], '4.1.0', true);
             
 
